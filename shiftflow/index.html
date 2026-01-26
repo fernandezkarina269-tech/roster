@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ShiftFlow V56 - DreamArt Growth</title>
+    <title>ShiftFlow V57 - DreamArt Ultimate</title>
     <style>
         :root {
             --shift1: #fef9c3; --shift2: #e0f2fe; --shift3: #f3f4f6;
@@ -12,13 +12,13 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; margin: 0; padding: 0; color: #f8fafc; }
         .hidden { display: none !important; }
 
-        /* LOGIN */
+        /* LOGIN - INDESTRUCTIBLE */
         #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-card { background: #fff; color: #000; padding: 35px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid #FFD700; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 16px; }
         .btn-main { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
 
-        /* APP */
+        /* APP VIEW */
         #view-app { background: #f1f5f9; color: #1e293b; min-height: 100vh; display: none; }
         .nav { background: #000; color: #fff; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #FFD700; position: sticky; top: 0; z-index: 1000; }
         
@@ -26,13 +26,13 @@
         .btn-ctrl { background: #334155; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .btn-gold { background: #FFD700; color: black; }
 
-        /* POD CARDS */
+        /* PODS */
         .pods-container { padding: 20px; display: flex; flex-direction: column; gap: 30px; }
         .pod-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
         .pod-header { padding: 12px 20px; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
         .h-A { background: var(--podA); } .h-B { background: var(--podB); } .h-F { background: var(--podF); } 
         .h-BACKUP { background: var(--podBackup); } .h-MGR { background: var(--mgrCol); color: #3730a3; }
-        .goal-success { background: var(--goalMet) !important; color: #166534 !important; }
+        .goal-success { background: var(--goalMet) !important; color: #166534 !important; border: 1px solid #bbf7d0; }
 
         /* TABLES */
         .table-wrapper { overflow-x: auto; position: relative; }
@@ -41,7 +41,11 @@
         td { padding: 10px; text-align: center; font-weight: bold; border-bottom: 1px solid #f1f5f9; background: white; color: #334155; }
         
         .sticky-col { position: sticky; left: 0; z-index: 20; background: #fff !important; border-right: 2px solid #e2e8f0 !important; text-align: left !important; padding-left: 20px !important; }
-        .sc-2 { left: 100px; } .sc-3 { left: 200px; width: 180px; }
+        .sc-2 { left: 100px; } .sc-3 { left: 200px; width: 220px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* DELETE BUTTON */
+        .btn-del { background: #fee2e2; color: #ef4444; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 9px; margin-left: 5px; visibility: hidden; }
+        tr:hover .btn-del { visibility: visible; }
 
         .sales-tag { display: block; font-size: 10px; color: #059669; margin-top: 4px; font-style: italic; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; }
@@ -53,11 +57,11 @@
     <div id="view-login">
         <div class="login-card">
             <h1>ShiftFlow</h1>
-            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART GROWTH V56</p>
-            <input type="text" id="user-in" placeholder="Username">
+            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART ULTIMATE V57</p>
+            <input type="text" id="user-in" placeholder="Username" autocomplete="off">
             <input type="password" id="pass-in" placeholder="Password">
-            <button class="btn-main" onclick="auth()">LOG IN</button>
-            <button onclick="bypass()" style="margin-top:20px; background:red; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;">⚠️ EMERGENCY BYPASS (KARINA)</button>
+            <button class="btn-main" onclick="processAuth()">LOG IN</button>
+            <button onclick="karinaBypass()" style="margin-top:20px; background:red; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%; font-size:12px;">⚠️ EMERGENCY BYPASS (KARINA)</button>
         </div>
     </div>
 
@@ -66,4 +70,216 @@
             <div style="font-size:20px; font-weight:900;">DREAMART</div>
             <div>
                 <span id="user-display" style="color:gold; font-weight:bold; margin-right:15px; text-transform:uppercase;"></span>
-                <button class="btn-ctrl btn-gold" onclick="openStats()">📊 STAT
+                <button class="btn-ctrl btn-gold" onclick="openStats()">📊 STATS</button>
+                <button id="btn-add" class="hidden btn-ctrl btn-gold" onclick="openAdd()">+ ADD PERSON</button>
+                <button class="btn-ctrl" onclick="location.reload()" style="background:red;">LOG OUT</button>
+            </div>
+        </div>
+        <div class="controls">
+            <button class="btn-ctrl" onclick="changeWeek(-1)">❮ PREV</button>
+            <div id="week-label" style="font-weight:900; color:#1e293b; min-width:200px; text-align:center;"></div>
+            <button class="btn-ctrl" onclick="changeWeek(1)">NEXT ❯</button>
+        </div>
+        <div id="pods-area" class="pods-container"></div>
+    </div>
+
+    <div id="modal-add" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Add New Member</h3>
+            <input type="text" id="n-name" placeholder="Full Name">
+            <select id="n-role" onchange="document.getElementById('ch-fields').classList.toggle('hidden', this.value==='manager')">
+                <option value="chatter">Chatter</option><option value="manager">Manager</option>
+            </select>
+            <div id="ch-fields">
+                <input type="text" id="n-team" placeholder="Team"><input type="text" id="n-model" placeholder="Model">
+                <select id="n-pod"><option value="A">POD A</option><option value="B">POD B</option><option value="F">POD F</option><option value="BACKUP">BACKUP POD</option></select>
+            </div>
+            <button class="btn-main" onclick="saveNewPerson()">SAVE PERSON</button>
+            <button class="btn-ctrl" style="width:100%; margin-top:10px;" onclick="closeModals()">CANCEL</button>
+        </div>
+    </div>
+
+    <div id="modal-status" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="target-name"></h3>
+            <div id="sales-ui" class="hidden" style="margin-bottom:15px; padding:15px; background:#f0fdf4; border-radius:10px;">
+                <input type="number" id="sales-val" placeholder="Sales ($)">
+                <button class="btn-main" style="background:#10b981;" onclick="applySales()">SAVE SALES</button>
+            </div>
+            <div id="mgr-ui" class="hidden" style="margin-bottom:15px; padding:15px; background:#eef2ff; border-radius:10px;">
+                <select id="mgr-pod-sel"><option value="A">POD A</option><option value="B">POD B</option><option value="F">POD F</option><option value="BACKUP">BACKUP</option></select>
+                <button class="btn-main" style="background:#4f46e5;" onclick="applyMgrPod()">CONFIRM POD</button>
+            </div>
+            <div id="status-btns">
+                <button id="btn-sales" class="btn-ctrl btn-gold" style="width:100%; margin-bottom:10px;" onclick="document.getElementById('sales-ui').classList.toggle('hidden')">💸 ADD SALES</button>
+                <button class="btn-main" style="background:green; margin-bottom:8px;" onclick="handleWorking()">WORKING</button>
+                <button class="btn-main" style="background:orange; margin-bottom:8px;" onclick="saveStatus('ABSENT')">ABSENT</button>
+                <button class="btn-main" style="background:red;" onclick="saveStatus('OFF')">OFF</button>
+            </div>
+            <button class="btn-ctrl" style="width:100%; margin-top:15px;" onclick="closeModals()">CANCEL</button>
+        </div>
+    </div>
+
+    <div id="modal-stats" class="modal-overlay"><div class="modal-box"><h2>30-Day Stats</h2><div id="stats-data"></div><button class="btn-ctrl" style="width:100%; margin-top:15px;" onclick="closeModals()">CLOSE</button></div></div>
+
+<script>
+    // --- AUTH LOGIC (ISOLATED) ---
+    const ADMINS = ["karina", "exequiel", "argenis", "andre"];
+    const MANAGERS = ["shirly", "maria", "heilen", "michel", "gustavo", "rafael", "johanny", "victor", "david", "camila", "gabriel"];
+
+    function processAuth() {
+        const u = document.getElementById('user-in').value.toLowerCase().trim();
+        const p = document.getElementById('pass-in').value.trim();
+        if(p === '1234' && (ADMINS.includes(u) || MANAGERS.includes(u))) {
+            window.sessionUser = u; window.sessionRole = ADMINS.includes(u) ? 'admin' : 'manager';
+            boot();
+        } else { alert("Access Denied"); }
+    }
+    function karinaBypass() { window.sessionUser = "karina"; window.sessionRole = "admin"; boot(); }
+
+    // --- APP LOGIC ---
+    let db = { emps: [], mgrs: [], sched: {}, sales: {}, mgr_pods: {}, goals: {A:500, B:500, F:500, BACKUP:200} };
+    let weekOffset = 0, cell = null;
+
+    function boot() {
+        try {
+            const saved = localStorage.getItem('SF_ULTIMATE_V57');
+            if(saved) db = JSON.parse(saved);
+        } catch(e) { console.error("Clean start triggered"); }
+
+        document.getElementById('view-login').style.display = 'none';
+        document.getElementById('view-app').style.display = 'block';
+        document.getElementById('user-display').innerText = window.sessionUser;
+        if(window.sessionRole === 'admin') document.getElementById('btn-add').classList.remove('hidden');
+        render();
+    }
+
+    function getDates(off) {
+        const curr = new Date(); const day = curr.getDay();
+        const diff = curr.getDate() - day + (day === 0 ? -6 : 1) + (off * 7);
+        const mon = new Date(curr.setDate(diff)); const res = [];
+        for(let i=0; i<7; i++) {
+            const dt = new Date(mon); dt.setDate(mon.getDate() + i);
+            res.push({ label: `${dt.getDate()}/${dt.getMonth()+1}`, key: `${dt.getFullYear()}-${dt.getMonth()+1}-${dt.getDate()}` });
+        }
+        return res;
+    }
+
+    function render() {
+        const area = document.getElementById('pods-area'); area.innerHTML = '';
+        const week = getDates(weekOffset);
+        document.getElementById('week-label').innerText = `DATES: ${week[0].key} - ${week[6].key}`;
+        const todayK = `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`;
+
+        ['A','B','F','BACKUP'].forEach(pod => {
+            const pEmps = db.emps.filter(e => e.pod === pod);
+            let podRev = 0;
+            pEmps.forEach(e => podRev += (db.sales[e.id] ? db.sales[e.id][todayK] || 0 : 0));
+            const goalMet = podRev >= (db.goals[pod] || 0);
+
+            let h = `<div class="pod-card"><div class="pod-header h-${pod} ${goalMet ? 'goal-success' : ''}">
+                <span>POD ${pod}</span><span style="font-size:11px">Revenue: $${podRev} / Goal: $${db.goals[pod]}</span>
+                </div><div class="table-wrapper"><table><thead><tr><th class="sticky-col">TEAM</th><th class="sticky-col sc-2">MODEL</th><th class="sticky-col sc-3">CHATTER</th>`;
+            week.forEach(d => h += `<th>${d.label}</th>`);
+            h += `</tr></thead><tbody>`;
+            pEmps.forEach(e => {
+                h += `<tr><td class="sticky-col">${e.team}</td><td class="sticky-col sc-2">${e.model}</td>
+                    <td class="sticky-col sc-3">
+                        <span>${e.name}</span>
+                        ${window.sessionRole==='admin'?`<button class="btn-del" onclick="deletePerson(${e.id},'chatter')">✖</button>`:''}
+                    </td>`;
+                week.forEach(d => {
+                    const st = db.sched[e.id] ? db.sched[e.id][d.key] || 'ON' : 'ON';
+                    const sl = db.sales[e.id] ? db.sales[e.id][d.key] || 0 : 0;
+                    h += `<td onclick="openStatus(${e.id},'${d.key}','${e.name}','chatter')"><span class="${st==='OFF'?'st-OFF':st==='ABSENT'?'st-ABSENT':''}">${st==='ON'?'●':st}</span>${sl>0?`<span class="sales-tag">$${sl}</span>`:''}</td>`;
+                });
+                h += `</tr>`;
+            });
+            area.innerHTML += h + `</tbody></table></div></div>`;
+        });
+
+        // Managers
+        let mh = `<div class="pod-card"><div class="pod-header h-MGR">MANAGERS & BACKUPS</div><div class="table-wrapper"><table><thead><tr><th class="sticky-col">ROLE</th><th class="sticky-col sc-2">--</th><th class="sticky-col sc-3">NAME</th>`;
+        week.forEach(d => mh += `<th>${d.label}</th>`);
+        mh += `</tr></thead><tbody>`;
+        db.mgrs.forEach(m => {
+            mh += `<tr><td class="sticky-col">Manager</td><td class="sticky-col sc-2">--</td>
+                <td class="sticky-col sc-3">
+                    <span>${m.name}</span>
+                    ${window.sessionRole==='admin'?`<button class="btn-del" onclick="deletePerson(${m.id},'manager')">✖</button>`:''}
+                </td>`;
+            week.forEach(d => {
+                const st = db.sched[m.id] ? db.sched[m.id][d.key] || 'ON' : 'ON';
+                const assigned = db.mgr_pods[m.id] ? db.mgr_pods[m.id][d.key] || '' : '';
+                mh += `<td onclick="openStatus(${m.id},'${d.key}','${m.name}','manager')">${st==='ON'?'●':st}${assigned?`<div style="font-size:9px;color:blue">POD ${assigned}</div>`:''}</td>`;
+            });
+            mh += `</tr>`;
+        });
+        area.innerHTML += mh + `</tbody></table></div></div>`;
+    }
+
+    function deletePerson(id, type) {
+        if(confirm("Delete this person from the system?")) {
+            if(type === 'chatter') db.emps = db.emps.filter(e => e.id !== id);
+            else db.mgrs = db.mgrs.filter(m => m.id !== id);
+            save();
+        }
+    }
+
+    function saveNewPerson() {
+        const n = document.getElementById('n-name').value.trim();
+        if(!n) return alert("Enter Name");
+        const id = Date.now();
+        if(document.getElementById('n-role').value === 'chatter') {
+            db.emps.push({ id, name: n, team: document.getElementById('n-team').value, model: document.getElementById('n-model').value, pod: document.getElementById('n-pod').value });
+        } else { db.mgrs.push({ id, name: n }); }
+        document.getElementById('n-name').value = ''; save(); closeModals();
+    }
+
+    function applySales() {
+        const v = parseFloat(document.getElementById('sales-val').value) || 0;
+        if(!db.sales[cell.id]) db.sales[cell.id] = {};
+        db.sales[cell.id][cell.key] = v;
+        save(); closeModals();
+    }
+
+    function applyMgrPod() {
+        if(!db.mgr_pods[cell.id]) db.mgr_pods[cell.id] = {};
+        db.mgr_pods[cell.id][cell.key] = document.getElementById('mgr-pod-sel').value;
+        saveStatus('ON');
+    }
+
+    function saveStatus(st) {
+        if(!db.sched[cell.id]) db.sched[cell.id] = {};
+        db.sched[cell.id][cell.key] = st;
+        save(); closeModals();
+    }
+
+    function openStatus(id, key, name, type) {
+        cell = {id, key, name, type};
+        document.getElementById('target-name').innerText = name;
+        document.getElementById('sales-ui').classList.add('hidden');
+        document.getElementById('mgr-ui').classList.add('hidden');
+        document.getElementById('btn-sales').classList.toggle('hidden', type !== 'chatter');
+        document.getElementById('modal-status').style.display='flex';
+    }
+
+    function handleWorking() {
+        if(cell.type === 'manager') document.getElementById('mgr-ui').classList.remove('hidden');
+        else saveStatus('ON');
+    }
+
+    function openAdd() { document.getElementById('modal-add').style.display='flex'; }
+    function save() { localStorage.setItem('SF_ULTIMATE_V57', JSON.stringify(db)); render(); }
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display='none'); }
+    function changeWeek(n) { weekOffset += n; render(); }
+    function openStats() {
+        let rev = {A:0, B:0, F:0, BACKUP:0};
+        db.emps.forEach(e => Object.values(db.sales[e.id]||{}).forEach(s => rev[e.pod] += s));
+        const c = document.getElementById('stats-data'); c.innerHTML = '';
+        Object.keys(rev).forEach(p => c.innerHTML += `<div><b>POD ${p}:</b> $${rev[p]}</div>`);
+        document.getElementById('modal-stats').style.display='flex';
+    }
+</script>
+</body>
+</html>
