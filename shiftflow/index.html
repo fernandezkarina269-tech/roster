@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ShiftFlow V49 - DreamArt Stability</title>
+    <title>ShiftFlow V50 - DreamArt Executive</title>
     <style>
         :root {
             --shift1: #fef9c3; --shift2: #e0f2fe; --shift3: #f3f4f6;
@@ -42,7 +42,7 @@
         /* BADGES */
         .st-OFF { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 3px; border-radius: 4px; }
         .st-ABSENT { background: #fff7ed; color: #c2410c; border: 2px solid #ea580c; padding: 3px; border-radius: 4px; }
-        .sales-tag { display: block; font-size: 10px; color: #059669; margin-top: 4px; }
+        .sales-tag { display: block; font-size: 10px; color: #059669; margin-top: 4px; font-style: italic; }
         .mgr-pod { display: block; font-size: 10px; background: #e0e7ff; color: #3730a3; padding: 2px; border-radius: 3px; margin-top: 4px; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; }
@@ -54,5 +54,38 @@
     <div id="view-login">
         <div class="login-card">
             <h1>ShiftFlow</h1>
-            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART STABILITY V49</p>
-            <input type="text" id="user-in"
+            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART EXECUTIVE V50</p>
+            <input type="text" id="user-in" placeholder="Username">
+            <input type="password" id="pass-in" placeholder="Password">
+            <button class="btn-action btn-gold" style="width:100%; padding:15px;" onclick="login()">LOG IN</button>
+            <button onclick="bypassLogin()" style="margin-top:20px; background:red; color:white; border:none; padding:8px; border-radius:4px; font-weight:bold; cursor:pointer;">⚠️ BYPASS (KARINA)</button>
+        </div>
+    </div>
+
+    <div id="view-app">
+        <div class="nav">
+            <div style="font-size:20px; font-weight:900;">DREAMART</div>
+            <div>
+                <span id="user-display" style="color:gold; font-weight:bold; margin-right:15px; text-transform:uppercase;"></span>
+                <button class="btn-action btn-gold" onclick="openStats()">📊 STATS</button>
+                <button id="btn-add" class="hidden btn-action btn-gold" onclick="openAdd()">+ ADD PERSON</button>
+                <button class="btn-action" onclick="location.reload()" style="background:red;">LOG OUT</button>
+            </div>
+        </div>
+
+        <div style="background:white; display:flex; justify-content:center; gap:20px; padding:15px; border-bottom:1px solid #ddd;">
+            <button class="btn-action" onclick="changeWeek(-1)">❮ PREV WEEK</button>
+            <div id="week-label" style="font-weight:900; color:#1e293b; min-width:200px; text-align:center;"></div>
+            <button class="btn-action" onclick="changeWeek(1)">NEXT WEEK ❯</button>
+        </div>
+
+        <div id="pods-area" class="pods-container"></div>
+    </div>
+
+    <div id="modal-status" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="target-name"></h3>
+            <div id="sales-ui" class="hidden" style="margin-bottom:15px; padding:15px; background:#f0fdf4; border-radius:10px;">
+                <label>Daily Sales ($):</label>
+                <input type="number" id="sales-amount" placeholder="0.00">
+                <button class="
