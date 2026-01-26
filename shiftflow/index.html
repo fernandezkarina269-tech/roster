@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ShiftFlow V44 - DreamArt Command</title>
+    <title>ShiftFlow V46 - DreamArt All-In</title>
     <style>
         :root {
             --shift1: #fef9c3; --shift2: #e0f2fe; --shift3: #f3f4f6;
@@ -11,255 +11,26 @@
         body { font-family: 'Segoe UI', sans-serif; background: #0f172a; margin: 0; padding: 0; color: #f8fafc; }
         .hidden { display: none !important; }
 
+        /* NAV & BASE */
+        .nav { background: #000; color: #fff; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #FFD700; position: sticky; top: 0; z-index: 1000; }
+        #view-app { background: #f1f5f9; color: #1e293b; min-height: 100vh; display: none; }
+        .btn-action { background: #334155; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-gold { background: #FFD700; color: black; }
+
+        /* ANALYTICS DASHBOARD */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; padding: 10px; }
+        .stat-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid #000; text-align: left; }
+        .stat-val { font-size: 22px; font-weight: 900; color: #1e293b; margin: 5px 0; }
+        .bar-container { background: #e2e8f0; height: 10px; border-radius: 5px; margin-top: 8px; overflow: hidden; }
+        .bar-fill { background: #10b981; height: 100%; }
+
         /* LOGIN */
         #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-card { background: #fff; color: #000; padding: 40px; width: 340px; border-radius: 15px; text-align: center; border-top: 8px solid #FFD700; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 16px; }
-        .btn-entry { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
+        .login-card { background: #fff; color: #000; padding: 40px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid #FFD700; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; }
 
-        /* APP VIEW */
-        #view-app { background: #f1f5f9; color: #1e293b; min-height: 100vh; display: none; }
-        .nav { background: #000; color: #fff; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #FFD700; position: sticky; top: 0; z-index: 1000; }
-        
-        #absent-alert { background: #ef4444; color: white; padding: 12px; text-align: center; font-weight: 900; animation: blink 1.5s infinite; border-bottom: 4px solid #b91c1c; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-
-        .tab-row { display: flex; justify-content: center; padding: 15px; background: #fff; border-bottom: 1px solid #ddd; gap: 10px; }
-        .tab { padding: 10px 25px; border-radius: 20px; border: 2px solid #ddd; cursor: pointer; font-weight: bold; }
-        #t-1st.active { background: var(--shift1); border-color: #eab308; }
-        #t-2nd.active { background: var(--shift2); border-color: #3b82f6; }
-        #t-3rd.active { background: var(--shift3); border-color: #64748b; }
-
-        /* TABLE & NOTES */
-        .pods-container { padding: 20px; display: flex; flex-direction: column; gap: 40px; }
+        /* TABLES & STICKY */
+        .pods-container { padding: 20px; display: flex; flex-direction: column; gap: 35px; }
         .pod-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        .pod-header { padding: 15px 25px; font-weight: 900; font-size: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; }
-        .h-A { background: var(--podA); color: #9a3412; } .h-B { background: var(--podB); color: #1e40af; } 
-        .h-F { background: var(--podF); color: #854d0e; } .h-BACKUP { background: var(--podBackup); color: #6b21a8; }
+        .pod-header { padding: 12px 20px; font-weight: 900; font-size: 18px; display: flex; justify
 
-        .note-box { background: #fffde7; padding: 10px 25px; border-bottom: 1px solid #eee; }
-        textarea { width: 100%; height: 45px; border: 1px solid #fbc02d; padding: 10px; resize: none; font-weight: bold; box-sizing: border-box; }
-
-        .table-wrapper { overflow-x: auto; position: relative; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; }
-        th { background: #1e293b; color: white; padding: 12px; font-size: 11px; position: sticky; top: 0; z-index: 10; }
-        td { padding: 12px; text-align: center; font-weight: bold; border-bottom: 1px solid #f1f5f9; background: white; color: #334155; }
-
-        .sticky-col { position: sticky; left: 0; z-index: 20; background: #fff !important; border-right: 2px solid #e2e8f0 !important; text-align: left !important; padding-left: 20px !important; }
-        .sc-2 { left: 100px; } .sc-3 { left: 200px; width: 180px; color: #000 !important; }
-
-        /* BADGES */
-        .st-OFF { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 4px; border-radius: 4px; }
-        .st-ABSENT { background: #fff7ed; color: #c2410c; border: 2px solid #ea580c; padding: 4px; border-radius: 4px; }
-        .st-REPLACEMENT { background: #ecfdf5; color: #059669; border: 1px solid #10b981; padding: 4px; border-radius: 4px; font-size: 10px; display: block; }
-        
-        /* MODALS */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-box { background: white; padding: 30px; border-radius: 12px; width: 450px; text-align: center; border: 4px solid #000; color: #000; max-height: 80vh; overflow-y: auto; }
-        .btn-action { background: #334155; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-gold { background: #FFD700; color: black; }
-    </style>
-</head>
-<body>
-
-    <div id="view-login">
-        <div class="login-card">
-            <h1>ShiftFlow</h1>
-            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART COMMAND V44</p>
-            <input type="text" id="user-in" placeholder="Username">
-            <input type="password" id="pass-in" placeholder="Password">
-            <button class="btn-entry" onclick="login()">LOG IN</button>
-            <p id="error-msg" style="color:red; font-size:12px; margin-top:15px; font-weight:bold;"></p>
-            <button onclick="bypassLogin()" style="margin-top:20px; background:red; color:white; border:none; padding:8px; border-radius:4px; font-weight:bold; cursor:pointer;">⚠️ BYPASS LOGIN</button>
-        </div>
-    </div>
-
-    <div id="view-app">
-        <div id="absent-alert" class="hidden">
-            ⚠️ ATTENTION: ABSENCES REPORTED! 
-            <button onclick="clearAlerts()" style="background:white; color:red; border:none; padding:5px 10px; font-weight:bold; cursor:pointer; margin-left:15px; border-radius:4px;">REVIED & CLEAR</button>
-        </div>
-        
-        <div class="nav">
-            <div style="font-size:20px; font-weight:900;">DREAMART</div>
-            <div>
-                <span id="user-display" style="color:gold; font-weight:bold; margin-right:15px; text-transform:uppercase;"></span>
-                <button class="btn-action btn-gold" onclick="openSearch()">🔎 SEARCH</button>
-                <button class="btn-action" onclick="openLog()">📜 LOGS</button>
-                <button id="btn-db" class="hidden btn-action" onclick="openDB()">💾 DB</button>
-                <button id="btn-add" class="hidden btn-action btn-gold" onclick="openAdd()">+ AGENT</button>
-                <button class="btn-action" onclick="location.reload()" style="background:red;">LOG OUT</button>
-            </div>
-        </div>
-
-        <div style="background:white; display:flex; justify-content:center; align-items:center; gap:20px; padding:15px; border-bottom:1px solid #ddd;">
-            <button class="btn-action" onclick="changeWeek(-1)">❮ PREV</button>
-            <div id="week-label" style="font-weight:900; color:#1e293b; min-width:300px; text-align:center;"></div>
-            <button class="btn-action" onclick="changeWeek(1)">NEXT ❯</button>
-        </div>
-
-        <div class="tab-row">
-            <div id="t-1st" class="tab active" onclick="setShift('1st')">1st Shift</div>
-            <div id="t-2nd" class="tab" onclick="setShift('2nd')">2nd Shift</div>
-            <div id="t-3rd" class="tab" onclick="setShift('3rd')">3rd Shift</div>
-        </div>
-
-        <div id="pods-area" class="pods-container"></div>
-    </div>
-
-    <div id="modal-status" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="target-name"></h3>
-            <div id="status-btns">
-                <button class="btn-entry" style="background:#22c55e;" onclick="checkReplacementReq('ON')">WORKING</button>
-                <button class="btn-entry" style="background:#f97316;" onclick="saveStatus('ABSENT')">ABSENT</button>
-                <button class="btn-entry" style="background:#ef4444;" onclick="saveStatus('OFF')">OFF-DAY</button>
-                <button class="btn-entry" style="background:#a855f7;" onclick="document.getElementById('sick-ui').classList.toggle('hidden')">SICK</button>
-            </div>
-            <div id="replacement-ui" class="hidden" style="margin-top:15px; background:#f1f5f9; padding:15px; border-radius:10px;">
-                <label style="font-weight:bold; font-size:12px;">IN REPLACEMENT OF:</label>
-                <select id="replacing-select" style="margin-top:10px;"></select>
-                <button class="btn-entry" style="background:#10b981;" onclick="confirmReplacement()">CONFIRM</button>
-            </div>
-            <div id="sick-ui" class="hidden" style="margin-top:10px;"><input type="date" id="sick-date"><button class="btn-entry" onclick="saveStatus('SICK')">CONFIRM</button></div>
-            <button class="btn-action" style="width:100%; margin-top:15px;" onclick="closeModals()">CANCEL</button>
-        </div>
-    </div>
-
-    <div id="modal-add" class="modal-overlay">
-        <div class="modal-box">
-            <h3>ADD NEW AGENT</h3>
-            <input id="n-name" placeholder="Full Name">
-            <input id="n-team" placeholder="Team Name">
-            <input id="n-model" placeholder="Model Name">
-            <div style="display:flex; gap:10px;">
-                <select id="n-shift"><option value="1st">1st Shift</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select>
-                <select id="n-pod"><option value="A">POD A</option><option value="B">POD B</option><option value="F">POD F</option><option value="BACKUP">BACKUP</option></select>
-            </div>
-            <button class="btn-entry" style="background:gold; color:black;" onclick="saveNewAgent()">SAVE AGENT</button>
-            <button class="btn-action" style="width:100%; margin-top:10px;" onclick="closeModals()">CANCEL</button>
-        </div>
-    </div>
-
-    <div id="modal-info" class="modal-overlay"><div class="modal-box"><h3 id="info-title"></h3><div id="info-content" style="text-align:left; font-size:12px; max-height:400px; overflow-y:auto;"></div><button class="btn-action" style="width:100%; margin-top:20px;" onclick="closeModals()">CLOSE</button></div></div>
-
-<script>
-    const ADMINS = ["karina", "exequiel", "argenis", "andre"];
-    const MANAGERS = ["shirly", "maria", "heilen", "michel", "gustavo", "rafael", "johanny", "victor", "david", "camila", "gabriel"];
-
-    let db = { emps: [], sched: {}, memos: {}, sick: {}, logs: [], alerts: [] };
-    let user = null, role = null, curShift = '1st', weekOffset = 0, cell = null;
-
-    function init() {
-        const saved = localStorage.getItem('SF_DATA_V44');
-        if(saved) db = JSON.parse(saved);
-        if(!db.memos) db.memos = {};
-    }
-    init();
-
-    function login() {
-        const u = document.getElementById('user-in').value.toLowerCase().trim();
-        const p = document.getElementById('pass-in').value.trim();
-        if(p === '1234' && (ADMINS.includes(u) || MANAGERS.includes(u))) { user = u; role = ADMINS.includes(u) ? 'admin' : 'manager'; startApp(); }
-        else { document.getElementById('error-msg').innerText = "Incorrect credentials"; }
-    }
-    function bypassLogin() { user = "karina"; role = "admin"; startApp(); }
-
-    function startApp() {
-        document.getElementById('view-login').style.display='none'; document.getElementById('view-app').style.display='block'; document.getElementById('user-display').innerText = user;
-        if(role==='admin') { document.getElementById('btn-add').classList.remove('hidden'); }
-        render();
-    }
-
-    function getWeekDates(off) {
-        const curr = new Date(); const day = curr.getDay();
-        const diff = curr.getDate() - day + (day === 0 ? -6 : 1) + (off * 7);
-        const mon = new Date(curr.setDate(diff)); const res = [];
-        const n = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
-        for(let i=0; i<7; i++) {
-            const dt = new Date(mon); dt.setDate(mon.getDate() + i);
-            res.push({ label: `${n[i]} ${dt.getDate()}/${dt.getMonth()+1}`, key: `${dt.getFullYear()}-${dt.getMonth()+1}-${dt.getDate()}` });
-        }
-        return res;
-    }
-
-    function render() {
-        const area = document.getElementById('pods-area'); area.innerHTML = '';
-        const week = getWeekDates(weekOffset);
-        document.getElementById('week-label').innerText = `DATES: ${week[0].key} - ${week[6].key}`;
-        const hasAbs = db.alerts.some(a => a.shift === curShift);
-        document.getElementById('absent-alert').className = (role==='admin' && hasAbs) ? '' : 'hidden';
-
-        ['A','B','F','BACKUP'].forEach(pod => {
-            const pEmps = db.emps.filter(e => e.shift === curShift && e.pod === pod);
-            const mKey = `${curShift}_${pod}`;
-            let h = `<div class="pod-card"><div class="pod-header h-${pod}"><span>POD ${pod}</span><span>${pEmps.length} Agents</span></div>
-                <div class="note-box"><textarea onchange="saveMemo('${pod}', this.value)" placeholder="Write POD notes here...">${db.memos[mKey] || ''}</textarea></div>
-                <div class="table-wrapper"><table><thead><tr><th class="sticky-col">TEAM</th><th class="sticky-col sc-2">MODEL</th><th class="sticky-col sc-3">CHATTER</th>`;
-            week.forEach(d => h += `<th>${d.label}</th>`);
-            h += `</tr></thead><tbody>`;
-            pEmps.sort((a,b) => a.team.localeCompare(b.team)).forEach(e => {
-                h += `<tr><td class="sticky-col">${e.team}</td><td class="sticky-col sc-2">${e.model}</td><td class="sticky-col sc-3">${e.name}</td>`;
-                week.forEach(d => {
-                    const st = db.sched[e.id] ? db.sched[e.id][d.key] || 'ON' : 'ON';
-                    let txt = '●', cls = 'st-ON';
-                    if(typeof st === 'object') { txt = `REPLACING: ${st.replacing}`; cls = 'st-REPLACEMENT'; }
-                    else {
-                        if(st === 'OFF') { txt = 'OFF'; cls = 'st-OFF'; }
-                        if(st === 'ABSENT') { txt = 'ABSENT'; cls = 'st-ABSENT'; }
-                        if(st === 'SICK') { txt = '🚑'; cls = 'st-SICK'; }
-                    }
-                    h += `<td onclick="openStatus(${e.id},'${d.key}','${e.name}')" style="cursor:pointer"><span class="${cls}">${txt}</span></td>`;
-                });
-                h += `</tr>`;
-            });
-            area.innerHTML += h + `</tbody></table></div></div>`;
-        });
-    }
-
-    function openStatus(id, key, name) { cell = {id, key, name}; document.getElementById('target-name').innerText = name; document.getElementById('modal-status').style.display='flex'; document.getElementById('replacement-ui').classList.add('hidden'); document.getElementById('status-btns').classList.remove('hidden'); }
-    function checkReplacementReq(st) {
-        const emp = db.emps.find(e => e.id === cell.id);
-        if(emp.pod === 'BACKUP' && st === 'ON') {
-            const others = db.emps.filter(e => e.shift === curShift && e.pod !== 'BACKUP');
-            const cands = others.filter(e => ['OFF','ABSENT','SICK'].includes(db.sched[e.id][cell.key]));
-            const sel = document.getElementById('replacing-select');
-            sel.innerHTML = '<option value="">Support</option>';
-            cands.forEach(c => sel.innerHTML += `<option value="${c.name}">${c.name} (${c.pod})</option>`);
-            document.getElementById('status-btns').classList.add('hidden'); document.getElementById('replacement-ui').classList.remove('hidden');
-        } else saveStatus(st);
-    }
-    function confirmReplacement() { saveStatus({status: 'ON', replacing: document.getElementById('replacing-select').value || 'Support'}); }
-
-    function saveStatus(st) {
-        if(!db.sched[cell.id]) db.sched[cell.id] = {};
-        if(st === 'ABSENT') db.alerts.push({shift: curShift, chatter: cell.name});
-        db.sched[cell.id][cell.key] = st;
-        db.logs.unshift({u: user, a: `Updated ${cell.name} to ${st.status || st}`, t: new Date().toLocaleString()});
-        save(); closeModals();
-    }
-
-    function saveNewAgent() {
-        const n = document.getElementById('n-name').value.trim(), t = document.getElementById('n-team').value.trim(), m = document.getElementById('n-model').value.trim();
-        if(!n || !t) return alert("Fill Name and Team!");
-        if(db.emps.some(e => e.name.toLowerCase() === n.toLowerCase())) return alert("ERROR: Employee already exists!");
-        const id = Date.now(); db.emps.push({ id, name: n, team: t, model: m, shift: document.getElementById('n-shift').value, pod: document.getElementById('n-pod').value });
-        db.sched[id] = {}; save(); closeModals();
-    }
-
-    function clearAlerts() { db.alerts = db.alerts.filter(a => a.shift !== curShift); save(); }
-    function saveMemo(pod, val) { db.memos[`${curShift}_${pod}`] = val; save(); }
-    function save() { localStorage.setItem('SF_DATA_V44', JSON.stringify(db)); render(); }
-    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display='none'); }
-    function changeWeek(n) { weekOffset += n; render(); }
-    function setShift(s) { curShift = s; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.getElementById('t-'+s).classList.add('active'); render(); }
-    function openLog() { document.getElementById('info-title').innerText = "LOGS"; document.getElementById('info-content').innerHTML = db.logs.map(l => `<div><b>${l.t}</b>: ${l.a}</div>`).join(''); document.getElementById('modal-info').style.display='flex'; }
-    function openSearch() {
-        const d = prompt("Enter Date (YYYY-M-D):"); if(!d) return;
-        const res = db.emps.map(e => `<div><b>${e.name}</b>: ${db.sched[e.id] ? db.sched[e.id][d] || 'WORKING' : 'WORKING'}</div>`);
-        document.getElementById('info-title').innerText = "AUDIT: " + d; document.getElementById('info-content').innerHTML = res.join(''); document.getElementById('modal-info').style.display='flex';
-    }
-    function openAdd() { document.getElementById('modal-add').style.display='flex'; }
-</script>
-</body>
-</html>
