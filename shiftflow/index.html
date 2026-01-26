@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ShiftFlow V59 - DreamArt Shadow Control</title>
+    <title>ShiftFlow V60 - Bulletproof Boss</title>
     <style>
         :root {
             --shift1: #fef9c3; --shift2: #e0f2fe; --shift3: #f3f4f6;
@@ -12,13 +12,13 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; margin: 0; padding: 0; color: #f8fafc; }
         .hidden { display: none !important; }
 
-        /* LOGIN */
+        /* LOGIN - ULTRA STABLE */
         #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-card { background: #fff; color: #000; padding: 40px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid #FFD700; box-shadow: 0 10px 50px rgba(0,0,0,0.8); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 16px; }
-        .btn-login { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
+        .login-card input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 16px; }
+        .btn-entry { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
 
-        /* APP */
+        /* APP VIEW */
         #view-app { background: #f1f5f9; color: #1e293b; min-height: 100vh; display: none; }
         .nav { background: #000; color: #fff; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #FFD700; position: sticky; top: 0; z-index: 1000; }
         .controls { background: white; padding: 15px; display: flex; justify-content: center; gap: 20px; align-items: center; border-bottom: 1px solid #ddd; }
@@ -31,9 +31,7 @@
         .pod-header { padding: 12px 20px; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
         .h-A { background: var(--podA); } .h-B { background: var(--podB); } .h-F { background: var(--podF); } 
         .h-BACKUP { background: var(--podBackup); } .h-MGR { background: var(--mgrCol); color: #3730a3; }
-        .goal-success { background: var(--goalMet) !important; color: #166534 !important; }
-
-        .btn-edit-goal { font-size: 10px; background: #334155; color: white; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+        .goal-success { background: var(--goalMet) !important; color: #166534 !important; border: 1px solid #bbf7d0; }
 
         /* TABLES */
         .table-wrapper { overflow-x: auto; position: relative; }
@@ -44,131 +42,5 @@
         .sticky-col { position: sticky; left: 0; z-index: 20; background: #fff !important; border-right: 2px solid #e2e8f0 !important; text-align: left !important; padding-left: 20px !important; }
         .sc-2 { left: 100px; } .sc-3 { left: 200px; width: 180px; }
 
-        .btn-del { color: #ef4444; border: none; background: none; cursor: pointer; font-size: 14px; margin-left: 5px; visibility: hidden; }
-        tr:hover .btn-del { visibility: visible; }
-
-        .sales-tag { display: block; font-size: 10px; color: #059669; margin-top: 4px; font-style: italic; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-box { background: white; padding: 25px; border-radius: 12px; width: 450px; text-align: center; border: 4px solid #000; color: #000; }
-    </style>
-</head>
-<body>
-
-    <div id="view-login">
-        <div class="login-card">
-            <h1>ShiftFlow</h1>
-            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART SHADOW V59</p>
-            <input type="text" id="user-in" placeholder="Username" autocomplete="off">
-            <input type="password" id="pass-in" placeholder="Password">
-            <button class="btn-login" onclick="attemptLogin()">LOG IN</button>
-            <button onclick="emergencyExit()" style="margin-top:20px; background:red; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%; font-size:12px;">⚠️ EMERGENCY BYPASS (KARINA)</button>
-        </div>
-    </div>
-
-    <div id="view-app">
-        <div class="nav">
-            <div style="font-size:20px; font-weight:900;">DREAMART</div>
-            <div>
-                <span id="user-display" style="color:gold; font-weight:bold; margin-right:15px; text-transform:uppercase;"></span>
-                <button class="btn-ctrl btn-gold" onclick="showStats()">📊 STATS</button>
-                <button id="btn-add-p" class="hidden btn-ctrl btn-gold" onclick="openAddModal()">+ ADD PERSON</button>
-                <button class="btn-ctrl" onclick="location.reload()" style="background:red;">LOG OUT</button>
-            </div>
-        </div>
-        <div class="controls">
-            <button class="btn-ctrl" onclick="moveWeek(-1)">❮ PREV</button>
-            <div id="week-label" style="font-weight:900; color:#1e293b; min-width:200px; text-align:center;"></div>
-            <button class="btn-ctrl" onclick="moveWeek(1)">NEXT ❯</button>
-        </div>
-        <div id="pods-area" class="pods-container"></div>
-    </div>
-
-    <div id="modal-add" class="modal-overlay">
-        <div class="modal-box">
-            <h3>New Member</h3>
-            <input type="text" id="add-name" placeholder="Full Name">
-            <select id="add-role" onchange="document.getElementById('extra-fields').classList.toggle('hidden', this.value==='shadower')">
-                <option value="chatter">Chatter</option><option value="shadower">Shadower</option>
-            </select>
-            <div id="extra-fields">
-                <input type="text" id="add-team" placeholder="Team"><input type="text" id="add-model" placeholder="Model">
-                <select id="add-pod"><option value="A">POD A</option><option value="B">POD B</option><option value="F">POD F</option><option value="BACKUP">BACKUP POD</option></select>
-            </div>
-            <button class="btn-login" onclick="confirmAdd()">SAVE</button>
-            <button class="btn-ctrl" style="width:100%; margin-top:10px;" onclick="closeModals()">CANCEL</button>
-        </div>
-    </div>
-
-    <div id="modal-status" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="status-target"></h3>
-            <div id="sales-zone" class="hidden" style="margin-bottom:15px; padding:15px; background:#f0fdf4; border-radius:10px;">
-                <input type="number" id="input-sales" placeholder="Daily Sales ($)">
-                <button class="btn-login" style="background:#10b981;" onclick="saveSales()">SAVE SALES</button>
-            </div>
-            <div id="replacement-zone" class="hidden" style="margin-bottom:15px; padding:15px; background:#eef2ff; border-radius:10px;">
-                <label id="repl-label" style="font-size:12px; font-weight:bold;"></label>
-                <select id="sel-replacement"></select>
-                <button class="btn-login" style="background:#4f46e5;" onclick="saveReplacement()">CONFIRM COVERAGE</button>
-            </div>
-            <div id="status-options">
-                <button id="btn-show-sales" class="btn-ctrl btn-gold" style="width:100%; margin-bottom:10px;" onclick="document.getElementById('sales-zone').classList.toggle('hidden')">💸 ADD SALES</button>
-                <button class="btn-login" style="background:green; margin-bottom:8px;" onclick="handleWorking()">WORKING</button>
-                <button class="btn-login" style="background:orange; margin-bottom:8px;" onclick="updateStatus('ABSENT')">ABSENT</button>
-                <button class="btn-login" style="background:red;" onclick="updateStatus('OFF')">OFF</button>
-            </div>
-            <button class="btn-ctrl" style="width:100%; margin-top:15px;" onclick="closeModals()">CANCEL</button>
-        </div>
-    </div>
-
-    <div id="modal-stats" class="modal-overlay"><div class="modal-box"><h2>30-Day Revenue</h2><div id="stats-view"></div><button class="btn-ctrl" style="width:100%; margin-top:15px;" onclick="closeModals()">CLOSE</button></div></div>
-
-<script>
-    let db = { emps: [], mgrs: [], sched: {}, sales: {}, mgr_pods: {}, goals: {A:500, B:500, F:500, BACKUP:200} };
-    let weekOff = 0, activeCell = null, curUser = null, curRole = null;
-
-    function attemptLogin() {
-        const u = document.getElementById('user-in').value.toLowerCase().trim();
-        const p = document.getElementById('pass-in').value;
-        const ADMINS = ["karina", "exequiel", "argenis", "andre"];
-        const MANAGERS = ["shirly", "maria", "heilen", "michel", "gustavo", "rafael", "johanny", "victor", "david", "camila", "gabriel"];
-        if(p === '1234' && (ADMINS.includes(u) || MANAGERS.includes(u))) { curUser = u; curRole = ADMINS.includes(u) ? 'admin' : 'manager'; startApp(); }
-        else alert("Access Denied");
-    }
-
-    function emergencyExit() { curUser = "karina"; curRole = "admin"; startApp(); }
-
-    function startApp() {
-        const saved = localStorage.getItem('SF_SHADOW_V59');
-        if(saved) db = JSON.parse(saved);
-        if(!db.mgr_pods) db.mgr_pods = {};
-        document.getElementById('view-login').style.display='none';
-        document.getElementById('view-app').style.display='block';
-        document.getElementById('user-display').innerText = curUser;
-        if(curRole === 'admin') document.getElementById('btn-add-p').classList.remove('hidden');
-        render();
-    }
-
-    function getWeekDays(off) {
-        const curr = new Date(); const day = curr.getDay();
-        const diff = curr.getDate() - day + (day === 0 ? -6 : 1) + (off * 7);
-        const mon = new Date(curr.setDate(diff)); const res = [];
-        for(let i=0; i<7; i++) {
-            const dt = new Date(mon); dt.setDate(mon.getDate() + i);
-            res.push({ label: `${dt.getDate()}/${dt.getMonth()+1}`, key: `${dt.getFullYear()}-${dt.getMonth()+1}-${dt.getDate()}` });
-        }
-        return res;
-    }
-
-    function editGoal(pod) {
-        const newVal = prompt(`Enter new goal for POD ${pod}:`, db.goals[pod]);
-        if(newVal !== null && !isNaN(newVal)) { db.goals[pod] = parseFloat(newVal); save(); }
-    }
-
-    function render() {
-        const area = document.getElementById('pods-area'); area.innerHTML = '';
-        const week = getWeekDays(weekOff);
-        document.getElementById('week-label').innerText = `DATES: ${week[0].key} - ${week[6].key}`;
-        const today = `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`;
-
-        ['A','B','F','BACKUP'].forEach
+        /* UTILS */
+        .btn-del { color: #ef4444; border: none; background: none; cursor: pointer; font-size: 14px; margin-left:
