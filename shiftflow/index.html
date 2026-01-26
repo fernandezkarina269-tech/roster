@@ -2,31 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ShiftFlow V58 - Final Fortress</title>
+    <title>ShiftFlow V59 - DreamArt Shadow Control</title>
     <style>
         :root {
             --shift1: #fef9c3; --shift2: #e0f2fe; --shift3: #f3f4f6;
             --podA: #ffedd5; --podB: #dbeafe; --podF: #fef3c7; --podBackup: #f3e8ff;
             --mgrCol: #e0e7ff; --goalMet: #dcfce7;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; color: #f8fafc; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; margin: 0; padding: 0; color: #f8fafc; }
         .hidden { display: none !important; }
 
-        /* LOGIN SCREEN - PURE HTML/CSS FOCUS */
+        /* LOGIN */
         #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-card { background: #fff; color: #000; padding: 40px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid #FFD700; box-shadow: 0 10px 50px rgba(0,0,0,0.8); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 16px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 16px; }
         .btn-login { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
 
-        /* APP VIEW */
+        /* APP */
         #view-app { background: #f1f5f9; color: #1e293b; min-height: 100vh; display: none; }
         .nav { background: #000; color: #fff; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #FFD700; position: sticky; top: 0; z-index: 1000; }
-        
         .controls { background: white; padding: 15px; display: flex; justify-content: center; gap: 20px; align-items: center; border-bottom: 1px solid #ddd; }
         .btn-ctrl { background: #334155; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .btn-gold { background: #FFD700; color: black; }
 
-        /* PODS & TABLES */
+        /* PODS */
         .pods-container { padding: 20px; display: flex; flex-direction: column; gap: 30px; }
         .pod-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
         .pod-header { padding: 12px 20px; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
@@ -34,6 +33,9 @@
         .h-BACKUP { background: var(--podBackup); } .h-MGR { background: var(--mgrCol); color: #3730a3; }
         .goal-success { background: var(--goalMet) !important; color: #166534 !important; }
 
+        .btn-edit-goal { font-size: 10px; background: #334155; color: white; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+
+        /* TABLES */
         .table-wrapper { overflow-x: auto; position: relative; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; }
         th { background: #1e293b; color: white; padding: 10px; font-size: 11px; }
@@ -45,7 +47,7 @@
         .btn-del { color: #ef4444; border: none; background: none; cursor: pointer; font-size: 14px; margin-left: 5px; visibility: hidden; }
         tr:hover .btn-del { visibility: visible; }
 
-        .sales-tag { display: block; font-size: 10px; color: #059669; margin-top: 4px; }
+        .sales-tag { display: block; font-size: 10px; color: #059669; margin-top: 4px; font-style: italic; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; }
         .modal-box { background: white; padding: 25px; border-radius: 12px; width: 450px; text-align: center; border: 4px solid #000; color: #000; }
     </style>
@@ -54,13 +56,12 @@
 
     <div id="view-login">
         <div class="login-card">
-            <h1 style="margin:0;">ShiftFlow</h1>
-            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART FORTRESS V58</p>
+            <h1>ShiftFlow</h1>
+            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART SHADOW V59</p>
             <input type="text" id="user-in" placeholder="Username" autocomplete="off">
             <input type="password" id="pass-in" placeholder="Password">
             <button class="btn-login" onclick="attemptLogin()">LOG IN</button>
             <button onclick="emergencyExit()" style="margin-top:20px; background:red; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%; font-size:12px;">⚠️ EMERGENCY BYPASS (KARINA)</button>
-            <p onclick="clearAllData()" style="margin-top:20px; color:blue; text-decoration:underline; font-size:10px; cursor:pointer; font-weight:bold;">FACTORY RESET (FIX BLUE SCREEN)</p>
         </div>
     </div>
 
@@ -86,8 +87,8 @@
         <div class="modal-box">
             <h3>New Member</h3>
             <input type="text" id="add-name" placeholder="Full Name">
-            <select id="add-role" onchange="document.getElementById('extra-fields').classList.toggle('hidden', this.value==='manager')">
-                <option value="chatter">Chatter</option><option value="manager">Manager</option>
+            <select id="add-role" onchange="document.getElementById('extra-fields').classList.toggle('hidden', this.value==='shadower')">
+                <option value="chatter">Chatter</option><option value="shadower">Shadower</option>
             </select>
             <div id="extra-fields">
                 <input type="text" id="add-team" placeholder="Team"><input type="text" id="add-model" placeholder="Model">
@@ -105,9 +106,10 @@
                 <input type="number" id="input-sales" placeholder="Daily Sales ($)">
                 <button class="btn-login" style="background:#10b981;" onclick="saveSales()">SAVE SALES</button>
             </div>
-            <div id="mgr-zone" class="hidden" style="margin-bottom:15px; padding:15px; background:#eef2ff; border-radius:10px;">
-                <select id="sel-mgr-pod"><option value="A">POD A</option><option value="B">POD B</option><option value="F">POD F</option><option value="BACKUP">BACKUP</option></select>
-                <button class="btn-login" style="background:#4f46e5;" onclick="saveMgrPod()">ASSIGN</button>
+            <div id="replacement-zone" class="hidden" style="margin-bottom:15px; padding:15px; background:#eef2ff; border-radius:10px;">
+                <label id="repl-label" style="font-size:12px; font-weight:bold;"></label>
+                <select id="sel-replacement"></select>
+                <button class="btn-login" style="background:#4f46e5;" onclick="saveReplacement()">CONFIRM COVERAGE</button>
             </div>
             <div id="status-options">
                 <button id="btn-show-sales" class="btn-ctrl btn-gold" style="width:100%; margin-bottom:10px;" onclick="document.getElementById('sales-zone').classList.toggle('hidden')">💸 ADD SALES</button>
@@ -122,7 +124,6 @@
     <div id="modal-stats" class="modal-overlay"><div class="modal-box"><h2>30-Day Revenue</h2><div id="stats-view"></div><button class="btn-ctrl" style="width:100%; margin-top:15px;" onclick="closeModals()">CLOSE</button></div></div>
 
 <script>
-    // CORE DATA
     let db = { emps: [], mgrs: [], sched: {}, sales: {}, mgr_pods: {}, goals: {A:500, B:500, F:500, BACKUP:200} };
     let weekOff = 0, activeCell = null, curUser = null, curRole = null;
 
@@ -131,21 +132,16 @@
         const p = document.getElementById('pass-in').value;
         const ADMINS = ["karina", "exequiel", "argenis", "andre"];
         const MANAGERS = ["shirly", "maria", "heilen", "michel", "gustavo", "rafael", "johanny", "victor", "david", "camila", "gabriel"];
-
-        if(p === '1234' && (ADMINS.includes(u) || MANAGERS.includes(u))) {
-            curUser = u; curRole = ADMINS.includes(u) ? 'admin' : 'manager';
-            startApp();
-        } else alert("Access Denied");
+        if(p === '1234' && (ADMINS.includes(u) || MANAGERS.includes(u))) { curUser = u; curRole = ADMINS.includes(u) ? 'admin' : 'manager'; startApp(); }
+        else alert("Access Denied");
     }
 
     function emergencyExit() { curUser = "karina"; curRole = "admin"; startApp(); }
-    function clearAllData() { if(confirm("This will clear the blue screen but reset the roster. Continue?")) { localStorage.clear(); location.reload(); } }
 
     function startApp() {
-        try {
-            const saved = localStorage.getItem('SF_FORTRESS_V58');
-            if(saved) db = JSON.parse(saved);
-        } catch(e) {}
+        const saved = localStorage.getItem('SF_SHADOW_V59');
+        if(saved) db = JSON.parse(saved);
+        if(!db.mgr_pods) db.mgr_pods = {};
         document.getElementById('view-login').style.display='none';
         document.getElementById('view-app').style.display='block';
         document.getElementById('user-display').innerText = curUser;
@@ -164,25 +160,15 @@
         return res;
     }
 
+    function editGoal(pod) {
+        const newVal = prompt(`Enter new goal for POD ${pod}:`, db.goals[pod]);
+        if(newVal !== null && !isNaN(newVal)) { db.goals[pod] = parseFloat(newVal); save(); }
+    }
+
     function render() {
         const area = document.getElementById('pods-area'); area.innerHTML = '';
         const week = getWeekDays(weekOff);
         document.getElementById('week-label').innerText = `DATES: ${week[0].key} - ${week[6].key}`;
         const today = `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`;
 
-        ['A','B','F','BACKUP'].forEach(pod => {
-            const pEmps = (db.emps || []).filter(e => e.pod === pod);
-            let podRev = 0;
-            pEmps.forEach(e => podRev += (db.sales[e.id] ? db.sales[e.id][today] || 0 : 0));
-            const goalMet = podRev >= (db.goals[pod] || 500);
-
-            let h = `<div class="pod-card"><div class="pod-header h-${pod} ${goalMet ? 'goal-success' : ''}">
-                <span>POD ${pod}</span><span style="font-size:11px">Today: $${podRev} / Goal: $${db.goals[pod]}</span>
-                </div><div class="table-wrapper"><table><thead><tr><th class="sticky-col">TEAM</th><th class="sticky-col sc-2">MODEL</th><th class="sticky-col sc-3">CHATTER</th>`;
-            week.forEach(d => h += `<th>${d.label}</th>`);
-            h += `</tr></thead><tbody>`;
-            pEmps.forEach(e => {
-                h += `<tr><td class="sticky-col">${e.team}</td><td class="sticky-col sc-2">${e.model}</td>
-                    <td class="sticky-col sc-3"><span>${e.name}</span>${curRole==='admin'?`<button class="btn-del" onclick="removePerson(${e.id},'chatter')">✖</button>`:''}</td>`;
-                week.forEach(d => {
-                    const st = db.sched
+        ['A','B','F','BACKUP'].forEach
