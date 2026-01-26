@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ShiftFlow V55 - DreamArt Nuclear</title>
+    <title>ShiftFlow V56 - DreamArt Growth</title>
     <style>
         :root {
             --shift1: #fef9c3; --shift2: #e0f2fe; --shift3: #f3f4f6;
@@ -12,14 +12,13 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; margin: 0; padding: 0; color: #f8fafc; }
         .hidden { display: none !important; }
 
-        /* LOGIN FIXED */
+        /* LOGIN */
         #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-card { background: #fff; color: #000; padding: 35px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid #FFD700; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        .login-card h1 { margin: 0 0 10px; font-size: 24px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 16px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 16px; }
         .btn-main { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
 
-        /* APP VIEW */
+        /* APP */
         #view-app { background: #f1f5f9; color: #1e293b; min-height: 100vh; display: none; }
         .nav { background: #000; color: #fff; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #FFD700; position: sticky; top: 0; z-index: 1000; }
         
@@ -35,12 +34,12 @@
         .h-BACKUP { background: var(--podBackup); } .h-MGR { background: var(--mgrCol); color: #3730a3; }
         .goal-success { background: var(--goalMet) !important; color: #166534 !important; }
 
+        /* TABLES */
         .table-wrapper { overflow-x: auto; position: relative; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; }
         th { background: #1e293b; color: white; padding: 10px; font-size: 11px; }
         td { padding: 10px; text-align: center; font-weight: bold; border-bottom: 1px solid #f1f5f9; background: white; color: #334155; }
         
-        /* STICKY COLUMNS */
         .sticky-col { position: sticky; left: 0; z-index: 20; background: #fff !important; border-right: 2px solid #e2e8f0 !important; text-align: left !important; padding-left: 20px !important; }
         .sc-2 { left: 100px; } .sc-3 { left: 200px; width: 180px; }
 
@@ -54,13 +53,17 @@
     <div id="view-login">
         <div class="login-card">
             <h1>ShiftFlow</h1>
-            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART NUCLEAR V55</p>
-            
-            <input type="text" id="user-in" placeholder="Username" autocomplete="username">
+            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART GROWTH V56</p>
+            <input type="text" id="user-in" placeholder="Username">
             <input type="password" id="pass-in" placeholder="Password">
-            
-            <button class="btn-main" onclick="authProcess()">LOG IN</button>
-            
-            <button onclick="karinaBypass()" style="margin-top:20px; background:red; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%; font-size:12px;">⚠️ EMERGENCY BYPASS (KARINA)</button>
-            
-            <p onclick="nukeMemory()" style="margin-top:20px; color:blue; text-decoration:underline; font-size:10px; cursor:pointer; font-weight:bold;">SYSTEM REPAIR (USE
+            <button class="btn-main" onclick="auth()">LOG IN</button>
+            <button onclick="bypass()" style="margin-top:20px; background:red; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;">⚠️ EMERGENCY BYPASS (KARINA)</button>
+        </div>
+    </div>
+
+    <div id="view-app">
+        <div class="nav">
+            <div style="font-size:20px; font-weight:900;">DREAMART</div>
+            <div>
+                <span id="user-display" style="color:gold; font-weight:bold; margin-right:15px; text-transform:uppercase;"></span>
+                <button class="btn-ctrl btn-gold" onclick="openStats()">📊 STAT
