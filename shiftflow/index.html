@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ShiftFlow V68 - Advanced Analytics</title>
+    <title>ShiftFlow V69 - DreamArt Total Visibility</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -16,7 +16,7 @@
         /* LOGIN */
         #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-card { background: #fff; color: #000; padding: 40px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; font-weight: bold; font-size: 16px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 16px; }
         .btn-main { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; }
 
         /* APP VIEW */
@@ -55,14 +55,14 @@
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(4px); }
         .modal-box { background: white; padding: 30px; border-radius: 16px; width: 480px; text-align: center; border: 4px solid #000; color: #000; }
         
-        /* ANALYTICS SPECIFIC */
-        .analytics-modal { width: 800px !important; max-height: 90vh; overflow-y: auto; }
+        /* ANALYTICS */
+        .analytics-modal { width: 850px !important; max-height: 90vh; overflow-y: auto; }
         .stats-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
-        .stat-item { background: #f1f5f9; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; }
-        .stat-item b { display: block; font-size: 11px; color: #64748b; }
-        .stat-item span { font-size: 18px; font-weight: 900; color: #0f172a; }
-        .chart-container { margin-top: 20px; padding: 15px; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; height: 300px; }
-        .filter-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .stat-item { background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; }
+        .stat-item b { display: block; font-size: 11px; color: #64748b; text-transform: uppercase; }
+        .stat-item span { font-size: 22px; font-weight: 900; color: #0f172a; }
+        .chart-container { margin-top: 20px; padding: 20px; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; height: 350px; }
+        .filter-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
     </style>
 </head>
 <body>
@@ -70,11 +70,12 @@
     <div id="view-login">
         <div class="login-card">
             <h1>ShiftFlow</h1>
-            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART ANALYTICS V68</p>
+            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART VISIBILITY V69</p>
             <input type="text" id="user-in" placeholder="Username" autocomplete="off">
             <input type="password" id="pass-in" placeholder="Password">
             <button class="btn-main" onclick="handleAuth()">LOG IN</button>
             <button onclick="emergency()" style="margin-top:15px; background:red; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;">⚠️ BYPASS</button>
+            <p onclick="localStorage.clear(); location.reload();" style="margin-top:20px; color:blue; text-decoration:underline; font-size:10px; cursor:pointer; font-weight:bold;">REPAIR & RESET SYSTEM</p>
         </div>
     </div>
 
@@ -83,7 +84,7 @@
             <div style="font-size:22px; font-weight:900;">DREAMART SYSTEM</div>
             <div style="display:flex; gap:10px; align-items:center;">
                 <span id="user-display" style="color:gold; font-weight:bold; text-transform:uppercase; font-size:13px;"></span>
-                <button class="btn-ctrl btn-gold" onclick="openAnalytics()">📊 ANALYTICS</button>
+                <button class="btn-ctrl btn-gold" style="padding: 10px 20px; font-size: 14px;" onclick="openAnalytics()">📊 ANALYTICS</button>
                 <button id="btn-add-p" class="hidden btn-ctrl btn-gold" onclick="openAddModal()">+ ADD PERSON</button>
                 <button class="btn-ctrl" onclick="location.reload()" style="background:#dc2626;">LOG OUT</button>
             </div>
@@ -107,23 +108,22 @@
 
     <div id="modal-analytics" class="modal-overlay">
         <div class="modal-box analytics-modal">
-            <h2 style="margin:0;">Performance Report</h2>
-            <p id="stats-shift-label" style="font-weight:bold; color:#64748b; margin-bottom:15px;"></p>
+            <h2 style="margin:0; font-size: 28px;">Agency Performance Report</h2>
+            <p id="stats-shift-label" style="font-weight:bold; color:#64748b; margin-bottom:20px;"></p>
             
             <div class="filter-group">
-                <button class="btn-ctrl" onclick="updateAnalytics(7)">Last 7 Days</button>
-                <button class="btn-ctrl" onclick="updateAnalytics(14)">Last 14 Days</button>
-                <button class="btn-ctrl" onclick="updateAnalytics(30)">Last 30 Days</button>
+                <button class="btn-ctrl" style="background:#0f172a;" onclick="updateAnalytics(7)">7 Days</button>
+                <button class="btn-ctrl" style="background:#0f172a;" onclick="updateAnalytics(14)">14 Days</button>
+                <button class="btn-ctrl" style="background:#0f172a;" onclick="updateAnalytics(30)">30 Days</button>
             </div>
 
-            <div class="stats-summary" id="stats-pods-summary">
-                </div>
+            <div class="stats-summary" id="stats-pods-summary"></div>
 
             <div class="chart-container">
                 <canvas id="performanceChart"></canvas>
             </div>
 
-            <button class="btn-ctrl" style="width:100%; margin-top:25px;" onclick="closeModals()">CLOSE REPORT</button>
+            <button class="btn-ctrl" style="width:100%; margin-top:25px; padding: 15px;" onclick="closeModals()">CLOSE REPORT</button>
         </div>
     </div>
 
@@ -139,14 +139,14 @@
                 <input type="text" id="add-team" placeholder="Team"><input type="text" id="add-model" placeholder="Model">
                 <select id="add-pod"><option value="A">POD A</option><option value="B">POD B</option><option value="F">POD F</option><option value="BACKUP">BACKUP</option></select>
             </div>
-            <button class="btn-entry" onclick="confirmAddMember()" style="background:#000;">SAVE</button>
+            <button class="btn-entry" onclick="confirmAddMember()" style="background:#000; color:white;">SAVE MEMBER</button>
             <button class="btn-ctrl" style="width:100%; margin-top:10px;" onclick="closeModals()">CANCEL</button>
         </div>
     </div>
 
     <div id="modal-status" class="modal-overlay">
         <div class="modal-box">
-            <h3 id="target-name" style="margin-top:0;"></h3>
+            <h3 id="target-name"></h3>
             <div id="sales-zone" class="hidden" style="margin-bottom:15px; padding:15px; background:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
                 <input type="number" id="sales-val" placeholder="0.00" style="font-size:20px; text-align:center;">
                 <button class="btn-entry" style="background:#10b981;" onclick="applySales()">SAVE SALES</button>
@@ -164,7 +164,7 @@
     </div>
 
 <script>
-    // --- DATABASE & CORE ---
+    // --- ENGINE ---
     let db = { emps: [], mgrs: [], sched: {}, sales: {}, goals: { '1st':{A:500,B:500,F:500,BACKUP:200}, '2nd':{A:500,B:500,F:500,BACKUP:200}, '3rd':{A:500,B:500,F:500,BACKUP:200} } };
     let weekOff = 0, currentShift = '1st', activeCell = null, user = null, role = null, myChart = null;
 
@@ -179,7 +179,7 @@
     function emergency() { user="karina"; role="admin"; launch(); }
 
     function launch() {
-        const saved = localStorage.getItem('SF_ATOMIC_V68');
+        const saved = localStorage.getItem('SF_V69_TOTAL');
         if(saved) db = JSON.parse(saved);
         document.getElementById('view-login').style.display='none';
         document.getElementById('view-app').style.display='block';
@@ -188,16 +188,11 @@
         render();
     }
 
-    // --- RENDER ROSTER ---
-    function setShift(s) { currentShift = s; render(); }
-    function changeWeek(n) { weekOff += n; render(); }
-
     function render() {
         const area = document.getElementById('pods-area'); area.innerHTML = '';
         const week = getWeekRange(weekOff);
         document.getElementById('week-label').innerText = `${week[0].label} — ${week[6].label}`;
         const today = getTodayKey();
-
         document.querySelectorAll('.btn-shift').forEach(b => b.classList.toggle('active', b.id === 'shift-'+currentShift));
 
         ['A','B','F','BACKUP'].forEach(pod => {
@@ -219,8 +214,7 @@
                 week.forEach(d => {
                     const st = db.sched[e.id]?.[d.key] || 'ON';
                     const sl = db.sales[e.id]?.[d.key] || 0;
-                    let display = (st === 'ON') ? '●' : st;
-                    h += `<td onclick="openStatus(${e.id},'${d.key}','${e.name}','chatter')" style="cursor:pointer;"><span class="${st==='OFF'?'st-OFF':st==='ABSENT'?'st-ABSENT':''}">${display}</span>${sl>0?`<span class="sales-tag">$${sl}</span>`:''}</td>`;
+                    h += `<td onclick="openStatus(${e.id},'${d.key}','${e.name}','chatter')" style="cursor:pointer;"><span class="${st==='OFF'?'st-OFF':st==='ABSENT'?'st-ABSENT':''}">${st==='ON'?'●':st}</span>${sl>0?`<span class="sales-tag">$${sl}</span>`:''}</td>`;
                 });
                 h += `</tr>`;
             });
@@ -228,10 +222,10 @@
         });
     }
 
-    // --- ANALYTICS ENGINE (The New Stuff) ---
+    // --- ANALYTICS ENGINE (V69 FIX) ---
     function openAnalytics() {
         document.getElementById('modal-analytics').style.display = 'flex';
-        document.getElementById('stats-shift-label').innerText = `Filtering data for ${currentShift} Shift`;
+        document.getElementById('stats-shift-label').innerText = `Data Insights for ${currentShift} Shift`;
         updateAnalytics(7);
     }
 
@@ -240,7 +234,6 @@
         const labels = [];
         const dailyData = [];
 
-        // Generar lista de fechas
         for (let i = days - 1; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
@@ -258,14 +251,12 @@
             dailyData.push(totalDay);
         }
 
-        // Renderizar Cuadritos de PODS
         const summary = document.getElementById('stats-pods-summary');
         summary.innerHTML = '';
         Object.keys(podTotals).forEach(p => {
             summary.innerHTML += `<div class="stat-item"><b>POD ${p}</b><span>$${podTotals[p].toLocaleString()}</span></div>`;
         });
 
-        // Renderizar Gráfico
         if (myChart) myChart.destroy();
         const ctx = document.getElementById('performanceChart').getContext('2d');
         myChart = new Chart(ctx, {
@@ -273,11 +264,12 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: `Global Revenue (${currentShift})`,
+                    label: `Revenue Progression ($)`,
                     data: dailyData,
                     borderColor: '#FFD700',
                     backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                    borderWidth: 3,
+                    borderWidth: 4,
+                    pointRadius: 5,
                     fill: true,
                     tension: 0.3
                 }]
@@ -290,7 +282,7 @@
         });
     }
 
-    // --- UTILS ---
+    // --- ACTIONS ---
     function editGoal(p) { const n = prompt(`Goal for POD ${p}:`, db.goals[currentShift][p]); if(n) { db.goals[currentShift][p]=parseFloat(n); save(); } }
     function openAddModal() { document.getElementById('modal-add').style.display='flex'; }
     function confirmAddMember() {
@@ -305,9 +297,10 @@
     }
     function delMember(id, type) { if(confirm("Delete?")) { if(type==='chatter') db.emps=db.emps.filter(e=>e.id!==id); else db.mgrs=db.mgrs.filter(m=>m.id!==id); save(); } }
     function openStatus(id, key, name, type) { activeCell={id,key,name,type}; document.getElementById('target-name').innerText=name; document.getElementById('sales-zone').classList.add('hidden'); document.getElementById('modal-status').style.display='flex'; }
+    function handleWorking() { updateStatus('ON'); }
     function applySales() { const v = parseFloat(document.getElementById('sales-val').value)||0; if(!db.sales[activeCell.id]) db.sales[activeCell.id]={}; db.sales[activeCell.id][activeCell.key]=v; save(); closeModals(); }
     function updateStatus(st) { if(!db.sched[activeCell.id]) db.sched[activeCell.id]={}; db.sched[activeCell.id][activeCell.key]=st; save(); closeModals(); }
-    function save() { localStorage.setItem('SF_ATOMIC_V68', JSON.stringify(db)); render(); }
+    function save() { localStorage.setItem('SF_V69_TOTAL', JSON.stringify(db)); render(); }
     function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display='none'); }
     function getTodayKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
     function getWeekRange(off) {
@@ -320,6 +313,7 @@
         }
         return res;
     }
+    function setShift(s) { currentShift = s; render(); }
 </script>
 </body>
 </html>
