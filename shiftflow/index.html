@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DreamArt ShiftFlow V67 - Infinite Recovery</title>
+    <title>ShiftFlow V68 - Advanced Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #0f172a; --nav: #000; --gold: #FFD700;
@@ -12,36 +13,35 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #f8fafc; }
         .hidden { display: none !important; }
 
-        /* --- LOGIN (LAYER 0) --- */
+        /* LOGIN */
         #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-card { background: #fff; color: #000; padding: 40px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .login-card input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 16px; display: block; }
-        .btn-entry { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
+        .login-card { background: #fff; color: #000; padding: 40px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; font-weight: bold; font-size: 16px; }
+        .btn-main { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; }
 
-        /* --- APP CONTENT --- */
+        /* APP VIEW */
         #view-app { background: #f1f5f9; color: #1e293b; min-height: 100vh; display: none; }
         .nav { background: var(--nav); color: #fff; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
-        .sub-nav { background: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #cbd5e1; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .sub-nav { background: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #cbd5e1; }
         
-        /* SHIFTS */
         .shift-bar { display: flex; background: #e2e8f0; padding: 4px; border-radius: 8px; gap: 4px; }
-        .btn-shift { border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-weight: 800; color: #475569; background: transparent; transition: 0.2s; }
+        .btn-shift { border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-weight: 800; color: #475569; background: transparent; }
         .btn-shift.active { background: #000; color: #fff; }
 
         .btn-ctrl { background: #334155; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-gold { background: var(--gold); color: black; }
 
-        /* TABLES */
-        .pods-container { padding: 25px; display: flex; flex-direction: column; gap: 35px; }
+        /* PODS */
+        .pods-container { padding: 20px; display: flex; flex-direction: column; gap: 30px; }
         .pod-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        .pod-header { padding: 15px 25px; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
+        .pod-header { padding: 12px 20px; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
         .h-A { background: var(--podA); } .h-B { background: var(--podB); } .h-F { background: var(--podF); } 
         .h-BACKUP { background: var(--podBackup); } .h-SHADOWER { background: var(--shadowerCol); color: #3730a3; }
         .goal-success { background: var(--goalMet) !important; color: #166534 !important; }
 
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1300px; }
-        th { background: #1e293b; color: white; padding: 12px; font-size: 11px; text-transform: uppercase; }
+        th { background: #1e293b; color: white; padding: 12px; font-size: 11px; }
         td { padding: 12px; text-align: center; font-weight: bold; border-bottom: 1px solid #f1f5f9; background: white; color: #334155; }
         
         .sticky-col { position: sticky; left: 0; z-index: 20; background: #fff !important; border-right: 2px solid #e2e8f0 !important; text-align: left !important; padding-left: 20px !important; }
@@ -54,28 +54,36 @@
         /* MODALS */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(4px); }
         .modal-box { background: white; padding: 30px; border-radius: 16px; width: 480px; text-align: center; border: 4px solid #000; color: #000; }
+        
+        /* ANALYTICS SPECIFIC */
+        .analytics-modal { width: 800px !important; max-height: 90vh; overflow-y: auto; }
+        .stats-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        .stat-item { background: #f1f5f9; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; }
+        .stat-item b { display: block; font-size: 11px; color: #64748b; }
+        .stat-item span { font-size: 18px; font-weight: 900; color: #0f172a; }
+        .chart-container { margin-top: 20px; padding: 15px; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; height: 300px; }
+        .filter-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div id="view-login">
         <div class="login-card">
-            <h1 style="margin:0;">ShiftFlow</h1>
-            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART INFINITE V67</p>
+            <h1>ShiftFlow</h1>
+            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART ANALYTICS V68</p>
             <input type="text" id="user-in" placeholder="Username" autocomplete="off">
             <input type="password" id="pass-in" placeholder="Password">
-            <button class="btn-entry" onclick="handleAuth()">LOG IN</button>
-            <button onclick="bypass()" style="margin-top:20px; background:red; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;">⚠️ EMERGENCY BYPASS</button>
-            <p onclick="nuke()" style="margin-top:20px; color:blue; text-decoration:underline; font-size:10px; cursor:pointer; font-weight:bold;">CLEAN SYSTEM (IF BLANK SCREEN)</p>
+            <button class="btn-main" onclick="handleAuth()">LOG IN</button>
+            <button onclick="emergency()" style="margin-top:15px; background:red; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;">⚠️ BYPASS</button>
         </div>
     </div>
 
     <div id="view-app">
         <div class="nav">
-            <div style="font-size:22px; font-weight:900;">DREAMART <span style="color:var(--gold); font-size:12px;">SYSTEM</span></div>
+            <div style="font-size:22px; font-weight:900;">DREAMART SYSTEM</div>
             <div style="display:flex; gap:10px; align-items:center;">
                 <span id="user-display" style="color:gold; font-weight:bold; text-transform:uppercase; font-size:13px;"></span>
-                <button class="btn-ctrl btn-gold" onclick="openStats()">📊 STATISTICS</button>
+                <button class="btn-ctrl btn-gold" onclick="openAnalytics()">📊 ANALYTICS</button>
                 <button id="btn-add-p" class="hidden btn-ctrl btn-gold" onclick="openAddModal()">+ ADD PERSON</button>
                 <button class="btn-ctrl" onclick="location.reload()" style="background:#dc2626;">LOG OUT</button>
             </div>
@@ -97,9 +105,31 @@
         <div id="pods-area" class="pods-container"></div>
     </div>
 
+    <div id="modal-analytics" class="modal-overlay">
+        <div class="modal-box analytics-modal">
+            <h2 style="margin:0;">Performance Report</h2>
+            <p id="stats-shift-label" style="font-weight:bold; color:#64748b; margin-bottom:15px;"></p>
+            
+            <div class="filter-group">
+                <button class="btn-ctrl" onclick="updateAnalytics(7)">Last 7 Days</button>
+                <button class="btn-ctrl" onclick="updateAnalytics(14)">Last 14 Days</button>
+                <button class="btn-ctrl" onclick="updateAnalytics(30)">Last 30 Days</button>
+            </div>
+
+            <div class="stats-summary" id="stats-pods-summary">
+                </div>
+
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+
+            <button class="btn-ctrl" style="width:100%; margin-top:25px;" onclick="closeModals()">CLOSE REPORT</button>
+        </div>
+    </div>
+
     <div id="modal-add" class="modal-overlay">
         <div class="modal-box">
-            <h3>Add New Member</h3>
+            <h3>Add Member</h3>
             <input type="text" id="add-name" placeholder="Full Name">
             <select id="add-role" onchange="document.getElementById('ch-fields').classList.toggle('hidden', this.value==='shadower')">
                 <option value="chatter">Chatter</option><option value="shadower">Shadower</option>
@@ -121,36 +151,22 @@
                 <input type="number" id="sales-val" placeholder="0.00" style="font-size:20px; text-align:center;">
                 <button class="btn-entry" style="background:#10b981;" onclick="applySales()">SAVE SALES</button>
             </div>
-            <div id="repl-zone" class="hidden" style="margin-bottom:15px; padding:15px; background:#eef2ff; border-radius:10px;">
-                <label id="repl-msg" style="font-size:12px; font-weight:bold;"></label>
-                <select id="sel-repl"></select>
-                <button class="btn-entry" style="background:#4f46e5;" onclick="confirmRepl()">CONFIRM COVERAGE</button>
-            </div>
             <div id="status-btns">
                 <button id="btn-sales-trigger" class="btn-ctrl btn-gold" style="width:100%; margin-bottom:10px;" onclick="document.getElementById('sales-zone').classList.toggle('hidden')">💸 ADD SALES</button>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                     <button class="btn-entry" style="background:green; margin:0;" onclick="handleWorking()">WORKING</button>
-                    <button class="btn-entry" style="background:orange; margin:0;" onclick="saveStatus('ABSENT')">ABSENT</button>
-                    <button class="btn-entry" style="background:red; margin:0;" onclick="saveStatus('OFF')">OFF</button>
-                    <button class="btn-entry" style="background:purple; margin:0;" onclick="saveStatus('SICK')">SICK</button>
+                    <button class="btn-entry" style="background:orange; margin:0;" onclick="updateStatus('ABSENT')">ABSENT</button>
+                    <button class="btn-entry" style="background:red; margin:0;" onclick="updateStatus('OFF')">OFF</button>
                 </div>
             </div>
             <button class="btn-ctrl" style="width:100%; margin-top:15px;" onclick="closeModals()">CLOSE</button>
         </div>
     </div>
 
-    <div id="modal-stats" class="modal-overlay">
-        <div class="modal-box" style="width: 550px;">
-            <h2 style="margin-top:0;">Revenue Report</h2>
-            <div id="stats-data"></div>
-            <button class="btn-ctrl" style="width:100%; margin-top:15px;" onclick="closeModals()">CLOSE</button>
-        </div>
-    </div>
-
 <script>
-    // --- AUTH & MEMORY ---
+    // --- DATABASE & CORE ---
     let db = { emps: [], mgrs: [], sched: {}, sales: {}, goals: { '1st':{A:500,B:500,F:500,BACKUP:200}, '2nd':{A:500,B:500,F:500,BACKUP:200}, '3rd':{A:500,B:500,F:500,BACKUP:200} } };
-    let weekOff = 0, currentShift = '1st', activeCell = null, user = null, role = null;
+    let weekOff = 0, currentShift = '1st', activeCell = null, user = null, role = null, myChart = null;
 
     function handleAuth() {
         const u = document.getElementById('user-in').value.toLowerCase().trim();
@@ -160,14 +176,11 @@
         if(p === '1234' && (ADMINS.includes(u) || MGRS.includes(u))) { user = u; role = ADMINS.includes(u) ? 'admin' : 'manager'; launch(); }
         else alert("Access Denied");
     }
-    function bypass() { user="karina"; role="admin"; launch(); }
-    function nuke() { if(confirm("This will clear the blue screen. Data might be reset. OK?")) { localStorage.clear(); location.reload(); } }
+    function emergency() { user="karina"; role="admin"; launch(); }
 
     function launch() {
-        try {
-            const saved = localStorage.getItem('SF_INFINITE_V67');
-            if(saved) db = JSON.parse(saved);
-        } catch(e) {}
+        const saved = localStorage.getItem('SF_ATOMIC_V68');
+        if(saved) db = JSON.parse(saved);
         document.getElementById('view-login').style.display='none';
         document.getElementById('view-app').style.display='block';
         document.getElementById('user-display').innerText = user;
@@ -175,14 +188,8 @@
         render();
     }
 
-    // --- RENDER ---
-    function setShift(s) {
-        currentShift = s;
-        document.querySelectorAll('.btn-shift').forEach(b => b.classList.remove('active'));
-        document.getElementById('shift-'+s).classList.add('active');
-        render();
-    }
-
+    // --- RENDER ROSTER ---
+    function setShift(s) { currentShift = s; render(); }
     function changeWeek(n) { weekOff += n; render(); }
 
     function render() {
@@ -191,16 +198,18 @@
         document.getElementById('week-label').innerText = `${week[0].label} — ${week[6].label}`;
         const today = getTodayKey();
 
+        document.querySelectorAll('.btn-shift').forEach(b => b.classList.toggle('active', b.id === 'shift-'+currentShift));
+
         ['A','B','F','BACKUP'].forEach(pod => {
             const pEmps = (db.emps || []).filter(e => e.pod === pod && e.shift === currentShift);
-            let podRev = 0;
-            pEmps.forEach(e => podRev += (db.sales[e.id]?.[today] || 0));
+            let podTodayRev = 0;
+            pEmps.forEach(e => podTodayRev += (db.sales[e.id]?.[today] || 0));
             const goal = db.goals[currentShift][pod];
-            const goalMet = podRev >= goal;
+            const goalMet = podTodayRev >= goal;
 
             let h = `<div class="pod-card"><div class="pod-header h-${pod} ${goalMet ? 'goal-success' : ''}">
                 <span>POD ${pod} <small>(${currentShift})</small></span>
-                <span>$${podRev} / Goal: $${goal} ${role==='admin'?`<button onclick="editGoal('${pod}')" style="font-size:10px; cursor:pointer; background:#334155; color:white; border:none; padding:2px 5px; border-radius:3px; margin-left:10px;">EDIT</button>`:''}</span>
+                <span>$${podTodayRev} / Goal: $${goal} ${role==='admin'?`<button onclick="editGoal('${pod}')" style="font-size:10px; cursor:pointer; background:#334155; color:white; border:none; padding:2px 5px; border-radius:3px; margin-left:10px;">EDIT</button>`:''}</span>
                 </div><div class="table-wrapper"><table><thead><tr><th class="sticky-col">TEAM</th><th class="sticky-col sc-2">MODEL</th><th class="sticky-col sc-3">CHATTER</th>`;
             week.forEach(d => h += `<th>${d.short}</th>`);
             h += `</tr></thead><tbody>`;
@@ -210,37 +219,80 @@
                 week.forEach(d => {
                     const st = db.sched[e.id]?.[d.key] || 'ON';
                     const sl = db.sales[e.id]?.[d.key] || 0;
-                    let display = (st === 'ON') ? '●' : (typeof st === 'object' ? `COV: ${st.replacing}` : st);
+                    let display = (st === 'ON') ? '●' : st;
                     h += `<td onclick="openStatus(${e.id},'${d.key}','${e.name}','chatter')" style="cursor:pointer;"><span class="${st==='OFF'?'st-OFF':st==='ABSENT'?'st-ABSENT':''}">${display}</span>${sl>0?`<span class="sales-tag">$${sl}</span>`:''}</td>`;
                 });
                 h += `</tr>`;
             });
             area.innerHTML += h + `</tbody></table></div></div>`;
         });
-
-        // Shadower Table
-        const pMgrs = (db.mgrs || []).filter(m => m.shift === currentShift);
-        let mh = `<div class="pod-card"><div class="pod-header h-SHADOWER">SHADOWERS CONTROL <small>(${currentShift})</small></div><div class="table-wrapper"><table><thead><tr><th class="sticky-col">ROLE</th><th class="sticky-col sc-2">--</th><th class="sticky-col sc-3">NAME</th>`;
-        week.forEach(d => mh += `<th>${d.short}</th>`);
-        mh += `</tr></thead><tbody>`;
-        pMgrs.forEach(m => {
-            mh += `<tr><td class="sticky-col">Shadower</td><td class="sticky-col sc-2">--</td>
-                <td class="sticky-col sc-3"><span>${m.name}</span>${role==='admin'?`<button class="btn-del" onclick="delMember(${m.id},'shadower')">✖</button>`:''}</td>`;
-            week.forEach(d => {
-                const st = db.sched[m.id]?.[d.key] || 'ON';
-                let display = (st === 'ON') ? '●' : (typeof st === 'object' ? `COV: ${st.replacing}` : st);
-                mh += `<td onclick="openStatus(${m.id},'${d.key}','${m.name}','shadower')" style="cursor:pointer;">${display}</td>`;
-            });
-            mh += `</tr>`;
-        });
-        area.innerHTML += mh + `</tbody></table></div></div>`;
     }
 
-    // --- ACTIONS ---
-    function editGoal(p) { const n = prompt(`Goal for POD ${p} (${currentShift}):`, db.goals[currentShift][p]); if(n) { db.goals[currentShift][p]=parseFloat(n); save(); } }
+    // --- ANALYTICS ENGINE (The New Stuff) ---
+    function openAnalytics() {
+        document.getElementById('modal-analytics').style.display = 'flex';
+        document.getElementById('stats-shift-label').innerText = `Filtering data for ${currentShift} Shift`;
+        updateAnalytics(7);
+    }
+
+    function updateAnalytics(days) {
+        const podTotals = { A: 0, B: 0, F: 0, BACKUP: 0 };
+        const labels = [];
+        const dailyData = [];
+
+        // Generar lista de fechas
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const key = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+            labels.push(`${d.getDate()}/${d.getMonth()+1}`);
+            
+            let totalDay = 0;
+            db.emps.forEach(e => {
+                if(e.shift === currentShift) {
+                    const s = db.sales[e.id]?.[key] || 0;
+                    totalDay += s;
+                    podTotals[e.pod] += s;
+                }
+            });
+            dailyData.push(totalDay);
+        }
+
+        // Renderizar Cuadritos de PODS
+        const summary = document.getElementById('stats-pods-summary');
+        summary.innerHTML = '';
+        Object.keys(podTotals).forEach(p => {
+            summary.innerHTML += `<div class="stat-item"><b>POD ${p}</b><span>$${podTotals[p].toLocaleString()}</span></div>`;
+        });
+
+        // Renderizar Gráfico
+        if (myChart) myChart.destroy();
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: `Global Revenue (${currentShift})`,
+                    data: dailyData,
+                    borderColor: '#FFD700',
+                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    // --- UTILS ---
+    function editGoal(p) { const n = prompt(`Goal for POD ${p}:`, db.goals[currentShift][p]); if(n) { db.goals[currentShift][p]=parseFloat(n); save(); } }
     function openAddModal() { document.getElementById('modal-add').style.display='flex'; }
-    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display='none'); }
-    
     function confirmAddMember() {
         const n = document.getElementById('add-name').value.trim();
         const sh = document.getElementById('add-shift').value;
@@ -251,42 +303,12 @@
         else db.mgrs.push({id, name:n, shift: sh});
         save(); closeModals();
     }
-
-    function delMember(id, type) { if(confirm("Delete member?")) { if(type==='chatter') db.emps=db.emps.filter(e=>e.id!==id); else db.mgrs=db.mgrs.filter(m=>m.id!==id); save(); } }
-    function openStatus(id, key, name, type) { activeCell={id,key,name,type}; document.getElementById('target-name').innerText=name; document.getElementById('sales-zone').classList.add('hidden'); document.getElementById('repl-zone').classList.add('hidden'); document.getElementById('btn-sales-trigger').classList.toggle('hidden', type!=='chatter'); document.getElementById('modal-status').style.display='flex'; }
-    function handleWorking() {
-        const others = activeCell.type==='chatter' ? db.emps.filter(e=>e.id!==activeCell.id && e.shift === currentShift && e.pod!=='BACKUP') : db.mgrs.filter(m=>m.id!==activeCell.id && m.shift === currentShift);
-        const cands = others.filter(o => ['OFF','ABSENT','SICK'].includes(db.sched[o.id]?.[activeCell.key]));
-        if(cands.length>0) {
-            document.getElementById('repl-msg').innerText = `Who is ${activeCell.name} covering?`;
-            const s = document.getElementById('sel-repl'); s.innerHTML = '<option value="">Standard Shift</option>';
-            cands.forEach(c => s.innerHTML += `<option value="${c.name}">${c.name}</option>`);
-            document.getElementById('repl-zone').classList.remove('hidden');
-        } else saveStatus('ON');
-    }
-    function confirmRepl() { const r = document.getElementById('sel-repl').value; if(r) saveStatus({status:'ON', replacing: r}); else saveStatus('ON'); }
+    function delMember(id, type) { if(confirm("Delete?")) { if(type==='chatter') db.emps=db.emps.filter(e=>e.id!==id); else db.mgrs=db.mgrs.filter(m=>m.id!==id); save(); } }
+    function openStatus(id, key, name, type) { activeCell={id,key,name,type}; document.getElementById('target-name').innerText=name; document.getElementById('sales-zone').classList.add('hidden'); document.getElementById('modal-status').style.display='flex'; }
     function applySales() { const v = parseFloat(document.getElementById('sales-val').value)||0; if(!db.sales[activeCell.id]) db.sales[activeCell.id]={}; db.sales[activeCell.id][activeCell.key]=v; save(); closeModals(); }
-    function saveStatus(st) { if(!db.sched[activeCell.id]) db.sched[activeCell.id]={}; db.sched[activeCell.id][activeCell.key]=st; save(); closeModals(); }
-
-    function openStats() {
-        let totals = { '1st':0, '2nd':0, '3rd':0 };
-        db.emps.forEach(e => { Object.values(db.sales[e.id] || {}).forEach(v => totals[e.shift] += v); });
-        const g = totals['1st'] + totals['2nd'] + totals['3rd'];
-        document.getElementById('stats-data').innerHTML = `
-            <div style="background:#000; color:#fff; padding:20px; border-radius:12px; margin-bottom:15px;">
-                <h4 style="margin:0; opacity:0.8;">GLOBAL REVENUE</h4>
-                <div style="font-size:35px; font-weight:900; color:var(--gold);">$${g.toLocaleString()}</div>
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
-                <div style="background:#f1f5f9; padding:10px; border-radius:8px;"><b>1st</b><br>$${totals['1st'].toLocaleString()}</div>
-                <div style="background:#f1f5f9; padding:10px; border-radius:8px;"><b>2nd</b><br>$${totals['2nd'].toLocaleString()}</div>
-                <div style="background:#f1f5f9; padding:10px; border-radius:8px;"><b>3rd</b><br>$${totals['3rd'].toLocaleString()}</div>
-            </div>`;
-        document.getElementById('modal-stats').style.display='flex';
-    }
-
-    // --- UTILS ---
-    function save() { localStorage.setItem('SF_INFINITE_V67', JSON.stringify(db)); render(); }
+    function updateStatus(st) { if(!db.sched[activeCell.id]) db.sched[activeCell.id]={}; db.sched[activeCell.id][activeCell.key]=st; save(); closeModals(); }
+    function save() { localStorage.setItem('SF_ATOMIC_V68', JSON.stringify(db)); render(); }
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display='none'); }
     function getTodayKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
     function getWeekRange(off) {
         const curr = new Date(); const day = curr.getDay();
