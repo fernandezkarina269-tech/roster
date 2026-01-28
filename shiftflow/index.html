@@ -3,103 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DreamArt V106 - ABSOLUTE</title>
+    <title>DreamArt V107 - DESTROYER</title>
     <style>
-        :root { --gold: #FFD700; --bg: #1e1b4b; }
-        body { font-family: sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; padding-bottom: 50px; }
+        :root { --gold: #FFD700; --bg: #121212; --accent: #1e293b; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f8fafc; color: #0f172a; padding-bottom: 60px; }
         .hidden { display: none !important; }
         
         /* LOGIN CON COLOR NUEVO PARA CONFIRMAR VERSIÓN */
         #view-login { position: fixed; inset: 0; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-card { background: #fff; padding: 40px; border-radius: 20px; text-align: center; width: 320px; border-top: 10px solid var(--gold); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #000; border-radius: 8px; font-size: 16px; font-weight: bold; }
-        .btn-main { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
+        .login-card { background: #fff; padding: 40px; border-radius: 24px; text-align: center; width: 340px; border: 4px solid var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; font-weight: 600; transition: 0.3s; }
+        input:focus { border-color: var(--gold); outline: none; }
+        .btn-main { padding: 16px; width: 100%; background: #000; color: #fff; border: none; font-weight: 800; cursor: pointer; border-radius: 12px; text-transform: uppercase; margin-top: 12px; }
         .btn-gold { background: var(--gold); color: #000; }
 
         /* NAV */
-        .nav { background: #000; color: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--gold); }
+        .nav { background: #000; color: #fff; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--gold); }
         
         /* TABLES */
-        .pod-card { background: white; border-radius: 12px; margin: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #ddd; }
+        .pod-card { background: white; border-radius: 16px; margin: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+        .pod-header { background: #f1f5f9; padding: 16px 20px; font-weight: 800; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
         table { width: 100%; border-collapse: collapse; min-width: 1300px; }
-        th { background: #1e293b; color: white; padding: 12px; font-size: 11px; }
-        td { padding: 12px; text-align: center; border: 1px solid #f0f0f0; font-weight: bold; font-size: 13px; }
+        th { background: #0f172a; color: white; padding: 14px; font-size: 12px; text-transform: uppercase; }
+        td { padding: 14px; text-align: center; border-bottom: 1px solid #f1f5f9; font-weight: 700; font-size: 14px; }
         
         /* COLUMNAS FIJAS */
-        .sc-1 { position: sticky; left: 0; background: white !important; z-index: 10; width: 90px; border-right: 1px solid #eee; }
-        .sc-2 { position: sticky; left: 90px; background: white !important; z-index: 10; width: 110px; border-right: 1px solid #eee; }
-        .sc-3 { position: sticky; left: 200px; background: white !important; z-index: 10; border-right: 2px solid #ddd; width: 180px; text-align: left; padding-left: 10px; }
+        .sc-1 { position: sticky; left: 0; background: #fff !important; z-index: 10; width: 100px; border-right: 1px solid #e2e8f0; }
+        .sc-2 { position: sticky; left: 100px; background: #fff !important; z-index: 10; width: 120px; border-right: 1px solid #e2e8f0; }
+        .sc-3 { position: sticky; left: 220px; background: #fff !important; z-index: 10; border-right: 2px solid #cbd5e1; width: 180px; text-align: left; padding-left: 15px; }
 
-        /* COLORES DE KARINA */
+        /* COLORES DE ESTADOS - REGLAS DE KARINA */
         .st-OFF { color: #f97316 !important; font-weight: 900 !important; } 
         .st-SICK { color: #a855f7 !important; } 
         .st-ABSENT { color: #ef4444 !important; font-weight: 900 !important; } 
-        .st-COV { color: #3b82f6; font-size: 10px; display: block; }
-        .sales-tag { display: block; font-size: 10px; color: #059669; font-weight: 900; }
+        .st-COV { color: #3b82f6; font-size: 11px; display: block; margin-top: 4px; }
+        .sales-tag { display: block; font-size: 11px; color: #10b981; font-weight: 800; margin-top: 4px; }
+
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-box { background: white; padding: 35px; border-radius: 24px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
     <div id="view-login">
         <div class="login-card">
-            <h1>ShiftFlow</h1>
-            <p style="font-weight:900; color:var(--bg);">V106 - PURPLE EDITION</p>
-            <input type="password" id="pass-in" placeholder="CLAVE (1234)">
-            <button class="btn-main" onclick="startApp()">ENTRAR</button>
-            <button class="btn-main btn-gold" onclick="bypass()">BYPASS DE EMERGENCIA</button>
-            <p onclick="localStorage.clear(); location.reload();" style="color:red; text-decoration:underline; cursor:pointer; font-size:11px; margin-top:20px;">BORRAR MEMORIA (RESET)</p>
+            <h1 style="margin-bottom:10px;">ShiftFlow</h1>
+            <p style="font-weight:900; color:#10b981; font-size:13px; margin-bottom:20px;">V107 - CACHE DESTROYER</p>
+            <input type="password" id="pass-in" placeholder="CLAVE DE ACCESO">
+            <button class="btn-main" onclick="startApp()">ENTRAR AL SISTEMA</button>
+            <button class="btn-main btn-gold" onclick="bypass()">ACCESO DIRECTO</button>
+            <p onclick="localStorage.clear(); location.reload();" style="color:#ef4444; text-decoration:underline; cursor:pointer; font-size:12px; margin-top:20px; font-weight:bold;">SOLUCIONAR PANTALLA BLANCA (RESET)</p>
         </div>
     </div>
 
     <div id="view-app" class="hidden">
         <div class="nav">
-            <div style="font-weight:900;">DREAMART SYSTEM</div>
-            <button class="btn-main btn-gold" style="width:auto; padding:8px 15px;" onclick="showAdd()">+ AGREGAR MIEMBRO</button>
+            <div style="font-weight:900; letter-spacing:1px;">DREAMART SYSTEM</div>
+            <button class="btn-main btn-gold" style="width:auto; padding:10px 20px;" onclick="showAdd()">+ AGREGAR MIEMBRO</button>
         </div>
         <div id="pods-area"></div>
     </div>
 
-    <div id="modal-status" class="modal" style="background:white; padding:30px; border-radius:20px; border:4px solid #000; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:3000; width:90%; max-width:400px; display:none;">
-        <h2 id="target-name"></h2>
-        <div id="cov-zone" class="hidden" style="margin-bottom:15px;">
-            <label style="font-size:11px; font-weight:bold;">¿A quién cubre?</label>
-            <select id="cov-select"></select>
-            <button class="btn-main" style="background:#3b82f6;" onclick="confirmCov()">GUARDAR COBERTURA</button>
+    <div id="modal-status" class="modal">
+        <div class="modal-box">
+            <h2 id="target-name" style="margin-top:0; color:#0f172a;"></h2>
+            <div id="cov-zone" class="hidden" style="background:#f0f9ff; padding:20px; border-radius:16px; margin-bottom:20px; border:1px solid #bae6fd;">
+                <label style="font-size:12px; font-weight:800; display:block; margin-bottom:10px;">¿A QUIÉN CUBRE?</label>
+                <select id="cov-select"></select>
+                <button class="btn-main" style="background:#0284c7;" onclick="confirmCov()">CONFIRMAR COBERTURA</button>
+            </div>
+            <div id="sick-zone" class="hidden" style="background:#f5f3ff; padding:20px; border-radius:16px; margin-bottom:20px; border:1px solid #ddd6fe;">
+                <label style="font-size:12px; font-weight:800; display:block; margin-bottom:10px;">FECHA DE REINCORPORACIÓN:</label>
+                <input type="date" id="sick-date">
+                <button class="btn-main" style="background:#7c3aed;" onclick="confirmSick()">GUARDAR FECHA SICK</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <button class="btn-main" style="background:#10b981;" onclick="handleWorking()">WORKING</button>
+                <button class="btn-main" style="background:#f97316;" onclick="saveSt('OFF')">OFF</button>
+                <button class="btn-main" style="background:#ef4444;" onclick="saveSt('ABSENT')">ABSENT</button>
+                <button class="btn-main" style="background:#a855f7;" onclick="document.getElementById('sick-zone').classList.toggle('hidden')">SICK</button>
+            </div>
+            <button class="btn-main" style="background:#64748b; margin-top:20px;" onclick="closeM()">CANCELAR</button>
         </div>
-        <div id="sick-zone" class="hidden" style="margin-bottom:15px;">
-            <label style="font-size:11px; font-weight:bold;">Fecha Regreso:</label>
-            <input type="date" id="sick-date">
-            <button class="btn-main" style="background:#a855f7;" onclick="confirmSick()">GUARDAR SICK</button>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <button class="btn-main" style="background:green;" onclick="handleWorking()">WORKING</button>
-            <button class="btn-main" style="background:#f97316;" onclick="saveSt('OFF')">OFF</button>
-            <button class="btn-main" style="background:#ef4444;" onclick="saveSt('ABSENT')">ABSENT</button>
-            <button class="btn-main" style="background:#a855f7;" onclick="document.getElementById('sick-zone').classList.toggle('hidden')">SICK</button>
-        </div>
-        <button class="btn-main" style="background:#666; margin-top:20px;" onclick="closeM()">CERRAR</button>
     </div>
 
-    <div id="modal-add" class="modal" style="background:white; padding:30px; border-radius:20px; border:4px solid #000; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:3000; width:90%; max-width:400px; display:none;">
-        <h2>Nuevo Miembro</h2>
-        <input type="text" id="add-name" placeholder="Nombre">
-        <input type="text" id="add-team" placeholder="Team (Equipo)">
-        <input type="text" id="add-model" placeholder="Model (Modelo)">
-        <select id="add-pod"><option value="A">POD A</option><option value="B">POD B</option><option value="F">POD F</option><option value="BACKUP">POD BACKUP</option></select>
-        <select id="add-shift"><option value="1st">1st Shift</option><option value="2nd">2nd Shift</option><option value="3rd">3rd Shift</option></select>
-        <button class="btn-main" onclick="doAdd()">GUARDAR</button>
-        <button class="btn-main" style="background:#666;" onclick="closeM()">CANCELAR</button>
+    <div id="modal-add" class="modal">
+        <div class="modal-box">
+            <h2 style="margin-top:0;">Nuevo Miembro</h2>
+            <input type="text" id="add-name" placeholder="Nombre y Apellido">
+            <input type="text" id="add-team" placeholder="Nombre del Equipo (Team)">
+            <input type="text" id="add-model" placeholder="Nombre de la Modelo">
+            <select id="add-pod">
+                <option value="A">POD A</option><option value="B">POD B</option>
+                <option value="F">POD F</option><option value="BACKUP">POD BACKUP</option>
+            </select>
+            <select id="add-shift">
+                <option value="1st">1st Shift</option><option value="2nd">2nd Shift</option><option value="3rd">3rd Shift</option>
+            </select>
+            <button class="btn-main" onclick="doAdd()">GUARDAR MIEMBRO</button>
+            <button class="btn-main" style="background:#64748b; margin-top:10px;" onclick="closeM()">CANCELAR</button>
+        </div>
     </div>
 
 <script>
     let db = { emps: [], sched: {} };
     let act = null;
 
-    function startApp() { if(document.getElementById('pass-in').value === '1234') bypass(); else alert("Error"); }
+    function startApp() { if(document.getElementById('pass-in').value === '1234') bypass(); else alert("Clave Incorrecta"); }
     function bypass() {
-        const saved = localStorage.getItem('DREAMART_V106_OK');
+        const saved = localStorage.getItem('SF_V107_FINAL');
         if(saved) db = JSON.parse(saved);
-        document.getElementById('view-login').style.display = 'none';
+        document.getElementById('view-login').classList.add('hidden');
         document.getElementById('view-app').classList.remove('hidden');
         render();
     }
@@ -111,7 +125,7 @@
         ['A','B','F','BACKUP'].forEach(pod => {
             const list = db.emps.filter(e => e.pod === pod);
             if(list.length === 0) return;
-            let h = `<div class="pod-card"><div class="pod-header">POD ${pod}</div><div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">CHATTER</th>`;
+            let h = `<div class="pod-card"><div class="pod-header"><span>POD ${pod}</span></div><div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">CHATTER</th>`;
             days.forEach(d => h += `<th>${d}</th>`);
             h += `</tr></thead><tbody>`;
             list.forEach(e => {
@@ -122,8 +136,8 @@
                     if(st === 'OFF') cls = 'st-OFF';
                     if(st === 'ABSENT') cls = 'st-ABSENT';
                     if(typeof st === 'object') {
-                        if(st.status === 'SICK') { disp = 'SICK'; cls = 'st-SICK'; sub = `<br><small>${st.date}</small>`; }
-                        if(st.status === 'ON' && st.cov) { disp = '●'; sub = `<span class="st-COV">COV: ${st.cov}</span>`; }
+                        if(st.status === 'SICK') { disp = 'SICK'; cls = 'st-SICK'; sub = `<br><small style="color:#7c3aed">${st.date}</small>`; }
+                        if(st.status === 'ON' && st.cov) { disp = '●'; sub = `<span class="st-COV">CUBRIENDO: ${st.cov}</span>`; }
                     }
                     h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
                 });
@@ -137,7 +151,7 @@
         const others = db.emps.filter(e => e.id !== act.id);
         const absents = others.filter(o => ['OFF','ABSENT'].includes(db.sched[o.id]?.[act.key]));
         if(absents.length > 0) {
-            const sel = document.getElementById('cov-select'); sel.innerHTML = '<option value="">NORMAL</option>';
+            const sel = document.getElementById('cov-select'); sel.innerHTML = '<option value="">NORMAL (SIN COBERTURA)</option>';
             absents.forEach(a => sel.innerHTML += `<option value="${a.name}">${a.name}</option>`);
             document.getElementById('cov-zone').classList.remove('hidden');
         } else saveSt('●');
@@ -145,15 +159,15 @@
 
     function confirmCov() { saveSt({status: 'ON', cov: document.getElementById('cov-select').value || ''}); }
     function confirmSick() { saveSt({status: 'SICK', date: document.getElementById('sick-date').value}); }
-    function openM(id, k, n) { act={id,key:k,n}; document.getElementById('target-name').innerText=n; document.getElementById('modal-status').style.display='block'; }
-    function showAdd() { document.getElementById('modal-add').style.display='block'; }
-    function closeM() { document.querySelectorAll('.modal, #modal-status, #modal-add').forEach(m => m.style.display='none'); }
+    function openM(id, k, n) { act={id,key:k,n}; document.getElementById('target-name').innerText=n; document.querySelectorAll('#modal-status .hidden').forEach(z=>z.classList.add('hidden')); document.getElementById('modal-status').style.display='flex'; }
+    function showAdd() { document.getElementById('modal-add').style.display='flex'; }
+    function closeM() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
     function saveSt(s) { if(!db.sched[act.id]) db.sched[act.id]={}; db.sched[act.id][act.key]=s; save(); }
     function doAdd() {
         db.emps.push({ id: Date.now(), name: document.getElementById('add-name').value, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, shift: document.getElementById('add-shift').value });
         save();
     }
-    function save() { localStorage.setItem('DREAMART_V106_OK', JSON.stringify(db)); closeM(); render(); }
+    function save() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); closeM(); render(); }
 </script>
 </body>
 </html>
