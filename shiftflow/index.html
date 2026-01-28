@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DreamArt ShiftFlow V74 - Master</title>
+    <title>ShiftFlow V75 - DreamArt Ultimate</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -13,16 +13,16 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #f8fafc; }
         .hidden { display: none !important; }
 
-        /* --- LOGIN --- */
+        /* LOGIN */
         #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-card { background: #fff; color: #000; padding: 40px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .login-card { background: #fff; color: #000; padding: 40px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); }
         .login-card input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 6px; font-weight: bold; font-size: 16px; display: block; }
         .btn-main { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
 
-        /* --- APP VIEW --- */
+        /* APP VIEW */
         #view-app { background: #f1f5f9; color: #1e293b; min-height: 100vh; display: none; }
         .nav { background: var(--nav); color: #fff; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
-        .sub-nav { background: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #cbd5e1; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .sub-nav { background: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #cbd5e1; }
         
         .shift-bar { display: flex; background: #e2e8f0; padding: 4px; border-radius: 8px; gap: 4px; }
         .btn-shift { border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-weight: 800; color: #475569; background: transparent; }
@@ -31,7 +31,7 @@
         .btn-ctrl { background: #334155; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-gold { background: var(--gold); color: black; }
 
-        /* --- TABLES --- */
+        /* TABLES */
         .pods-container { padding: 25px; display: flex; flex-direction: column; gap: 35px; }
         .pod-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
         .pod-header { padding: 15px 25px; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
@@ -50,9 +50,12 @@
         tr:hover .btn-del { visibility: visible; }
         .sales-tag { display: block; font-size: 10px; color: #059669; margin-top: 4px; font-weight: 900; }
 
-        /* --- MODALS --- */
+        /* MODALS */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(4px); }
         .modal-box { background: white; padding: 30px; border-radius: 16px; width: 500px; text-align: center; border: 4px solid #000; color: #000; }
+        
+        /* ANALYTICS */
+        .analytics-modal { width: 850px !important; }
         .stats-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
         .stat-item { background: #f1f5f9; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; }
     </style>
@@ -62,11 +65,11 @@
     <div id="view-login">
         <div class="login-card">
             <h1>ShiftFlow</h1>
-            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART MASTER V74</p>
+            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART SYSTEM V75</p>
             <input type="text" id="user-in" placeholder="Username" autocomplete="off">
             <input type="password" id="pass-in" placeholder="Password">
             <button class="btn-main" onclick="verifyLogin()">LOG IN</button>
-            <p onclick="nuke()" style="margin-top:20px; color:blue; text-decoration:underline; font-size:10px; cursor:pointer; font-weight:bold;">REPAIR BLUE SCREEN (FULL RESET)</p>
+            <p onclick="localStorage.clear(); location.reload();" style="margin-top:20px; color:blue; text-decoration:underline; font-size:10px; cursor:pointer; font-weight:bold;">REPAIR & RESET SYSTEM</p>
         </div>
     </div>
 
@@ -97,48 +100,35 @@
 
     <div id="modal-add" class="modal-overlay">
         <div class="modal-box">
-            <h2 style="margin:0 0 15px;">Add New Member</h2>
+            <h2 style="margin:0 0 15px;">Register Member</h2>
             <input type="text" id="add-name" placeholder="Full Name">
-            
             <label style="display:block; text-align:left; font-size:11px; font-weight:bold;">ROLE:</label>
             <select id="add-role" onchange="toggleFields(this.value)">
                 <option value="chatter">Chatter</option>
                 <option value="shadower">Shadower</option>
             </select>
-            
-            <label style="display:block; text-align:left; font-size:11px; font-weight:bold;">SHIFT:</label>
-            <select id="add-shift">
-                <option value="1st">1st Shift</option>
-                <option value="2nd">2nd Shift</option>
-                <option value="3rd">3rd Shift</option>
-            </select>
-
+            <select id="add-shift"><option value="1st">1st Shift</option><option value="2nd">2nd Shift</option><option value="3rd">3rd Shift</option></select>
             <div id="ch-fields">
-                <input type="text" id="add-team" placeholder="Team">
-                <input type="text" id="add-model" placeholder="Model">
+                <input type="text" id="add-team" placeholder="Team"><input type="text" id="add-model" placeholder="Model">
                 <label style="display:block; text-align:left; font-size:11px; font-weight:bold;">POD ASSIGNMENT:</label>
                 <select id="add-pod">
-                    <option value="A">POD A</option>
-                    <option value="B">POD B</option>
-                    <option value="F">POD F</option>
-                    <option value="BACKUP">POD BACKUP</option>
+                    <option value="A">POD A</option><option value="B">POD B</option><option value="F">POD F</option><option value="BACKUP">POD BACKUP</option>
                 </select>
             </div>
-            
-            <button class="btn-main" onclick="confirmAdd()">SAVE TO ROSTER</button>
+            <button class="btn-main" onclick="confirmAdd()">SAVE MEMBER</button>
             <button class="btn-ctrl" style="width:100%; margin-top:10px;" onclick="closeModals()">CANCEL</button>
         </div>
     </div>
 
     <div id="modal-status" class="modal-overlay">
         <div class="modal-box">
-            <h3 id="target-name"></h3>
-            <div id="sales-zone" class="hidden" style="margin-bottom:15px; padding:15px; background:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
-                <input type="number" id="sales-val" placeholder="0.00" style="font-size:22px; text-align:center;">
+            <h3 id="target-name" style="margin-bottom:20px;"></h3>
+            <div id="sales-zone" class="hidden" style="margin-bottom:15px; padding:20px; background:#f0fdf4; border-radius:12px; border:1px solid #bbf7d0;">
+                <input type="number" id="sales-val" placeholder="0.00" style="font-size:24px; text-align:center; width: 100%;">
                 <button class="btn-main" style="background:#10b981;" onclick="applySales()">SAVE SALES</button>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button class="btn-ctrl btn-gold" style="grid-column: span 2;" onclick="document.getElementById('sales-zone').classList.remove('hidden')">💸 ADD SALES</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="btn-ctrl btn-gold" style="grid-column: span 2; padding: 12px;" onclick="document.getElementById('sales-zone').classList.toggle('hidden')">💸 ADD SALES</button>
                 <button class="btn-main" style="background:green; margin:0;" onclick="updateStatus('ON')">WORKING</button>
                 <button class="btn-main" style="background:orange; margin:0;" onclick="updateStatus('ABSENT')">ABSENT</button>
                 <button class="btn-main" style="background:red; margin:0;" onclick="updateStatus('OFF')">OFF</button>
@@ -149,15 +139,15 @@
     </div>
 
     <div id="modal-analytics" class="modal-overlay">
-        <div class="modal-box" style="width:850px;">
-            <h2 style="margin:0;">Agency Analytics</h2>
+        <div class="modal-box analytics-modal">
+            <h2 style="margin:0;">Performance Report</h2>
             <div style="display:flex; justify-content:center; gap:10px; margin:20px 0;">
                 <button class="btn-ctrl" onclick="updateStats(7)">7 Days</button>
                 <button class="btn-ctrl" onclick="updateStats(14)">14 Days</button>
                 <button class="btn-ctrl" onclick="updateStats(30)">30 Days</button>
             </div>
             <div class="stats-summary" id="stats-grid"></div>
-            <div style="height:320px; background:white; padding:10px; border-radius:10px;"><canvas id="perfChart"></canvas></div>
+            <div style="height:300px; background:white; padding:10px; border-radius:10px;"><canvas id="perfChart"></canvas></div>
             <button class="btn-ctrl" style="width:100%; margin-top:20px;" onclick="closeModals()">CLOSE</button>
         </div>
     </div>
@@ -175,11 +165,9 @@
         else alert("Access Denied");
     }
 
-    function nuke() { localStorage.clear(); location.reload(); }
-
     function boot() {
-        const saved = localStorage.getItem('SF_V74_MASTER');
-        if(saved) { try { db = JSON.parse(saved); } catch(e) {} }
+        const saved = localStorage.getItem('SF_V75_ULTIMATE');
+        if(saved) db = JSON.parse(saved);
         document.getElementById('view-login').style.display='none';
         document.getElementById('view-app').style.display='block';
         document.getElementById('user-display').innerText = user;
@@ -198,7 +186,6 @@
             const pEmps = (db.emps || []).filter(e => e.pod === pod && e.shift === currentShift);
             let podRev = 0; pEmps.forEach(e => podRev += (db.sales[e.id]?.[today] || 0));
             const goal = db.goals[currentShift][pod];
-
             let h = `<div class="pod-card"><div class="pod-header h-${pod} ${podRev >= goal ? 'goal-success' : ''}">
                 <span>POD ${pod}</span><span>$${podRev} / Goal: $${goal} ${role==='admin'?`<button onclick="editGoal('${pod}')" style="font-size:9px; cursor:pointer;">EDIT</button>`:''}</span>
                 </div><div style="overflow-x:auto;"><table><thead><tr><th class="sticky-col">TEAM</th><th class="sticky-col sc-2">MODEL</th><th class="sticky-col sc-3">CHATTER</th>`;
@@ -224,7 +211,10 @@
         pMgrs.forEach(m => {
             mh += `<tr><td class="sticky-col">Shadower</td><td class="sticky-col sc-2">--</td>
                 <td class="sticky-col sc-3"><span>${m.name}</span>${role==='admin'?`<button class="btn-del" onclick="delM(${m.id},'shadower')">✖</button>`:''}</td>`;
-            week.forEach(d => mh += `<td onclick="openStatus(${m.id},'${d.key}','${m.name}','shadower')" style="cursor:pointer;">${db.sched[m.id]?.[d.key] || '●'}</td>`);
+            week.forEach(d => {
+                const st = db.sched[m.id]?.[d.key] || '●';
+                mh += `<td onclick="openStatus(${m.id},'${d.key}','${m.name}','shadower')" style="cursor:pointer;">${st}</td>`;
+            });
             mh += `</tr>`;
         });
         area.innerHTML += mh + `</tbody></table></div></div>`;
@@ -232,25 +222,42 @@
 
     function toggleFields(role) { document.getElementById('ch-fields').classList.toggle('hidden', role==='shadower'); }
     function openAddModal() { document.getElementById('modal-add').style.display='flex'; }
-    
     function confirmAdd() {
         const n = document.getElementById('add-name').value.trim();
         const sh = document.getElementById('add-shift').value;
         const r = document.getElementById('add-role').value;
-        if(!n) return alert("Name is required");
+        if(!n) return alert("Name required");
         const id = Date.now();
-        if(r === 'chatter') {
-            db.emps.push({id, name:n, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, shift: sh});
-        } else {
-            db.mgrs.push({id, name:n, shift: sh});
-        }
+        if(r === 'chatter') db.emps.push({id, name:n, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, shift: sh});
+        else db.mgrs.push({id, name:n, shift: sh});
         save(); closeModals();
-        document.getElementById('add-name').value = '';
     }
 
+    function openStatus(id, key, name, type) { 
+        activeCell = {id, key, name, type}; 
+        document.getElementById('target-name').innerText = name; 
+        document.getElementById('sales-zone').classList.add('hidden'); 
+        document.getElementById('modal-status').style.display='flex'; 
+    }
+
+    function applySales() { 
+        const val = parseFloat(document.getElementById('sales-val').value) || 0; 
+        if(!db.sales[activeCell.id]) db.sales[activeCell.id] = {}; 
+        db.sales[activeCell.id][activeCell.key] = val; 
+        save(); closeModals(); 
+    }
+
+    function updateStatus(st) { 
+        if(!db.sched[activeCell.id]) db.sched[activeCell.id] = {}; 
+        db.sched[activeCell.id][activeCell.key] = st; 
+        save(); closeModals(); 
+    }
+
+    function save() { localStorage.setItem('SF_V75_ULTIMATE', JSON.stringify(db)); render(); }
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display='none'); }
     function openAnalytics() { document.getElementById('modal-analytics').style.display='flex'; updateStats(7); }
     function updateStats(days) {
-        const podTotals = { A:0, B:0, F:0, BACKUP:0 };
+        const podSums = { A:0, B:0, F:0, BACKUP:0 };
         const labels = []; const dataRev = []; const dataGoal = [];
         const totalGoalShift = Object.values(db.goals[currentShift]).reduce((a,b)=>a+b, 0);
         for(let i=days-1; i>=0; i--) {
@@ -258,11 +265,11 @@
             const k = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
             labels.push(`${d.getDate()}/${d.getMonth()+1}`);
             let dayRev = 0;
-            db.emps.forEach(e => { if(e.shift === currentShift) { const s = db.sales[e.id]?.[k] || 0; dayRev += s; podTotals[e.pod] += s; } });
+            db.emps.forEach(e => { if(e.shift === currentShift) { const s = db.sales[e.id]?.[k] || 0; dayRev += s; podSums[e.pod] += s; } });
             dataRev.push(dayRev); dataGoal.push(totalGoalShift);
         }
-        const g = document.getElementById('stats-grid'); g.innerHTML = '';
-        Object.keys(podTotals).forEach(p => g.innerHTML += `<div class="stat-item"><b>POD ${p}</b><span>$${podTotals[p].toLocaleString()}</span></div>`);
+        const grid = document.getElementById('stats-grid'); grid.innerHTML = '';
+        Object.keys(podSums).forEach(p => grid.innerHTML += `<div class="stat-item"><b>POD ${p}</b><span>$${podSums[p].toLocaleString()}</span></div>`);
         if(myChart) myChart.destroy();
         myChart = new Chart(document.getElementById('perfChart'), {
             type: 'line',
@@ -272,15 +279,9 @@
             ]}
         });
     }
-
-    function save() { localStorage.setItem('SF_V74_MASTER', JSON.stringify(db)); render(); }
-    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display='none'); }
     function setShift(s) { currentShift=s; render(); }
     function moveWeek(n) { weekOff += n; render(); }
-    function openStatus(id, k, n, t) { activeCell={id,k,n,t}; document.getElementById('target-name').innerText=n; document.getElementById('sales-zone').classList.add('hidden'); document.getElementById('modal-status').style.display='flex'; }
-    function applySales() { const v = parseFloat(document.getElementById('sales-val').value)||0; if(!db.sales[activeCell.id]) db.sales[activeCell.id]={}; db.sales[activeCell.id][activeCell.key]=v; save(); closeModals(); }
-    function updateStatus(st) { if(!db.sched[activeCell.id]) db.sched[activeCell.id]={}; db.sched[activeCell.id][activeCell.key]=st; save(); closeModals(); }
-    function delM(id, type) { if(confirm("Delete member?")) { if(type==='chatter') db.emps=db.emps.filter(e=>e.id!==id); else db.mgrs=db.mgrs.filter(m=>m.id!==id); save(); } }
+    function delM(id, type) { if(confirm("Delete?")) { if(type==='chatter') db.emps=db.emps.filter(e=>e.id!==id); else db.mgrs=db.mgrs.filter(m=>m.id!==id); save(); } }
     function editGoal(p) { const n = prompt(`New Goal for ${p}:`, db.goals[currentShift][p]); if(n) { db.goals[currentShift][p]=parseFloat(n); save(); } }
     function getTodayK() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
     function getWeekRange(off) {
@@ -296,5 +297,6 @@
 </script>
 </body>
 </html>
+
 
 
