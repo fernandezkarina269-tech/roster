@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DreamArt V102 - ULTIMATE</title>
+    <title>DreamArt V103 - FINAL OK</title>
     <style>
         :root { --gold: #FFD700; --dark: #000; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: #f1f5f9; padding-bottom: 50px; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f1f5f9; padding-bottom: 50px; }
         .hidden { display: none !important; }
         
-        /* LOGIN CARD */
+        /* LOGIN */
         #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-card { background: #fff; padding: 40px; border-radius: 20px; text-align: center; width: 320px; border-top: 10px solid var(--gold); }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #000; border-radius: 8px; font-size: 16px; font-weight: bold; }
@@ -25,32 +25,33 @@
         th { background: #1e293b; color: white; padding: 12px; font-size: 11px; }
         td { padding: 12px; text-align: center; border: 1px solid #f0f0f0; font-weight: bold; font-size: 13px; }
         
-        /* FIXED COLUMNS (TEAM, MODEL, NAME) */
+        /* COLUMNAS FIJAS */
         .sc-1 { position: sticky; left: 0; background: white !important; z-index: 10; width: 100px; border-right: 1px solid #eee; }
         .sc-2 { position: sticky; left: 100px; background: white !important; z-index: 10; width: 120px; border-right: 1px solid #eee; }
         .sc-3 { position: sticky; left: 220px; background: white !important; z-index: 10; border-right: 2px solid #ddd; text-align: left; padding-left: 10px; width: 180px; }
 
-        /* COLORS (KARINA'S PREFERENCES) */
-        .st-OFF { color: #f59e0b !important; font-weight: 900 !important; } /* Naranja */
-        .st-SICK { color: #8b5cf6 !important; font-weight: bold; } /* Morado */
-        .st-ABSENT { color: #ef4444 !important; font-weight: 900 !important; } /* Rojo */
+        /* COLORES KARINA (OBLIGATORIOS) */
+        .st-OFF { color: #f59e0b !important; font-weight: 900 !important; } /* NARANJA NEGRILLA */
+        .st-SICK { color: #8b5cf6 !important; font-weight: bold; } /* MORADO */
+        .st-ABSENT { color: #ef4444 !important; font-weight: 900 !important; } /* ROJO NEGRILLA */
         .st-COV { color: #3b82f6; font-size: 10px; display: block; font-weight: normal; }
         .return-date { font-size: 10px; display: block; color: #6d28d9; font-weight: normal; margin-top: 2px; }
 
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; }
         .modal-box { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; text-align: center; border: 4px solid #000; }
+        .sales-tag { display: block; font-size: 10px; color: #059669; font-weight: 900; margin-top: 4px; }
     </style>
 </head>
 <body>
 
     <div id="view-login">
         <div class="login-card">
-            <h1 style="margin:0;">ShiftFlow</h1>
-            <p style="font-weight:900; color:red; font-size:11px;">V102 - ULTIMATE FORCE</p>
+            <h1>ShiftFlow</h1>
+            <p style="font-weight:900; color:green; font-size:11px;">V103 - LIMPIEZA TOTAL</p>
             <input type="password" id="pass-in" placeholder="CLAVE (1234)">
             <button class="btn-main" onclick="startApp(false)">ENTRAR</button>
             <button class="btn-main btn-gold" onclick="startApp(true)">ENTRADA DIRECTA</button>
-            <button class="btn-main" style="background:red; font-size:10px;" onclick="forceReset()">☢️ LIMPIAR TODO (RESET)</button>
+            <button class="btn-main" style="background:red; font-size:10px;" onclick="forceClean()">☢️ RESET NUCLEAR (BORRAR CACHÉ)</button>
         </div>
     </div>
 
@@ -65,88 +66,11 @@
     <div id="modal-status" class="modal">
         <div class="modal-box">
             <h2 id="target-name"></h2>
+            <div id="sales-zone" class="hidden" style="background:#f0fdf4; padding:20px; border-radius:15px; border:2px solid #bbf7d0; margin-bottom:15px;">
+                <input type="number" id="sales-val" placeholder="VENTA $">
+                <button class="btn-main" style="background:#10b981; width:100%;" onclick="saveSales()">GUARDAR VENTA</button>
+            </div>
             <div id="cov-zone" class="hidden" style="background:#eef2ff; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #3b82f6;">
                 <label style="font-size:11px; font-weight:bold;">¿A QUIÉN CUBRE?</label>
                 <select id="cov-select"></select>
                 <button class="btn-main" style="background:#3b82f6; width:100%;" onclick="confirmCov()">CONFIRMAR COBERTURA</button>
-            </div>
-            <div id="sick-zone" class="hidden" style="background:#f5f3ff; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #8b5cf6;">
-                <label style="font-size:11px; font-weight:bold;">FECHA DE REGRESO:</label>
-                <input type="date" id="sick-date">
-                <button class="btn-main" style="background:#8b5cf6; width:100%;" onclick="confirmSick()">GUARDAR FECHA</button>
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button class="btn-main" style="background:green;" onclick="handleWorking()">WORKING</button>
-                <button class="btn-main" style="background:#f59e0b;" onclick="saveSt('ABSENT')">ABSENT</button>
-                <button class="btn-main" style="background:#ef4444;" onclick="saveSt('OFF')">OFF</button>
-                <button class="btn-main" style="background:#8b5cf6;" onclick="toggleZone('sick-zone')">SICK</button>
-            </div>
-            <button class="btn-main" style="background:#666; margin-top:20px; width:100%;" onclick="closeM()">CERRAR</button>
-        </div>
-    </div>
-
-    <div id="modal-add" class="modal">
-        <div class="modal-box">
-            <h2>Nuevo Miembro</h2>
-            <input type="text" id="add-name" placeholder="Nombre Completo">
-            <input type="text" id="add-team" placeholder="Team (Equipo)">
-            <input type="text" id="add-model" placeholder="Model (Modelo)">
-            <select id="add-pod">
-                <option value="A">POD A</option><option value="B">POD B</option>
-                <option value="F">POD F</option><option value="BACKUP">POD BACKUP</option>
-            </select>
-            <select id="add-shift">
-                <option value="1st">1st Shift</option><option value="2nd">2nd Shift</option><option value="3rd">3rd Shift</option>
-            </select>
-            <button class="btn-main" onclick="doAdd()">GUARDAR</button>
-            <button class="btn-main" style="background:#666; margin-top:10px; width:100%;" onclick="closeM()">CANCELAR</button>
-        </div>
-    </div>
-
-<script>
-    let db = { emps: [], sched: {} };
-    let curS = '1st', act = null;
-
-    function forceReset() { if(confirm("¿Borrar errores? Se perderán los datos actuales.")) { localStorage.clear(); location.reload(); } }
-
-    function startApp(bypass) {
-        if(!bypass && document.getElementById('pass-in').value !== '1234') { alert("Clave Incorrecta"); return; }
-        const saved = localStorage.getItem('DREAMART_V102_ULTIMATE');
-        if(saved) db = JSON.parse(saved);
-        document.getElementById('view-login').classList.add('hidden');
-        document.getElementById('view-app').classList.remove('hidden');
-        render();
-    }
-
-    function render() {
-        const area = document.getElementById('pods-area'); area.innerHTML = '';
-        const days = ['26/1','27/1','28/1','29/1','30/1','31/1','01/2'];
-        
-        ['A','B','F','BACKUP'].forEach(pod => {
-            const list = db.emps.filter(e => e.pod === pod);
-            if(list.length === 0) return;
-            let h = `<div class="pod-card"><div class="pod-header">POD ${pod}</div><div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">CHATTER</th>`;
-            days.forEach(d => h += `<th>${d}</th>`);
-            h += `</tr></thead><tbody>`;
-            list.forEach(e => {
-                h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3">${e.name}</td>`;
-                days.forEach(d => {
-                    const stRaw = db.sched[e.id]?.[d] || '●';
-                    let disp = stRaw, cls = '', sub = '';
-                    if(typeof stRaw === 'object') {
-                        if(stRaw.status === 'SICK') { disp = 'SICK'; cls = 'st-SICK'; sub = `<span class="return-date">Retorno: ${stRaw.date || '?'}</span>`; }
-                        if(stRaw.status === 'ON' && stRaw.cov) { disp = '●'; sub = `<span class="st-COV">COV: ${stRaw.cov}</span>`; }
-                    } else {
-                        if(stRaw === 'OFF') cls = 'st-OFF'; if(stRaw === 'ABSENT') cls = 'st-ABSENT';
-                    }
-                    h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
-                });
-                h += `</tr>`;
-            });
-            area.innerHTML += h + `</tbody></table></div></div>`;
-        });
-    }
-
-    function handleWorking() {
-        const others = db.emps.filter(e => e.id !== act.id);
-        const absents = others.filter(o => ['OFF','ABSENT'].includes(db.sched[o.id]?.[act.key]) || (typeof db.sched[o.id]?.[act.key] === 'object' && db.sched[o
