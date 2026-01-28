@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ShiftFlow V70 - DreamArt Executive</title>
+    <title>ShiftFlow V71 - DreamArt Ultimate</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -16,10 +16,10 @@
         /* LOGIN */
         #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-card { background: #fff; color: #000; padding: 40px; width: 320px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box; font-weight: bold; font-size: 14px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box; font-weight: bold; }
         .btn-main { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; }
 
-        /* APP VIEW */
+        /* APP */
         #view-app { background: #f1f5f9; color: #1e293b; min-height: 100vh; display: none; }
         .nav { background: var(--nav); color: #fff; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
         .sub-nav { background: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #cbd5e1; }
@@ -67,11 +67,11 @@
     <div id="view-login">
         <div class="login-card">
             <h1>ShiftFlow</h1>
-            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART EXECUTIVE V70</p>
-            <input type="text" id="user-in" placeholder="Username">
+            <p style="font-weight:900; color:#F59E0B; font-size:11px;">DREAMART ULTIMATE V71</p>
+            <input type="text" id="user-in" placeholder="Username" autocomplete="off">
             <input type="password" id="pass-in" placeholder="Password">
             <button class="btn-main" onclick="handleAuth()">LOG IN</button>
-            <button onclick="localStorage.clear(); location.reload();" style="margin-top:20px; background:none; color:blue; border:none; text-decoration:underline; cursor:pointer; font-size:10px;">REPAIR & RESET SYSTEM</button>
+            <p onclick="localStorage.clear(); location.reload();" style="margin-top:20px; color:blue; text-decoration:underline; cursor:pointer; font-size:10px;">REPAIR & RESET SYSTEM (USE IF BLANK)</p>
         </div>
     </div>
 
@@ -108,7 +108,7 @@
             <input type="text" id="add-name" placeholder="Full Name">
             
             <label style="display:block; text-align:left; font-size:11px; font-weight:bold; margin-top:10px;">ROLE:</label>
-            <select id="add-role" onchange="toggleAddFields(this.value)">
+            <select id="add-role" onchange="toggleFields(this.value)">
                 <option value="chatter">Chatter</option>
                 <option value="shadower">Shadower</option>
             </select>
@@ -132,7 +132,7 @@
                 </select>
             </div>
 
-            <button class="btn-main" onclick="confirmAddMember()" style="margin-top:20px;">SAVE MEMBER</button>
+            <button class="btn-main" onclick="confirmAddMember()" style="margin-top:20px;">SAVE TO ROSTER</button>
             <button class="btn-ctrl" style="width:100%; margin-top:10px; color:#334155;" onclick="closeModals()">CANCEL</button>
         </div>
     </div>
@@ -140,20 +140,13 @@
     <div id="modal-analytics" class="modal-overlay">
         <div class="modal-box analytics-modal">
             <h2 style="margin:0;">Performance Insights</h2>
-            <p id="stats-label" style="font-weight:bold; color:#64748b; margin-bottom:20px;"></p>
-            
-            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
+            <div style="display:flex; justify-content:center; gap:10px; margin:20px 0;">
                 <button class="btn-ctrl" onclick="updateAnalytics(7)">7 Days</button>
                 <button class="btn-ctrl" onclick="updateAnalytics(14)">14 Days</button>
                 <button class="btn-ctrl" onclick="updateAnalytics(30)">30 Days</button>
             </div>
-
             <div class="stats-summary" id="stats-summary-grid"></div>
-
-            <div style="background:white; padding:20px; border-radius:12px; border:1px solid #e2e8f0; height:350px;">
-                <canvas id="perfChart"></canvas>
-            </div>
-
+            <div style="background:white; padding:20px; border-radius:12px; height:350px;"><canvas id="perfChart"></canvas></div>
             <button class="btn-ctrl" style="width:100%; margin-top:25px; padding:15px;" onclick="closeModals()">CLOSE</button>
         </div>
     </div>
@@ -189,7 +182,7 @@
     }
 
     function boot() {
-        const saved = localStorage.getItem('SF_EXEC_V70');
+        const saved = localStorage.getItem('SF_ULTIMATE_V71');
         if(saved) db = JSON.parse(saved);
         document.getElementById('view-login').style.display='none';
         document.getElementById('view-app').style.display='block';
@@ -243,30 +236,38 @@
         area.innerHTML += mh + `</tbody></table></div></div>`;
     }
 
-    function toggleAddFields(role) { document.getElementById('ch-fields').classList.toggle('hidden', role==='shadower'); }
+    function toggleFields(role) { document.getElementById('ch-fields').classList.toggle('hidden', role==='shadower'); }
+    function openAddModal() { document.getElementById('modal-add').style.display='flex'; }
+    
     function confirmAddMember() {
-        const n = document.getElementById('add-name').value.trim();
-        const sh = document.getElementById('add-shift').value;
-        const r = document.getElementById('add-role').value;
-        if(!n) return;
-        const id = Date.now();
-        if(r === 'chatter') db.emps.push({id, name:n, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, shift: sh});
-        else db.mgrs.push({id, name:n, shift: sh});
-        save(); closeModals();
+        try {
+            const n = document.getElementById('add-name').value.trim();
+            const sh = document.getElementById('add-shift').value;
+            const r = document.getElementById('add-role').value;
+            if(!n) return alert("Please enter a name");
+            const id = Date.now();
+            if(r === 'chatter') {
+                db.emps.push({id, name:n, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, shift: sh});
+            } else {
+                db.mgrs.push({id, name:n, shift: sh});
+            }
+            save(); closeModals();
+            // Clear inputs
+            document.getElementById('add-name').value = '';
+            document.getElementById('add-team').value = '';
+            document.getElementById('add-model').value = '';
+        } catch(e) { alert("Error saving. Please check all fields."); }
     }
 
     function openAnalytics() {
         document.getElementById('modal-analytics').style.display='flex';
-        document.getElementById('stats-label').innerText = `Insights for ${currentShift} Shift`;
         updateAnalytics(7);
     }
 
     function updateAnalytics(days) {
         const podSums = { A:0, B:0, F:0, BACKUP:0 };
         const labels = []; const dataRev = []; const dataGoal = [];
-        
         const totalGoalShift = Object.values(db.goals[currentShift]).reduce((a,b)=>a+b, 0);
-
         for(let i=days-1; i>=0; i--) {
             const d = new Date(); d.setDate(d.getDate()-i);
             const k = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
@@ -275,25 +276,19 @@
             db.emps.forEach(e => { if(e.shift === currentShift) { const s = db.sales[e.id]?.[k] || 0; dayRev += s; podSums[e.pod] += s; } });
             dataRev.push(dayRev); dataGoal.push(totalGoalShift);
         }
-
         const grid = document.getElementById('stats-summary-grid'); grid.innerHTML = '';
         Object.keys(podSums).forEach(p => grid.innerHTML += `<div class="stat-item"><b>POD ${p}</b><span>$${podSums[p].toLocaleString()}</span></div>`);
-
         if(myChart) myChart.destroy();
         myChart = new Chart(document.getElementById('perfChart'), {
             type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    { label: 'Revenue', data: dataRev, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.1)', borderWidth: 3, fill: true },
-                    { label: 'Daily Goal', data: dataGoal, borderColor: '#ef4444', borderDash: [5,5], borderWidth: 2, pointRadius: 0 }
-                ]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
+            data: { labels, datasets: [
+                { label: 'Revenue', data: dataRev, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.1)', borderWidth: 3, fill: true },
+                { label: 'Daily Goal', data: dataGoal, borderColor: '#ef4444', borderDash: [5,5], borderWidth: 2, pointRadius: 0 }
+            ]}
         });
     }
 
-    function save() { localStorage.setItem('SF_EXEC_V70', JSON.stringify(db)); render(); }
+    function save() { localStorage.setItem('SF_ULTIMATE_V71', JSON.stringify(db)); render(); }
     function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display='none'); }
     function editGoal(p) { const n = prompt(`New Goal for ${p}:`, db.goals[currentShift][p]); if(n) { db.goals[currentShift][p]=parseFloat(n); save(); } }
     function setShift(s) { currentShift=s; render(); }
@@ -301,7 +296,7 @@
     function openStatus(id, k, n, t) { activeCell={id,k,n,t}; document.getElementById('target-name').innerText=n; document.getElementById('sales-zone').classList.add('hidden'); document.getElementById('modal-status').style.display='flex'; }
     function applySales() { const v = parseFloat(document.getElementById('sales-val').value)||0; if(!db.sales[activeCell.id]) db.sales[activeCell.id]={}; db.sales[activeCell.id][activeCell.key]=v; save(); closeModals(); }
     function updateStatus(st) { if(!db.sched[activeCell.id]) db.sched[activeCell.id]={}; db.sched[activeCell.id][activeCell.key]=st; save(); closeModals(); }
-    function delM(id, type) { if(confirm("Delete?")) { if(type==='chatter') db.emps=db.emps.filter(e=>e.id!==id); else db.mgrs=db.mgrs.filter(m=>m.id!==id); save(); } }
+    function delM(id, type) { if(confirm("Delete member?")) { if(type==='chatter') db.emps=db.emps.filter(e=>e.id!==id); else db.mgrs=db.mgrs.filter(m=>m.id!==id); save(); } }
     function getTodayK() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
     function getWeekRange(off) {
         const curr = new Date(); const day = curr.getDay();
@@ -316,4 +311,3 @@
 </script>
 </body>
 </html>
-
