@@ -2,64 +2,240 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DreamArt V86 - DIAGNOSTIC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamArt ShiftFlow V87 - Grand Vision</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --gold: #FFD700; }
-        body { font-family: sans-serif; margin: 0; background: #eee; padding-bottom: 50px; }
+        :root { --gold: #FFD700; --dark: #0f172a; --podA: #ffedd5; --podB: #dbeafe; --podF: #fef3c7; --podBack: #f3e8ff; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; }
         .hidden { display: none !important; }
         
-        /* LOGIN */
-        #view-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .card { background: #fff; padding: 30px; border-radius: 15px; text-align: center; width: 280px; border-top: 10px solid var(--gold); }
-        .btn { padding: 15px; width: 100%; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; text-transform: uppercase; margin-top: 10px; }
-
-        /* APP */
-        .nav { background: #000; color: #fff; padding: 15px; text-align: center; border-bottom: 4px solid var(--gold); }
-        .sub-nav { background: #fff; padding: 10px; display: flex; justify-content: space-around; border-bottom: 1px solid #ccc; }
+        /* NAV & SUBNAV */
+        .nav { background: #000; color: #fff; padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
+        .sub-nav { background: white; padding: 12px 25px; display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; align-items: center; gap: 10px; flex-wrap: wrap; }
         
-        /* TABLES */
-        .pod-box { background: #fff; margin: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); overflow: hidden; }
-        .pod-head { background: #f4f4f4; padding: 10px; font-weight: 900; border-bottom: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: #333; color: #fff; padding: 8px; }
-        td { border: 1px solid #eee; padding: 10px; text-align: center; font-weight: bold; }
-        .name-col { text-align: left; padding-left: 10px; background: #fafafa; font-weight: 900; }
+        .btn-shift { border: 1px solid #ddd; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; background: #fff; }
+        .btn-shift.active { background: #000; color: #fff; border-color: #000; }
+        .btn-main { padding: 12px 20px; background: #000; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; font-size: 12px; }
+        .btn-gold { background: var(--gold); color: #000; }
 
-        /* MODAL */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-box { background: #fff; padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 8px; font-size: 16px; }
+        /* TABLES */
+        .pods-container { padding: 20px; }
+        .pod-card { background: white; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+        .pod-header { padding: 15px; font-weight: 900; background: #f8fafc; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .h-A { border-left: 8px solid #f97316; } .h-B { border-left: 8px solid #3b82f6; } .h-F { border-left: 8px solid #eab308; } .h-BACKUP { border-left: 8px solid #a855f7; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th { background: #1e293b; color: white; padding: 12px; font-size: 11px; text-transform: uppercase; }
+        td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; font-weight: bold; font-size: 13px; }
+        .sticky { position: sticky; left: 0; background: white !important; border-right: 2px solid #eee; text-align: left; padding-left: 15px; z-index: 5; }
+        
+        /* STATUS */
+        .st-OFF { color: #ef4444; } .st-SICK { color: #8b5cf6; }
+        .sales-tag { display: block; font-size: 10px; color: #059669; font-weight: 900; margin-top: 4px; }
+
+        /* MODALS */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-box { background: white; padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; text-align: center; border: 4px solid #000; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #000; border-radius: 8px; font-size: 16px; font-weight: bold; }
+        
+        /* ANALYTICS PANEL */
+        .analytics-box { max-width: 850px !important; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0; }
+        .stat-card { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; }
     </style>
 </head>
 <body>
 
-    <div id="view-login">
-        <div class="card">
-            <h1 style="margin:0">ShiftFlow</h1>
-            <p style="color:red; font-weight:bold; font-size:12px;">V86 - DIAGNÓSTICO</p>
-            <button class="btn" style="background: blue;" onclick="alert('¡JavaScript Funcionando! Ahora pulsa Entrar.')">1. PROBAR CONEXIÓN</button>
-            <button class="btn" onclick="entrar()">2. ENTRAR AL SISTEMA</button>
-            <button class="btn" style="background: red; margin-top: 30px; font-size: 10px;" onclick="localStorage.clear(); location.reload();">RESETEAR TODO</button>
+    <div class="nav">
+        <div style="font-weight:900; font-size: 22px; letter-spacing: -1px;">DREAMART <span style="color:var(--gold);">AGENCY</span></div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-main btn-gold" onclick="openStats()">📊 ESTADÍSTICAS</button>
+            <button class="btn-main" style="background:#fff; color:#000;" onclick="showAdd()">+ AGREGAR</button>
         </div>
     </div>
 
-    <div id="view-app" class="hidden">
-        <div class="nav">
-            <b style="font-size: 18px;">DREAMART SYSTEM</b><br>
-            <button onclick="showAdd()" style="background:var(--gold); border:none; padding:5px 15px; border-radius:5px; margin-top:10px; font-weight:bold;">+ AGREGAR PERSONA</button>
+    <div class="sub-nav">
+        <div class="shift-bar">
+            <button class="btn-shift active" id="s1" onclick="setShift('1st')">1st Shift</button>
+            <button class="btn-shift" id="s2" onclick="setShift('2nd')">2nd Shift</button>
+            <button class="btn-shift" id="s3" onclick="setShift('3rd')">3rd Shift</button>
         </div>
-        
-        <div class="sub-nav">
-            <button onclick="setS('1st')" style="font-weight:bold;">1st Shift</button>
-            <button onclick="setS('2nd')" style="font-weight:bold;">2nd Shift</button>
-            <button onclick="setS('3rd')" style="font-weight:bold;">3rd Shift</button>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <button class="btn-shift" onclick="moveWeek(-1)">❮ PREV</button>
+            <div id="week-label" style="font-weight:900; font-size:14px; color:#334155; min-width:200px; text-align:center;"></div>
+            <button class="btn-shift" onclick="moveWeek(1)">NEXT ❯</button>
         </div>
-
-        <div id="main-area"></div>
     </div>
+
+    <div id="pods-area" class="pods-container"></div>
 
     <div id="modal-status" class="modal">
         <div class="modal-box">
-            <h2 id="target-name" style="margin:0 0 15
+            <h2 id="target-name" style="margin:0 0 15px 0;"></h2>
+            <div style="background:#f0fdf4; padding:15px; border-radius:10px; margin-bottom:15px; border: 1px solid #bbf7d0;">
+                <input type="number" id="sales-val" placeholder="Monto de Venta $">
+                <button class="btn-main" style="background:#10b981; width:100%;" onclick="saveSales()">GUARDAR VENTA</button>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="btn-main" style="background:green;" onclick="saveSt('ON')">WORKING</button>
+                <button class="btn-main" style="background:#f59e0b;" onclick="saveSt('ABSENT')">ABSENT</button>
+                <button class="btn-main" style="background:#ef4444;" onclick="saveSt('OFF')">OFF</button>
+                <button class="btn-main" style="background:#8b5cf6;" onclick="saveSt('SICK')">SICK</button>
+            </div>
+            <button class="btn-main" style="background:#64748b; margin-top:20px; width:100%;" onclick="closeM()">CERRAR</button>
+        </div>
+    </div>
+
+    <div id="modal-stats" class="modal">
+        <div class="modal-box analytics-box">
+            <h2 style="margin:0;">Reporte de Desempeño</h2>
+            <div style="display:flex; justify-content:center; gap:10px; margin:20px 0;">
+                <button class="btn-shift" onclick="updateChart(7)">7 Días</button>
+                <button class="btn-shift" onclick="updateChart(14)">14 Días</button>
+                <button class="btn-shift" onclick="updateChart(30)">30 Días</button>
+            </div>
+            <div class="stats-grid" id="stats-summary"></div>
+            <div style="height:350px; background:white; padding:10px; border-radius:10px; border:1px solid #ddd;">
+                <canvas id="perfChart"></canvas>
+            </div>
+            <button class="btn-main" style="background:#000; margin-top:20px; width:100%;" onclick="closeM()">CERRAR REPORTE</button>
+        </div>
+    </div>
+
+    <div id="modal-add" class="modal">
+        <div class="modal-box">
+            <h2>Nuevo Miembro</h2>
+            <input type="text" id="add-name" placeholder="Nombre Completo">
+            <select id="add-role"><option value="chatter">Chatter</option><option value="shadower">Shadower</option></select>
+            <select id="add-shift"><option value="1st">1st Shift</option><option value="2nd">2nd Shift</option><option value="3rd">3rd Shift</option></select>
+            <select id="add-pod">
+                <option value="A">POD A</option><option value="B">POD B</option>
+                <option value="F">POD F</option><option value="BACKUP">POD BACKUP</option>
+            </select>
+            <button class="btn-main" style="width:100%;" onclick="doAdd()">REGISTRAR EN ROSTER</button>
+            <button class="btn-main" style="background:#64748b; margin-top:10px; width:100%;" onclick="closeM()">CANCELAR</button>
+        </div>
+    </div>
+
+<script>
+    let db = { emps: [], sched: {}, sales: {}, goals: { '1st':500, '2nd':500, '3rd':500 } };
+    let curS = '1st', act = null, weekOff = 0, myChart = null;
+
+    // INICIO
+    window.onload = () => {
+        const saved = localStorage.getItem('SF_V87_GRAND');
+        if(saved) db = JSON.parse(saved);
+        render();
+    };
+
+    function render() {
+        const area = document.getElementById('pods-area'); area.innerHTML = '';
+        const week = getDates(weekOff);
+        document.getElementById('week-label').innerText = week[0].label + " — " + week[6].label;
+        document.querySelectorAll('.btn-shift').forEach(b => b.classList.toggle('active', b.innerText.includes(curS)));
+
+        ['A','B','F','BACKUP'].forEach(pod => {
+            const list = db.emps.filter(e => e.pod === pod && e.shift === curS && e.role === 'chatter');
+            let h = `<div class="pod-card"><div class="pod-header h-${pod}"><span>POD ${pod}</span><small>${curS}</small></div><div style="overflow-x:auto;"><table><thead><tr><th class="sticky">NOMBRE</th>`;
+            week.forEach(d => h += `<th>${d.short}</th>`);
+            h += `</tr></thead><tbody>`;
+            list.forEach(e => {
+                h += `<tr><td class="sticky">${e.name}</td>`;
+                week.forEach(d => {
+                    const st = db.sched[e.id]?.[d.key] || '●';
+                    const sl = db.sales[e.id]?.[d.key] || 0;
+                    h += `<td onclick="openM(${e.id},'${d.key}','${e.name}')" style="cursor:pointer; color:${st==='OFF'?'red':st==='SICK'?'purple':'inherit'}">${st}${sl>0?'<span class="sales-tag">$'+sl+'</span>':''}</td>`;
+                });
+                h += `</tr>`;
+            });
+            area.innerHTML += h + `</tbody></table></div></div>`;
+        });
+
+        // Shadowers
+        const shads = db.emps.filter(e => e.shift === curS && e.role === 'shadower');
+        if(shads.length > 0) {
+            let sh = `<div class="pod-card"><div class="pod-header" style="background:#e0e7ff;">SHADOWERS CONTROL</div><div style="overflow-x:auto;"><table><thead><tr><th class="sticky">NOMBRE</th>`;
+            week.forEach(d => sh += `<th>${d.short}</th>`);
+            sh += `</tr></thead><tbody>`;
+            shads.forEach(e => {
+                sh += `<tr><td class="sticky">${e.name}</td>`;
+                week.forEach(d => {
+                    const st = db.sched[e.id]?.[d.key] || '●';
+                    sh += `<td onclick="openM(${e.id},'${d.key}','${e.name}')" style="cursor:pointer;">${st}</td>`;
+                });
+                sh += `</tr>`;
+            });
+            area.innerHTML += sh + `</tbody></table></div></div>`;
+        }
+    }
+
+    // ACCIONES
+    function openM(id, k, n) { act={id,k,n}; document.getElementById('target-name').innerText = n; document.getElementById('modal-status').style.display='flex'; }
+    function closeM() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
+    function saveSt(s) { if(!db.sched[act.id]) db.sched[act.id]={}; db.sched[act.id][act.k]=s; save(); }
+    function saveSales() { const v = parseFloat(document.getElementById('sales-val').value) || 0; if(!db.sales[act.id]) db.sales[act.id]={}; db.sales[act.id][act.k]=v; save(); }
+    function doAdd() {
+        const n = document.getElementById('add-name').value;
+        if(!n) return;
+        db.emps.push({ id: Date.now(), name: n, role: document.getElementById('add-role').value, shift: document.getElementById('add-shift').value, pod: document.getElementById('add-pod').value });
+        save(); document.getElementById('add-name').value = '';
+    }
+    function save() { localStorage.setItem('SF_V87_GRAND', JSON.stringify(db)); closeM(); render(); }
+    
+    // NAVEGACIÓN
+    function setShift(s) { curS = s; render(); }
+    function moveWeek(n) { weekOff += n; render(); }
+    function showAdd() { document.getElementById('modal-add').style.display='flex'; }
+
+    // ANALYTICS (GRÁFICOS)
+    function openStats() { document.getElementById('modal-stats').style.display='flex'; updateChart(7); }
+    function updateChart(days) {
+        const podSums = { A:0, B:0, F:0, BACKUP:0 };
+        const labels = []; const dataRev = []; const dataGoal = [];
+        const dailyGoal = db.goals[curS] * 3; // Estimación simple de meta de turno
+
+        for(let i=days-1; i>=0; i--) {
+            const d = new Date(); d.setDate(d.getDate()-i);
+            const k = d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+            labels.push(d.getDate()+"/"+(d.getMonth()+1));
+            let dayTotal = 0;
+            db.emps.forEach(e => {
+                if(e.shift === curS) {
+                    const s = db.sales[e.id]?.[k] || 0;
+                    dayTotal += s;
+                    podSums[e.pod] += s;
+                }
+            });
+            dataRev.push(dayTotal); dataGoal.push(dailyGoal);
+        }
+
+        const grid = document.getElementById('stats-summary'); grid.innerHTML = '';
+        Object.keys(podSums).forEach(p => grid.innerHTML += `<div class="stat-card"><b>POD ${p}</b><br><span style="color:#059669; font-size:18px;">$${podSums[p]}</span></div>`);
+
+        if(myChart) myChart.destroy();
+        const ctx = document.getElementById('perfChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets: [
+                { label: 'Ventas Reales', data: dataRev, borderColor: '#000', borderWidth: 3, fill: false, tension: 0.3 },
+                { label: 'Meta Diaria', data: dataGoal, borderColor: 'red', borderDash: [5,5], borderWidth: 2, fill: false }
+            ]},
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    function getDates(off) {
+        const curr = new Date(); const day = curr.getDay();
+        const diff = curr.getDate() - day + (day === 0 ? -6 : 1) + (off * 7);
+        const mon = new Date(curr.setDate(diff)); const res = [];
+        for(let i=0; i<7; i++) {
+            const d = new Date(mon); d.setDate(mon.getDate() + i);
+            res.push({ key: d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(), short: d.getDate()+"/"+(d.getMonth()+1), label: d.toLocaleDateString() });
+        }
+        return res;
+    }
+</script>
+</body>
+</html>
 
