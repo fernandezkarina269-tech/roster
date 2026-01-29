@@ -353,7 +353,9 @@
                                 }
                                 if(st.status === 'ON' && st.cov) { 
                                     disp = '✓'; cls = 'st-WORKING'; 
-                                    sub = `<span class="st-COV">Covering... ${st.cov}</span>`; 
+                                    if(st.cov !== 'Lugar Vacío') {
+                                        sub = `<span class="st-COV">Covering... ${st.cov}</span>`; 
+                                    }
                                 }
                             }
                             
@@ -634,6 +636,7 @@
 </script>
 </body>
 </html>
+
 
 
 
