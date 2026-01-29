@@ -340,8 +340,11 @@
                             const st = db.sched[e.id]?.[d] || 'WORKING'; 
                             let cls = 'st-WORKING', disp = '✓', sub = '';
                             
-                            if(st === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
-                            if(st === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
+                            // Normalize status
+                            const status = (typeof st === 'object') ? st.status : st;
+
+                            if(status === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
+                            if(status === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
                             
                             if(typeof st === 'object') {
                                 if(st.status === 'SICK') { 
@@ -420,7 +423,12 @@
     function confirmSick() { 
         const date = document.getElementById('sick-date').value;
         if(!date) return alert("Selecciona fecha");
-        saveSt({status: 'SICK', date: date}); 
+        
+        const admin = prompt("¿Quién eres? (Admin que resuelve)");
+        if(!admin) return alert("Se requiere nombre de Admin para procesar la alerta.");
+        
+        alert(`🔴 ALERTA: ${admin} resolvió alerta de ${act.n} -> SICK`);
+        saveSt({status: 'SICK', date: date, resolver: admin}); 
     }
 
     function showStats() {
@@ -553,6 +561,15 @@
     function closeM() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
     function saveSt(s) { 
         if(!act) return;
+
+        // Intercept ABSENT for Alert
+        if(s === 'ABSENT') {
+            const admin = prompt("¿Quién eres? (Admin que resuelve)");
+            if(!admin) return alert("Se requiere nombre de Admin para procesar la alerta.");
+            alert(`🔴 ALERTA: ${admin} resolvió alerta de ${act.n} -> ABSENT`);
+            s = { status: 'ABSENT', resolver: admin };
+        }
+
         if(!db.sched[act.id]) db.sched[act.id]={}; 
         db.sched[act.id][act.key]=s; 
         save(); 
