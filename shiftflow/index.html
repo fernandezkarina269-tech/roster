@@ -231,7 +231,7 @@
         alert("Error Detectado: " + msg + "\nIntenta el botón REINICIAR APP.");
     };
 
-    let db = { emps: [], sched: {}, sales: {} };
+    let db = { emps: [], sched: {}, sales: {}, notes: {} };
     let act = null;
 
     // Helper for consistent Date Keys
@@ -278,7 +278,8 @@
                 db = JSON.parse(saved);
                 // Validate Structure
                 if(!Array.isArray(db.emps)) throw new Error("Datos Corruptos");
-                if(!db.sales) db.sales = {}; // Legacy support
+                if(!db.sales) db.sales = {}; 
+                if(!db.notes) db.notes = {}; 
             } else {
                 // SEED DATA
                 db.emps = [
@@ -287,11 +288,12 @@
                 ];
                 db.sched = {};
                 db.sales = {};
+                db.notes = {}; 
             }
         } catch(e) {
             alert("Error cargando datos. Se reiniciará la base de datos.");
             localStorage.removeItem('SF_V107_FINAL');
-            db = { emps: [], sched: {}, sales: {} };
+            db = { emps: [], sched: {}, sales: {}, notes: {} };
         }
         
         document.getElementById('view-login').classList.add('hidden');
@@ -310,8 +312,20 @@
             // 1. Helper to create a CARD + TABLE
             const renderCard = (title, list, labelOverride, bgColor) => {
                 const safeList = list || [];
+                const podId = title; 
+                const noteVal = (db.notes && db.notes[podId]) ? db.notes[podId] : '';
                 
-                let h = `<div class="pod-card"><div class="pod-header" style="background:${bgColor || '#f1f5f9'};"><span>${title}</span></div><div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
+                let h = `<div class="pod-card">
+                    <div class="pod-header" style="background:${bgColor || '#f1f5f9'};"><span>${title}</span></div>
+                    
+                    <!-- NOTES SECTION -->
+                    <div style="padding:10px 20px; background:#fff; border-bottom:1px solid #e2e8f0;">
+                        <textarea placeholder="Notas del equipo..." 
+                            style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; font-family:'Inter',sans-serif; height:60px; resize:vertical;"
+                            onblur="saveNote('${podId}', this.value)">${noteVal}</textarea>
+                    </div>
+
+                    <div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
                 days.forEach(d => h += `<th>${d}</th>`);
                 h += `</tr></thead><tbody>`;
                 
@@ -543,6 +557,12 @@
         db.sched[act.id][act.key]=s; 
         save(); 
     }
+
+    function saveNote(podId, text) {
+        if(!db.notes) db.notes = {};
+        db.notes[podId] = text;
+        localStorage.setItem('SF_V107_FINAL', JSON.stringify(db));
+    }
     
     function doAdd() {
         const name = document.getElementById('add-name').value;
@@ -578,6 +598,7 @@
 </script>
 </body>
 </html>
+
 
 
 
