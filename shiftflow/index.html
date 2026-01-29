@@ -216,59 +216,60 @@
             
             const days = ['28/1','29/1','30/1','31/1','01/2','02/2','03/2'];
             
-            ['A','B','F','BACKUP'].forEach(pod => {
-                const list = db.emps.filter(e => e.pod === pod);
-                if(list.length === 0) return;
+            // 1. Helper to create a CARD + TABLE for a group of people
+            const renderCard = (title, list, labelOverride) => {
+                if(!list || list.length === 0) return;
                 
-                let h = `<div class="pod-card"><div class="pod-header"><span>POD ${pod}</span></div><div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">CHATTER</th>`;
+                let h = `<div class="pod-card"><div class="pod-header"><span>${title}</span></div><div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
                 days.forEach(d => h += `<th>${d}</th>`);
                 h += `</tr></thead><tbody>`;
                 
-                // Helper to render rows
-                const renderRows = (members, title) => {
-                    if(members.length === 0) return '';
-                    let html = '';
-                    if(title) {
-                        html += `<tr style="background:#f1f5f9;"><td colspan="${3 + days.length}" style="text-align:left; padding:10px 20px; font-weight:900; color:#475569; letter-spacing:1px; border-top:2px solid #cbd5e1;">${title}</td></tr>`;
-                    }
-                    members.forEach(e => {
-                        html += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3">${e.name}</td>`;
-                        days.forEach(d => {
-                            const st = db.sched[e.id]?.[d] || 'WORKING'; 
-                            let cls = 'st-WORKING', disp = '✓', sub = '';
-                            
-                            if(st === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
-                            if(st === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
-                            
-                            if(typeof st === 'object') {
-                                if(st.status === 'SICK') { 
-                                    disp = 'SICK'; cls = 'st-SICK'; 
-                                    sub = `<br><small style="color:#7c3aed; font-weight:600;">Regreso: ${st.date}</small>`; 
-                                }
-                                if(st.status === 'ON' && st.cov) { 
-                                    disp = '✓'; cls = 'st-WORKING'; 
-                                    sub = `<span class="st-COV">Cubriendo: ${st.cov}</span>`; 
-                                }
+                list.forEach(e => {
+                    h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3">${e.name}</td>`;
+                    days.forEach(d => {
+                        const st = db.sched[e.id]?.[d] || 'WORKING'; 
+                        let cls = 'st-WORKING', disp = '✓', sub = '';
+                        
+                        if(st === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
+                        if(st === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
+                        
+                        if(typeof st === 'object') {
+                            if(st.status === 'SICK') { 
+                                disp = 'SICK'; cls = 'st-SICK'; 
+                                sub = `<br><small style="color:#7c3aed; font-weight:600;">Regreso: ${st.date}</small>`; 
                             }
-                            
-                            html += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
-                        });
-                        html += `</tr>`;
+                            if(st.status === 'ON' && st.cov) { 
+                                disp = '✓'; cls = 'st-WORKING'; 
+                                sub = `<span class="st-COV">Cubriendo: ${st.cov}</span>`; 
+                            }
+                        }
+                        
+                        h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
                     });
-                    return html;
-                };
+                    h += `</tr>`;
+                });
+                h += `</tbody></table></div></div>`;
+                area.innerHTML += h;
+            };
 
-                // GROUPS
-                const chatters = list.filter(e => !e.role || e.role === 'Chatter');
-                const shadowers = list.filter(e => e.role === 'Shadower');
-                const backups = list.filter(e => e.role === 'Backup');
-
-                h += renderRows(chatters, 'CHATTERS'); // Added 'CHATTERS' header for consistency
-                h += renderRows(shadowers, 'SHADOWERS');
-                h += renderRows(backups, 'BACKUPS');
-
-                area.innerHTML += h + `</tbody></table></div></div>`;
+            // 2. RENDER PODS (A, B, F) -> ONLY CHATTERS
+            ['A','B','F'].forEach(pod => {
+                // Filter: Must be in this Pod AND (No role defined OR Role is Chatter)
+                // We intentionally exclude Backups/Shadowers even if assigned to Pod A
+                const chatters = db.emps.filter(e => e.pod === pod && (!e.role || e.role === 'Chatter'));
+                renderCard(`POD ${pod}`, chatters, 'CHATTER');
             });
+
+            // 3. RENDER BACKUPS (GLOBAL list of anyone with Role=Backup OR Pod=BACKUP)
+            // We catch legacy data (Pod=BACKUP) or new data (Role=Backup)
+            const backups = db.emps.filter(e => e.role === 'Backup' || e.pod === 'BACKUP');
+            // Avoid duplicates if someone has both (though filter iterates once)
+            renderCard('BACKUP TEAM', backups, 'BACKUP');
+
+            // 4. RENDER SHADOWERS (GLOBAL list of Role=Shadower)
+            const shadowers = db.emps.filter(e => e.role === 'Shadower');
+            renderCard('SHADOWERS TEAM', shadowers, 'SHADOWER');
+
         } catch(e) {
             console.error("Render Error", e);
             alert("Error mostrando la tabla: " + e.message);
@@ -358,3 +359,4 @@
 </script>
 </body>
 </html>
+
