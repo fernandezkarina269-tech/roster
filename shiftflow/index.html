@@ -277,6 +277,16 @@
                                 }
                             }
                             
+                            // Sales Indicator
+                            try {
+                                const currentYear = new Date().getFullYear();
+                                const [dd, mm] = d.split('/');
+                                const isoDate = `${currentYear}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+                                if(db.sales && db.sales[e.id] && db.sales[e.id][isoDate]) {
+                                    sub += `<span style="color:#10b981; font-weight:900; font-size:12px; margin-left:4px;">$${db.sales[e.id][isoDate]}</span>`;
+                                }
+                            } catch(err) {}
+                            
                             h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
                         });
                         h += `</tr>`;
@@ -427,6 +437,7 @@
         } else {
              db.sales[act.id][act.isoDate] = amount;
         }
+        alert("Venta guardada correctamente.");
         save(); // Closes modal
     }
     
@@ -512,4 +523,5 @@
 </script>
 </body>
 </html>
+
 
