@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DreamArt V110 - SALES FIXED</title>
+    <!-- Cargamos Chart.js para el gráfico -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --gold: #FFD700; --bg: #121212; --accent: #1e293b; }
@@ -240,7 +241,7 @@
     let act = null;
     let salesChartInst = null;
 
-    // Helper for consistent Date Keys
+    // Helper para fechas consistentes (YYYY-MM-DD)
     function getIsoDate(dayStr) {
         try {
             const currentYear = new Date().getFullYear();
@@ -249,7 +250,7 @@
         } catch (e) { return null; }
     }
 
-    // Check login
+    // Login y Carga
     try {
         if(localStorage.getItem('SF_LOGGED_IN') === 'true') {
             initData();
@@ -266,7 +267,7 @@
     }
 
     function hardReset() {
-        if(confirm("¿BORRAR TODO Y REINICIAR? Se perderán los datos guardados.")) {
+        if(confirm("¿BORRAR TODO Y REINICIAR?")) {
             localStorage.clear();
             location.reload();
         }
@@ -282,26 +283,20 @@
             const saved = localStorage.getItem('SF_V107_FINAL');
             if(saved) {
                 db = JSON.parse(saved);
-                // Validate Structure
                 if(!Array.isArray(db.emps)) throw new Error("Datos Corruptos");
                 if(!db.sales) db.sales = {}; 
                 if(!db.notes) db.notes = {}; 
             } else {
-                // SEED DATA
                 db.emps = [
                     { id: 1, name: 'User Demo 1', team: 'T1', model: 'M1', pod: 'A', shift: '1st' },
                     { id: 2, name: 'User Demo 2', team: 'T2', model: 'M2', pod: 'B', shift: '2nd' }
                 ];
-                db.sched = {};
-                db.sales = {};
-                db.notes = {}; 
+                db.sched = {}; db.sales = {}; db.notes = {}; 
             }
         } catch(e) {
-            alert("Error cargando datos. Se reiniciará la base de datos.");
             localStorage.removeItem('SF_V107_FINAL');
             db = { emps: [], sched: {}, sales: {}, notes: {} };
         }
-        
         document.getElementById('view-login').classList.add('hidden');
         document.getElementById('view-app').classList.remove('hidden');
         render();
@@ -312,10 +307,8 @@
             const area = document.getElementById('pods-area'); 
             if(!area) return;
             area.innerHTML = '';
-            
             const days = ['28/1','29/1','30/1','31/1','01/2','02/2','03/2'];
             
-            // 1. Helper to create a CARD + TABLE
             const renderCard = (title, list, labelOverride, bgColor) => {
                 const safeList = list || [];
                 const podId = title; 
@@ -323,14 +316,11 @@
                 
                 let h = `<div class="pod-card">
                     <div class="pod-header" style="background:${bgColor || '#f1f5f9'};"><span>${title}</span></div>
-                    
-                    <!-- NOTES SECTION -->
                     <div style="padding:10px 20px; background:#fff; border-bottom:1px solid #e2e8f0;">
                         <textarea placeholder="Notas del equipo..." 
                             style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; font-family:'Inter',sans-serif; height:60px; resize:vertical;"
                             onblur="saveNote('${podId}', this.value)">${noteVal}</textarea>
                     </div>
-
                     <div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
                 days.forEach(d => h += `<th>${d}</th>`);
                 h += `</tr></thead><tbody>`;
@@ -339,19 +329,13 @@
                      h += `<tr><td colspan="${3 + days.length}" style="padding:20px; color:#94a3b8; font-style:italic;">Sin miembros asignados</td></tr>`;
                 } else {
                     safeList.forEach(e => {
-                        // Name cell is now clickable for editing
                         h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3" style="cursor:pointer; color:#2563eb; font-weight:800;" onclick="editMember(${e.id})">${e.name} <span style="font-size:10px; opacity:0.7;">✎</span></td>`;
-                        
                         days.forEach(d => {
                             const st = db.sched[e.id]?.[d] || 'WORKING'; 
                             let cls = 'st-WORKING', disp = '✓', sub = '';
-                            
-                            // Normalize status
                             const status = (typeof st === 'object') ? st.status : st;
-
                             if(status === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
                             if(status === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
-                            
                             if(typeof st === 'object') {
                                 if(st.status === 'SICK') { 
                                     disp = '🚑 SICK'; cls = 'st-SICK'; 
@@ -364,13 +348,10 @@
                                     }
                                 }
                             }
-                            
-                            // Sales Indicator
                             const isoDate = getIsoDate(d);
                             if(isoDate && db.sales && db.sales[e.id] && db.sales[e.id][isoDate]) {
                                 sub += `<span style="color:#10b981; font-weight:900; font-size:12px; margin-left:4px;">$${db.sales[e.id][isoDate]}</span>`;
                             }
-                            
                             h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
                         });
                         h += `</tr>`;
@@ -380,62 +361,29 @@
                 area.innerHTML += h;
             };
 
-            // 2. RENDER PODS (A, B, F) -> ONLY CHATTERS
             const pods = [
-                { id: 'A', color: '#dbeafe' }, // Blue-100
-                { id: 'B', color: '#dcfce7' }, // Green-100
-                { id: 'F', color: '#fae8ff' }  // Fuchsia-100 (Pinkish)
+                { id: 'A', color: '#dbeafe' }, { id: 'B', color: '#dcfce7' }, { id: 'F', color: '#fae8ff' }
             ];
-
-            pods.forEach(p => {
-                const chatters = db.emps.filter(e => e.pod === p.id && (!e.role || e.role === 'Chatter'));
-                renderCard(`POD ${p.id}`, chatters, 'CHATTER', p.color);
-            });
-
-            // 3. RENDER BACKUP TEAM
-            const backups = db.emps.filter(e => e.role === 'Backup' || e.pod === 'BACKUP');
-            renderCard('BACKUP TEAM', backups, 'BACKUP', '#ffedd5'); // Orange-100
-
-            // 4. RENDER SHADOWERS TEAM
-            const shadowers = db.emps.filter(e => e.role === 'Shadower');
-            renderCard('SHADOWERS TEAM', shadowers, 'SHADOWER', '#f3e8ff'); // Purple-100
-
-        } catch(e) {
-            console.error("Render Error", e);
-            alert("Error mostrando la tabla: " + e.message);
-        }
+            pods.forEach(p => renderCard(`POD ${p.id}`, db.emps.filter(e => e.pod === p.id && (!e.role || e.role === 'Chatter')), 'CHATTER', p.color));
+            renderCard('BACKUP TEAM', db.emps.filter(e => e.role === 'Backup' || e.pod === 'BACKUP'), 'BACKUP', '#ffedd5');
+            renderCard('SHADOWERS TEAM', db.emps.filter(e => e.role === 'Shadower'), 'SHADOWER', '#f3e8ff');
+        } catch(e) { console.error(e); }
     }
 
     function handleWorking() {
         try {
             const me = db.emps.find(e => e.id === act.id);
-            // Check if user is backup (role or pod)
-            const isBackup = (me.role === 'Backup' || me.pod === 'BACKUP');
-
-            if (!isBackup) {
-                saveSt('WORKING');
-                return;
-            }
-            
-            // It is a backup, find targets (SICK or ABSENT)
-            const others = db.emps.filter(e => e.id !== act.id);
-            const targets = others.filter(o => {
+            if (!(me.role === 'Backup' || me.pod === 'BACKUP')) return saveSt('WORKING');
+            const targets = db.emps.filter(o => {
                 const stRaw = db.sched[o.id]?.[act.key];
                 const status = (typeof stRaw === 'object') ? stRaw.status : stRaw;
                 return ['SICK', 'ABSENT'].includes(status);
             });
-            
             const sel = document.getElementById('cov-select');
-            sel.innerHTML = '<option value="">-- SELECCIONA OPCIÓN --</option>';
-            sel.innerHTML += '<option value="Lugar Vacío">LUGAR VACÍO</option>';
-            
-            targets.forEach(t => {
-                sel.innerHTML += `<option value="${t.name}">${t.name} (${t.pod})</option>`;
-            });
-            
+            sel.innerHTML = '<option value="">-- OPCIÓN --</option><option value="Lugar Vacío">LUGAR VACÍO</option>';
+            targets.forEach(t => sel.innerHTML += `<option value="${t.name}">${t.name} (${t.pod})</option>`);
             document.getElementById('cov-zone').classList.remove('hidden');
-
-        } catch(e) { alert("Error: " + e.message); }
+        } catch(e) { alert(e.message); }
     }
 
     function confirmCov() { 
@@ -446,38 +394,31 @@
     
     function confirmSick() { 
         const date = document.getElementById('sick-date').value;
-        if(!date) return alert("Selecciona fecha");
-        
-        const admin = prompt("¿Quién eres? (Admin que resuelve)");
-        if(!admin) return alert("Se requiere nombre de Admin para procesar la alerta.");
-        
-        alert(`🔴 ALERTA: ${admin} resolvió alerta de ${act.n} -> SICK`);
-        saveSt({status: 'SICK', date: date, resolver: admin}); 
+        const admin = prompt("¿Admin que resuelve?");
+        if(date && admin) {
+            alert(`🔴 ALERTA: ${admin} resolvió -> SICK`);
+            saveSt({status: 'SICK', date: date, resolver: admin}); 
+        }
     }
 
     function showStats() {
         let work=0, off=0, abs=0, sick=0;
-        const days = ['28/1','29/1','30/1','31/1','01/2','02/2','03/2']; // Visible days
-        
+        const days = ['28/1','29/1','30/1','31/1','01/2','02/2','03/2'];
         db.emps.forEach(e => {
             days.forEach(d => {
                 const st = db.sched[e.id]?.[d] || 'WORKING';
-                if(st === 'WORKING') work++;
-                else if(st === 'OFF') off++;
-                else if(st === 'ABSENT') abs++;
-                else if(typeof st === 'object') {
-                    if(st.status === 'SICK') sick++;
-                    if(st.status === 'ON') work++;
-                }
+                const status = (typeof st === 'object') ? st.status : st;
+                if(status === 'WORKING' || status === 'ON') work++;
+                else if(status === 'OFF') off++;
+                else if(status === 'ABSENT') abs++;
+                else if(status === 'SICK') sick++;
             });
         });
-        
         document.getElementById('st-work').innerText = work;
         document.getElementById('st-off').innerText = off;
         document.getElementById('st-absent').innerText = abs;
         document.getElementById('st-sick').innerText = sick;
-        
-        filterSales(0); // Default to Today
+        filterSales(0); 
         document.getElementById('modal-stats').classList.remove('hidden');
     }
     
@@ -487,7 +428,6 @@
         cutoff.setDate(today.getDate() - range);
         cutoff.setHours(0, 0, 0, 0);
 
-        // Prep Chart Labels
         const labels = [];
         const podSales = { 'A': {}, 'B': {}, 'F': {}, 'BACKUP': {} };
         const startChart = new Date(today);
@@ -496,73 +436,53 @@
         for (let d = new Date(startChart); d <= today; d.setDate(d.getDate() + 1)) {
             const day = d.getDate().toString().padStart(2, '0');
             const month = (d.getMonth() + 1).toString().padStart(2, '0');
-            const label = `${day}/${month}`;
             const iso = `${d.getFullYear()}-${month}-${day}`;
-            labels.push({ label, iso });
+            labels.push({ label: `${day}/${month}`, iso });
             Object.keys(podSales).forEach(p => podSales[p][iso] = 0);
         }
 
         let totalSum = 0;
         db.emps.forEach(emp => {
-            const empPod = emp.pod || 'A';
+            const empPod = (['A','B','F'].includes(emp.pod)) ? emp.pod : 'BACKUP';
             if (db.sales && db.sales[emp.id]) {
                 Object.entries(db.sales[emp.id]).forEach(([dateStr, amount]) => {
                     const [y, m, d] = dateStr.split('-').map(Number);
                     const date = new Date(y, m - 1, d);
-                    date.setHours(0, 0, 0, 0);
-
-                    if (range === 0) {
-                        if (date.getTime() === today.getTime()) totalSum += amount;
-                    } else {
-                        if (date >= cutoff && date <= today) totalSum += amount;
-                    }
-
-                    if (podSales[empPod] && podSales[empPod].hasOwnProperty(dateStr)) {
-                        podSales[empPod][dateStr] += amount;
-                    }
+                    date.setHours(0,0,0,0);
+                    if (range === 0) { if(date.getTime() === today.getTime()) totalSum += amount; }
+                    else if (date >= cutoff && date <= today) totalSum += amount;
+                    if (podSales[empPod] && podSales[empPod].hasOwnProperty(dateStr)) podSales[empPod][dateStr] += amount;
                 });
             }
         });
 
         document.getElementById('st-sales-total').innerText = "$" + totalSum.toFixed(2);
-
-        const chartLabels = labels.map(l => l.label);
-        const chartData = {
+        renderSalesChart(labels.map(l => l.label), {
             'A': labels.map(l => podSales['A'][l.iso]),
             'B': labels.map(l => podSales['B'][l.iso]),
             'F': labels.map(l => podSales['F'][l.iso]),
             'BACKUP': labels.map(l => podSales['BACKUP'][l.iso])
-        };
-        renderSalesChart(chartLabels, chartData);
+        });
     }
 
     function renderSalesChart(labels, data) {
-        const canvas = document.getElementById('salesChart');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+        const ctx = document.getElementById('salesChart').getContext('2d');
         if (salesChartInst) salesChartInst.destroy();
-
         salesChartInst = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'POD A', data: data['A'], borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
-                    { label: 'POD B', data: data['B'], borderColor: '#10b981', backgroundColor: '#10b981', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
-                    { label: 'POD F', data: data['F'], borderColor: '#f43f5e', backgroundColor: '#f43f5e', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
-                    { label: 'BACKUP', data: data['BACKUP'], borderColor: '#f59e0b', backgroundColor: '#f59e0b', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 }
+                    { label: 'POD A', data: data['A'], borderColor: '#3b82f6', tension: 0.3, fill: false },
+                    { label: 'POD B', data: data['B'], borderColor: '#10b981', tension: 0.3, fill: false },
+                    { label: 'POD F', data: data['F'], borderColor: '#f43f5e', tension: 0.3, fill: false },
+                    { label: 'BACKUP', data: data['BACKUP'], borderColor: '#f59e0b', tension: 0.3, fill: false }
                 ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } }
-                },
-                scales: {
-                    y: { beginAtZero: true, ticks: { font: { size: 10 } }, grid: { color: '#f1f5f9' } },
-                    x: { ticks: { font: { size: 10 } }, grid: { display: false } }
-                }
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+                scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
             }
         });
     }
@@ -570,46 +490,26 @@
     function openM(id, k, n) { 
         act = { id, key: k, n }; 
         document.getElementById('target-name').innerText = n; 
-        
         act.isoDate = getIsoDate(k);
-        
         const amount = (db.sales && db.sales[id] && db.sales[id][act.isoDate]) ? db.sales[id][act.isoDate] : "";
         document.getElementById('sale-amount').value = amount;
-        
-        // RESET ZONES
         document.getElementById('cov-zone').classList.add('hidden');
         document.getElementById('sick-zone').classList.add('hidden');
-        
         document.getElementById('modal-status').classList.remove('hidden'); 
     }
     
     function saveSale() {
-        if(!act) return;
         const amount = parseFloat(document.getElementById('sale-amount').value);
-        
-        if(!db.sales) db.sales = {};
         if(!db.sales[act.id]) db.sales[act.id] = {};
-        
-        if(isNaN(amount) || amount === 0) {
-             if(db.sales[act.id][act.isoDate]) delete db.sales[act.id][act.isoDate];
-        } else {
-             db.sales[act.id][act.isoDate] = amount;
-        }
-        alert("¡Venta Guardada: $" + amount + "!\nFecha: " + act.isoDate);
-        save(); // Closes modal
+        if(isNaN(amount) || amount === 0) delete db.sales[act.id][act.isoDate];
+        else db.sales[act.id][act.isoDate] = amount;
+        alert("¡Venta Guardada!"); save();
     }
     
     function showAdd() { 
         document.getElementById('modal-title').innerText = "Nuevo Miembro";
         document.getElementById('edit-id').value = "";
         document.getElementById('add-name').value = "";
-        document.getElementById('add-team').value = "";
-        document.getElementById('add-model').value = "";
-        document.getElementById('add-pod').value = "A";
-        document.getElementById('add-role').value = "Chatter";
-        document.getElementById('add-shift').value = "1st";
-        document.getElementById('btn-save').innerText = "GUARDAR MIEMBRO";
-        document.getElementById('btn-delete').classList.add('hidden');
         document.getElementById('modal-add').classList.remove('hidden'); 
     }
 
@@ -624,70 +524,46 @@
         document.getElementById('add-pod').value = e.pod || "A";
         document.getElementById('add-role').value = e.role || "Chatter";
         document.getElementById('add-shift').value = e.shift || "1st";
-        document.getElementById('btn-save').innerText = "ACTUALIZAR DATOS";
         document.getElementById('btn-delete').classList.remove('hidden');
         document.getElementById('modal-add').classList.remove('hidden');
     }
 
     function doDelete() {
-        const id = parseInt(document.getElementById('edit-id').value);
-        if(!id) return;
-        if(confirm("¿Eliminar este miembro permanentemente?")) {
-            db.emps = db.emps.filter(e => e.id !== id);
-            delete db.sched[id];
+        if(confirm("¿Eliminar miembro?")) {
+            db.emps = db.emps.filter(e => e.id !== parseInt(document.getElementById('edit-id').value));
             save();
         }
     }
     
     function closeM() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
     function saveSt(s) { 
-        if(!act) return;
-
-        // Intercept ABSENT for Alert
         if(s === 'ABSENT') {
-            const admin = prompt("¿Quién eres? (Admin que resuelve)");
-            if(!admin) return alert("Se requiere nombre de Admin para procesar la alerta.");
-            alert(`🔴 ALERTA: ${admin} resolvió alerta de ${act.n} -> ABSENT`);
+            const admin = prompt("¿Admin que resuelve?");
+            if(!admin) return;
             s = { status: 'ABSENT', resolver: admin };
         }
-
         if(!db.sched[act.id]) db.sched[act.id]={}; 
         db.sched[act.id][act.key]=s; 
         save(); 
     }
 
-    function saveNote(podId, text) {
-        if(!db.notes) db.notes = {};
-        db.notes[podId] = text;
-        localStorage.setItem('SF_V107_FINAL', JSON.stringify(db));
-    }
+    function saveNote(p, t) { db.notes[p] = t; localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); }
     
     function doAdd() {
         const name = document.getElementById('add-name').value;
-        if(!name) return alert("Nombre requerido");
-        
         const editId = document.getElementById('edit-id').value;
+        const data = { 
+            name, team: document.getElementById('add-team').value, 
+            model: document.getElementById('add-model').value, 
+            pod: document.getElementById('add-pod').value, 
+            shift: document.getElementById('add-shift').value,
+            role: document.getElementById('add-role').value
+        };
         if(editId) {
-            const id = parseInt(editId);
-            const idx = db.emps.findIndex(e => e.id === id);
-            if(idx !== -1) {
-                db.emps[idx].name = name;
-                db.emps[idx].team = document.getElementById('add-team').value;
-                db.emps[idx].model = document.getElementById('add-model').value;
-                db.emps[idx].pod = document.getElementById('add-pod').value;
-                db.emps[idx].shift = document.getElementById('add-shift').value;
-                db.emps[idx].role = document.getElementById('add-role').value;
-            }
+            const idx = db.emps.findIndex(e => e.id === parseInt(editId));
+            db.emps[idx] = {...db.emps[idx], ...data};
         } else {
-            db.emps.push({ 
-                id: Date.now(), 
-                name: name, 
-                team: document.getElementById('add-team').value, 
-                model: document.getElementById('add-model').value, 
-                pod: document.getElementById('add-pod').value, 
-                shift: document.getElementById('add-shift').value,
-                role: document.getElementById('add-role').value
-            });
+            db.emps.push({ id: Date.now(), ...data });
         }
         save();
     }
@@ -696,6 +572,7 @@
 </script>
 </body>
 </html>
+
 
 
 
