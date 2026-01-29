@@ -400,17 +400,33 @@
 
     function handleWorking() {
         try {
-            const others = db.emps.filter(e => e.id !== act.id);
-            const absents = others.filter(o => ['OFF','ABSENT'].includes(db.sched[o.id]?.[act.key]));
-            
-            if(absents.length > 0) {
-                const sel = document.getElementById('cov-select'); 
-                sel.innerHTML = '<option value="">NORMAL (SIN COBERTURA)</option>';
-                absents.forEach(a => sel.innerHTML += `<option value="${a.name}">${a.name}</option>`);
-                document.getElementById('cov-zone').classList.remove('hidden');
-            } else {
+            const me = db.emps.find(e => e.id === act.id);
+            // Check if user is backup (role or pod)
+            const isBackup = (me.role === 'Backup' || me.pod === 'BACKUP');
+
+            if (!isBackup) {
                 saveSt('WORKING');
+                return;
             }
+            
+            // It is a backup, find targets (SICK or ABSENT)
+            const others = db.emps.filter(e => e.id !== act.id);
+            const targets = others.filter(o => {
+                const stRaw = db.sched[o.id]?.[act.key];
+                const status = (typeof stRaw === 'object') ? stRaw.status : stRaw;
+                return ['SICK', 'ABSENT'].includes(status);
+            });
+            
+            const sel = document.getElementById('cov-select');
+            sel.innerHTML = '<option value="">-- SELECCIONA OPCIÓN --</option>';
+            sel.innerHTML += '<option value="Lugar Vacío">LUGAR VACÍO</option>';
+            
+            targets.forEach(t => {
+                sel.innerHTML += `<option value="${t.name}">${t.name} (${t.pod})</option>`;
+            });
+            
+            document.getElementById('cov-zone').classList.remove('hidden');
+
         } catch(e) { alert("Error: " + e.message); }
     }
 
@@ -618,6 +634,7 @@
 </script>
 </body>
 </html>
+
 
 
 
