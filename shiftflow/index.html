@@ -87,12 +87,24 @@
                 <input type="date" id="sick-date">
                 <button class="btn-main" style="background:#7c3aed;" onclick="confirmSick()">GUARDAR FECHA SICK</button>
             </div>
+            
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 <button class="btn-main" style="background:#10b981;" onclick="handleWorking()">WORKING (✓)</button>
                 <button class="btn-main" style="background:#f97316;" onclick="saveSt('OFF')">OFF</button>
                 <button class="btn-main" style="background:#ef4444;" onclick="saveSt('ABSENT')">ABSENT</button>
-                <button class="btn-main" style="background:#a855f7;" onclick="document.getElementById('sick-zone').classList.toggle('hidden')">SICK</button>
+                <button class="btn-main" style="background:#a855f7;"
+                    onclick="document.getElementById('sick-zone').classList.toggle('hidden')">SICK</button>
             </div>
+            
+            <!-- SALES SECTION -->
+            <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:20px;">
+                <label style="font-size:12px; font-weight:800; display:block; margin-bottom:10px; color:#0f172a;">VENTA DIARIA ($)</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="sale-amount" placeholder="0.00" style="margin:0;">
+                    <button class="btn-main" style="width:auto; margin:0; background:#0f172a;" onclick="saveSale()">GUARDAR</button>
+                </div>
+            </div>
+
             <button class="btn-main" style="background:#64748b; margin-top:20px;" onclick="closeM()">CANCELAR</button>
         </div>
     </div>
@@ -143,6 +155,18 @@
                     <span class="stat-lbl">OFF</span>
                 </div>
             </div>
+            
+            <div style="margin-top:25px; border-top:2px solid #f1f5f9; padding-top:20px;">
+                <label style="font-weight:900; font-size:14px; text-transform:uppercase; color:#64748b;">Total Ventas</label>
+                <div style="font-size:32px; font-weight:900; color:#0f172a; margin:10px 0;" id="st-sales-total">$0.00</div>
+                <div style="display:flex; gap:5px; justify-content:center;">
+                    <button class="btn-main" style="padding:8px; font-size:11px; margin:0; background:#94a3b8;" onclick="filterSales(0)">HOY</button>
+                    <button class="btn-main" style="padding:8px; font-size:11px; margin:0; background:#64748b;" onclick="filterSales(7)">7 DÍAS</button>
+                    <button class="btn-main" style="padding:8px; font-size:11px; margin:0; background:#475569;" onclick="filterSales(14)">14 DÍAS</button>
+                    <button class="btn-main" style="padding:8px; font-size:11px; margin:0; background:#0f172a;" onclick="filterSales(30)">30 DÍAS</button>
+                </div>
+            </div>
+
             <button class="btn-main" style="background:#64748b; margin-top:20px;" onclick="closeM()">CERRAR</button>
         </div>
     </div>
@@ -153,7 +177,7 @@
         alert("Error Detectado: " + msg + "\nIntenta el botón REINICIAR APP.");
     };
 
-    let db = { emps: [], sched: {} };
+    let db = { emps: [], sched: {}, sales: {} };
     let act = null;
 
     // Check login
@@ -191,6 +215,7 @@
                 db = JSON.parse(saved);
                 // Validate Structure
                 if(!Array.isArray(db.emps)) throw new Error("Datos Corruptos");
+                if(!db.sales) db.sales = {}; // Legacy support
             } else {
                 // SEED DATA
                 db.emps = [
@@ -198,11 +223,12 @@
                     { id: 2, name: 'User Demo 2', team: 'T2', model: 'M2', pod: 'B', shift: '2nd' }
                 ];
                 db.sched = {};
+                db.sales = {};
             }
         } catch(e) {
             alert("Error cargando datos. Se reiniciará la base de datos.");
             localStorage.removeItem('SF_V107_FINAL');
-            db = { emps: [], sched: {} };
+            db = { emps: [], sched: {}, sales: {} };
         }
         
         document.getElementById('view-login').classList.add('hidden');
@@ -316,7 +342,7 @@
 
     function showStats() {
         let work=0, off=0, abs=0, sick=0;
-        const days = ['28/1','29/1','30/1','31/1','01/2','02/2','03/2'];
+        const days = ['28/1','29/1','30/1','31/1','01/2','02/2','03/2']; // Visible days
         
         db.emps.forEach(e => {
             days.forEach(d => {
@@ -336,10 +362,73 @@
         document.getElementById('st-absent').innerText = abs;
         document.getElementById('st-sick').innerText = sick;
         
+        filterSales(0); // Default to Today
         document.getElementById('modal-stats').classList.remove('hidden');
     }
+    
+    function filterSales(range) {
+        // Range: 0=Today, 7, 14, 30
+        
+        const now = new Date(); 
+        let total = 0;
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - range);
+        
+        // Normalize dates to midnight
+        const today = new Date(); today.setHours(0,0,0,0);
+        cutoff.setHours(0,0,0,0);
+        
+        // Loop all sales
+        Object.values(db.sales).forEach(empSales => {
+            Object.entries(empSales).forEach(([dateStr, amount]) => {
+                // dateStr is "YYYY-MM-DD"
+                if(!dateStr) return;
+                const [y, m, d] = dateStr.split('-').map(Number);
+                const date = new Date(y, m-1, d);
+                
+                if (range === 0) {
+                    // Special case for TODAY
+                    if(date.getTime() === today.getTime()) total += amount;
+                } else {
+                    if(date >= cutoff && date <= today) total += amount;
+                }
+            });
+        });
+        
+        document.getElementById('st-sales-total').innerText = "$" + total.toFixed(2);
+    }
 
-    function openM(id, k, n) { act={id,key:k,n}; document.getElementById('target-name').innerText=n; document.querySelectorAll('#modal-status .hidden').forEach(z=>z.classList.add('hidden')); document.getElementById('modal-status').classList.remove('hidden'); }
+    function openM(id, k, n) { 
+        act={id,key:k,n}; 
+        document.getElementById('target-name').innerText=n; 
+        
+        // Parse Key "28/1" to Date "2026-01-28" (Assuming Current Year)
+        const currentYear = new Date().getFullYear();
+        const [d, m] = k.split('/');
+        const isoDate = `${currentYear}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+        act.isoDate = isoDate;
+        
+        // Load Sales
+        const amount = db.sales[id]?.[isoDate] || "";
+        document.getElementById('sale-amount').value = amount;
+        
+        document.querySelectorAll('#modal-status .hidden').forEach(z=>z.classList.add('hidden')); 
+        document.getElementById('modal-status').classList.remove('hidden'); 
+    }
+    
+    function saveSale() {
+        if(!act) return;
+        const amount = parseFloat(document.getElementById('sale-amount').value);
+        
+        if(!db.sales[act.id]) db.sales[act.id] = {};
+        
+        if(isNaN(amount) || amount === 0) {
+             delete db.sales[act.id][act.isoDate];
+        } else {
+             db.sales[act.id][act.isoDate] = amount;
+        }
+        save(); // Closes modal
+    }
     
     function showAdd() { 
         document.getElementById('modal-title').innerText = "Nuevo Miembro";
@@ -423,3 +512,4 @@
 </script>
 </body>
 </html>
+
