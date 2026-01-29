@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DreamArt V110 - SALES FIXED</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --gold: #FFD700; --bg: #121212; --accent: #1e293b; }
         body { font-family: 'Inter', sans-serif; margin: 0; background: #f8fafc; color: #0f172a; padding-bottom: 60px; }
@@ -211,6 +212,10 @@
             </div>
             
             <div style="margin-top:25px; border-top:2px solid #f1f5f9; padding-top:20px;">
+                <label style="font-weight:900; font-size:14px; text-transform:uppercase; color:#64748b;">Ventas por POD</label>
+                <div style="height: 200px; margin-top: 10px; margin-bottom: 20px;">
+                    <canvas id="salesChart"></canvas>
+                </div>
                 <label style="font-weight:900; font-size:14px; text-transform:uppercase; color:#64748b;">Total Ventas</label>
                 <div style="font-size:32px; font-weight:900; color:#0f172a; margin:10px 0;" id="st-sales-total">$0.00</div>
                 <div style="display:flex; gap:5px; justify-content:center;">
@@ -233,6 +238,7 @@
 
     let db = { emps: [], sched: {}, sales: {}, notes: {} };
     let act = null;
+    let salesChartInst = null;
 
     // Helper for consistent Date Keys
     function getIsoDate(dayStr) {
@@ -476,35 +482,89 @@
     }
     
     function filterSales(range) {
-        // Range: 0=Today, 7, 14, 30
-        
-        const now = new Date(); 
-        let total = 0;
         const cutoff = new Date();
-        cutoff.setDate(cutoff.getDate() - range);
-        
-        // Normalize dates to midnight
-        const today = new Date(); today.setHours(0,0,0,0);
-        cutoff.setHours(0,0,0,0);
-        
-        // Loop all sales
-        Object.values(db.sales).forEach(empSales => {
-            Object.entries(empSales).forEach(([dateStr, amount]) => {
-                // dateStr is "YYYY-MM-DD"
-                if(!dateStr) return;
-                const [y, m, d] = dateStr.split('-').map(Number);
-                const date = new Date(y, m-1, d);
-                
-                if (range === 0) {
-                    // Special case for TODAY
-                    if(date.getTime() === today.getTime()) total += amount;
-                } else {
-                    if(date >= cutoff && date <= today) total += amount;
-                }
-            });
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        cutoff.setDate(today.getDate() - range);
+        cutoff.setHours(0, 0, 0, 0);
+
+        // Prep Chart Labels
+        const labels = [];
+        const podSales = { 'A': {}, 'B': {}, 'F': {}, 'BACKUP': {} };
+        const startChart = new Date(today);
+        startChart.setDate(today.getDate() - (range || 6));
+
+        for (let d = new Date(startChart); d <= today; d.setDate(d.getDate() + 1)) {
+            const day = d.getDate().toString().padStart(2, '0');
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const label = `${day}/${month}`;
+            const iso = `${d.getFullYear()}-${month}-${day}`;
+            labels.push({ label, iso });
+            Object.keys(podSales).forEach(p => podSales[p][iso] = 0);
+        }
+
+        let totalSum = 0;
+        db.emps.forEach(emp => {
+            const empPod = emp.pod || 'A';
+            if (db.sales && db.sales[emp.id]) {
+                Object.entries(db.sales[emp.id]).forEach(([dateStr, amount]) => {
+                    const [y, m, d] = dateStr.split('-').map(Number);
+                    const date = new Date(y, m - 1, d);
+                    date.setHours(0, 0, 0, 0);
+
+                    if (range === 0) {
+                        if (date.getTime() === today.getTime()) totalSum += amount;
+                    } else {
+                        if (date >= cutoff && date <= today) totalSum += amount;
+                    }
+
+                    if (podSales[empPod] && podSales[empPod].hasOwnProperty(dateStr)) {
+                        podSales[empPod][dateStr] += amount;
+                    }
+                });
+            }
         });
-        
-        document.getElementById('st-sales-total').innerText = "$" + total.toFixed(2);
+
+        document.getElementById('st-sales-total').innerText = "$" + totalSum.toFixed(2);
+
+        const chartLabels = labels.map(l => l.label);
+        const chartData = {
+            'A': labels.map(l => podSales['A'][l.iso]),
+            'B': labels.map(l => podSales['B'][l.iso]),
+            'F': labels.map(l => podSales['F'][l.iso]),
+            'BACKUP': labels.map(l => podSales['BACKUP'][l.iso])
+        };
+        renderSalesChart(chartLabels, chartData);
+    }
+
+    function renderSalesChart(labels, data) {
+        const canvas = document.getElementById('salesChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (salesChartInst) salesChartInst.destroy();
+
+        salesChartInst = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'POD A', data: data['A'], borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
+                    { label: 'POD B', data: data['B'], borderColor: '#10b981', backgroundColor: '#10b981', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
+                    { label: 'POD F', data: data['F'], borderColor: '#f43f5e', backgroundColor: '#f43f5e', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
+                    { label: 'BACKUP', data: data['BACKUP'], borderColor: '#f59e0b', backgroundColor: '#f59e0b', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { font: { size: 10 } }, grid: { color: '#f1f5f9' } },
+                    x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+                }
+            }
+        });
     }
 
     function openM(id, k, n) { 
