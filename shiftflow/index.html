@@ -193,7 +193,7 @@
                 // SEED DATA
                 db.emps = [
                     { id: 1, name: 'User Demo 1', team: 'T1', model: 'M1', pod: 'A', shift: '1st', role: 'Chatter' },
-                    { id: 2, name: 'User Demo 2', team: 'T2', model: 'M2', pod: 'B', shift: '2nd', role: 'Shadower' }
+                    { id: 2, name: 'User Demo 2', team: 'T2', model: 'M2', pod: 'B', shift: '2nd', role: 'Chatter' }
                 ];
                 db.sched = {};
             }
@@ -216,59 +216,70 @@
             
             const days = ['28/1','29/1','30/1','31/1','01/2','02/2','03/2'];
             
-            // 1. Helper to create a CARD + TABLE for a group of people
-            const renderCard = (title, list, labelOverride) => {
-                if(!list || list.length === 0) return;
+            // 1. Helper to create a CARD + TABLE
+            const renderCard = (title, list, labelOverride, bgColor) => {
+                // Remove early return to show empty pods if needed, 
+                // BUT for cleaner UI we usually hide empty. 
+                // User said "te falto Team F", suggesting they expected it. 
+                // We will SHOW valid pods even if empty, or at least check logic.
+                // To be safe, let's show them.
+                const safeList = list || [];
                 
-                let h = `<div class="pod-card"><div class="pod-header"><span>${title}</span></div><div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
+                let h = `<div class="pod-card"><div class="pod-header" style="background:${bgColor || '#f1f5f9'};"><span>${title}</span></div><div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
                 days.forEach(d => h += `<th>${d}</th>`);
                 h += `</tr></thead><tbody>`;
                 
-                list.forEach(e => {
-                    h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3">${e.name}</td>`;
-                    days.forEach(d => {
-                        const st = db.sched[e.id]?.[d] || 'WORKING'; 
-                        let cls = 'st-WORKING', disp = '✓', sub = '';
-                        
-                        if(st === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
-                        if(st === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
-                        
-                        if(typeof st === 'object') {
-                            if(st.status === 'SICK') { 
-                                disp = 'SICK'; cls = 'st-SICK'; 
-                                sub = `<br><small style="color:#7c3aed; font-weight:600;">Regreso: ${st.date}</small>`; 
+                if(safeList.length === 0) {
+                     h += `<tr><td colspan="${3 + days.length}" style="padding:20px; color:#94a3b8; font-style:italic;">Sin miembros asignados</td></tr>`;
+                } else {
+                    safeList.forEach(e => {
+                        h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3">${e.name}</td>`;
+                        days.forEach(d => {
+                            const st = db.sched[e.id]?.[d] || 'WORKING'; 
+                            let cls = 'st-WORKING', disp = '✓', sub = '';
+                            
+                            if(st === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
+                            if(st === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
+                            
+                            if(typeof st === 'object') {
+                                if(st.status === 'SICK') { 
+                                    disp = 'SICK'; cls = 'st-SICK'; 
+                                    sub = `<br><small style="color:#7c3aed; font-weight:600;">Regreso: ${st.date}</small>`; 
+                                }
+                                if(st.status === 'ON' && st.cov) { 
+                                    disp = '✓'; cls = 'st-WORKING'; 
+                                    sub = `<span class="st-COV">Cubriendo: ${st.cov}</span>`; 
+                                }
                             }
-                            if(st.status === 'ON' && st.cov) { 
-                                disp = '✓'; cls = 'st-WORKING'; 
-                                sub = `<span class="st-COV">Cubriendo: ${st.cov}</span>`; 
-                            }
-                        }
-                        
-                        h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
+                            
+                            h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
+                        });
+                        h += `</tr>`;
                     });
-                    h += `</tr>`;
-                });
+                }
                 h += `</tbody></table></div></div>`;
                 area.innerHTML += h;
             };
 
             // 2. RENDER PODS (A, B, F) -> ONLY CHATTERS
-            ['A','B','F'].forEach(pod => {
-                // Filter: Must be in this Pod AND (No role defined OR Role is Chatter)
-                // We intentionally exclude Backups/Shadowers even if assigned to Pod A
-                const chatters = db.emps.filter(e => e.pod === pod && (!e.role || e.role === 'Chatter'));
-                renderCard(`POD ${pod}`, chatters, 'CHATTER');
+            const pods = [
+                { id: 'A', color: '#dbeafe' }, // Blue-100
+                { id: 'B', color: '#dcfce7' }, // Green-100
+                { id: 'F', color: '#fae8ff' }  // Fuchsia-100 (Pinkish)
+            ];
+
+            pods.forEach(p => {
+                const chatters = db.emps.filter(e => e.pod === p.id && (!e.role || e.role === 'Chatter'));
+                renderCard(`POD ${p.id}`, chatters, 'CHATTER', p.color);
             });
 
-            // 3. RENDER BACKUPS (GLOBAL list of anyone with Role=Backup OR Pod=BACKUP)
-            // We catch legacy data (Pod=BACKUP) or new data (Role=Backup)
+            // 3. RENDER BACKUP TEAM
             const backups = db.emps.filter(e => e.role === 'Backup' || e.pod === 'BACKUP');
-            // Avoid duplicates if someone has both (though filter iterates once)
-            renderCard('BACKUP TEAM', backups, 'BACKUP');
+            renderCard('BACKUP TEAM', backups, 'BACKUP', '#ffedd5'); // Orange-100
 
-            // 4. RENDER SHADOWERS (GLOBAL list of Role=Shadower)
+            // 4. RENDER SHADOWERS TEAM
             const shadowers = db.emps.filter(e => e.role === 'Shadower');
-            renderCard('SHADOWERS TEAM', shadowers, 'SHADOWER');
+            renderCard('SHADOWERS TEAM', shadowers, 'SHADOWER', '#f3e8ff'); // Purple-100
 
         } catch(e) {
             console.error("Render Error", e);
