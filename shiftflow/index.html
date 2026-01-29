@@ -277,7 +277,7 @@
                             
                             if(typeof st === 'object') {
                                 if(st.status === 'SICK') { 
-                                    disp = 'SICK'; cls = 'st-SICK'; 
+                                    disp = '🚑 SICK'; cls = 'st-SICK'; 
                                     sub = `<br><small style="color:#7c3aed; font-weight:600;">Regreso: ${st.date}</small>`; 
                                 }
                                 if(st.status === 'ON' && st.cov) { 
@@ -427,7 +427,103 @@
     }
     
     function saveSale() {
-        if(!act
+        if(!act) return;
+        const amount = parseFloat(document.getElementById('sale-amount').value);
+        
+        if(!db.sales) db.sales = {};
+        if(!db.sales[act.id]) db.sales[act.id] = {};
+        
+        if(isNaN(amount) || amount === 0) {
+             if(db.sales[act.id][act.isoDate]) delete db.sales[act.id][act.isoDate];
+        } else {
+             db.sales[act.id][act.isoDate] = amount;
+        }
+        alert("¡Venta Guardada: $" + amount + "!\nFecha: " + act.isoDate);
+        save(); // Closes modal
+    }
+    
+    function showAdd() { 
+        document.getElementById('modal-title').innerText = "Nuevo Miembro";
+        document.getElementById('edit-id').value = "";
+        document.getElementById('add-name').value = "";
+        document.getElementById('add-team').value = "";
+        document.getElementById('add-model').value = "";
+        document.getElementById('add-pod').value = "A";
+        document.getElementById('add-role').value = "Chatter";
+        document.getElementById('add-shift').value = "1st";
+        document.getElementById('btn-save').innerText = "GUARDAR MIEMBRO";
+        document.getElementById('btn-delete').classList.add('hidden');
+        document.getElementById('modal-add').classList.remove('hidden'); 
+    }
+
+    function editMember(id) {
+        const e = db.emps.find(x => x.id === id);
+        if(!e) return;
+        document.getElementById('modal-title').innerText = "Editar Miembro";
+        document.getElementById('edit-id').value = e.id;
+        document.getElementById('add-name').value = e.name;
+        document.getElementById('add-team').value = e.team || "";
+        document.getElementById('add-model').value = e.model || "";
+        document.getElementById('add-pod').value = e.pod || "A";
+        document.getElementById('add-role').value = e.role || "Chatter";
+        document.getElementById('add-shift').value = e.shift || "1st";
+        document.getElementById('btn-save').innerText = "ACTUALIZAR DATOS";
+        document.getElementById('btn-delete').classList.remove('hidden');
+        document.getElementById('modal-add').classList.remove('hidden');
+    }
+
+    function doDelete() {
+        const id = parseInt(document.getElementById('edit-id').value);
+        if(!id) return;
+        if(confirm("¿Eliminar este miembro permanentemente?")) {
+            db.emps = db.emps.filter(e => e.id !== id);
+            delete db.sched[id];
+            save();
+        }
+    }
+    
+    function closeM() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
+    function saveSt(s) { 
+        if(!act) return;
+        if(!db.sched[act.id]) db.sched[act.id]={}; 
+        db.sched[act.id][act.key]=s; 
+        save(); 
+    }
+    
+    function doAdd() {
+        const name = document.getElementById('add-name').value;
+        if(!name) return alert("Nombre requerido");
+        
+        const editId = document.getElementById('edit-id').value;
+        if(editId) {
+            const id = parseInt(editId);
+            const idx = db.emps.findIndex(e => e.id === id);
+            if(idx !== -1) {
+                db.emps[idx].name = name;
+                db.emps[idx].team = document.getElementById('add-team').value;
+                db.emps[idx].model = document.getElementById('add-model').value;
+                db.emps[idx].pod = document.getElementById('add-pod').value;
+                db.emps[idx].shift = document.getElementById('add-shift').value;
+                db.emps[idx].role = document.getElementById('add-role').value;
+            }
+        } else {
+            db.emps.push({ 
+                id: Date.now(), 
+                name: name, 
+                team: document.getElementById('add-team').value, 
+                model: document.getElementById('add-model').value, 
+                pod: document.getElementById('add-pod').value, 
+                shift: document.getElementById('add-shift').value,
+                role: document.getElementById('add-role').value
+            });
+        }
+        save();
+    }
+    
+    function save() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); closeM(); render(); }
+</script>
+</body>
+</html>
 
 
 
