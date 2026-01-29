@@ -498,7 +498,10 @@
         const amount = (db.sales && db.sales[id] && db.sales[id][act.isoDate]) ? db.sales[id][act.isoDate] : "";
         document.getElementById('sale-amount').value = amount;
         
-        document.querySelectorAll('#modal-status .hidden').forEach(z=>z.classList.add('hidden')); 
+        // RESET ZONES
+        document.getElementById('cov-zone').classList.add('hidden');
+        document.getElementById('sick-zone').classList.add('hidden');
+        
         document.getElementById('modal-status').classList.remove('hidden'); 
     }
     
