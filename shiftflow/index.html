@@ -315,6 +315,11 @@
                 <option value="F">POD F</option>
                 <option value="BACKUP">POD BACKUP</option>
             </select>
+            <select id="add-role">
+                <option value="Chatter">Chatter</option>
+                <option value="Shadower">Shadower</option>
+                <option value="Backup">Backup</option>
+            </select>
             <select id="add-shift">
                 <option value="1st">1st Shift</option>
                 <option value="2nd">2nd Shift</option>
@@ -429,30 +434,49 @@
                     days.forEach(d => h += `<th>${d}</th>`);
                     h += `</tr></thead><tbody>`;
 
-                    list.forEach(e => {
-                        h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3">${e.name}</td>`;
-                        days.forEach(d => {
-                            const st = db.sched[e.id]?.[d] || 'WORKING';
-                            let cls = 'st-WORKING', disp = '✓', sub = '';
+                    // Helper to render rows
+                    const renderRows = (members, title) => {
+                        if (members.length === 0) return '';
+                        let html = '';
+                        if (title) {
+                            html += `<tr style="background:#f1f5f9;"><td colspan="${3 + days.length}" style="text-align:left; padding:10px 20px; font-weight:900; color:#475569; letter-spacing:1px; border-top:2px solid #cbd5e1;">${title}</td></tr>`;
+                        }
+                        members.forEach(e => {
+                            html += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3">${e.name}</td>`;
+                            days.forEach(d => {
+                                const st = db.sched[e.id]?.[d] || 'WORKING';
+                                let cls = 'st-WORKING', disp = '✓', sub = '';
 
-                            if (st === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
-                            if (st === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
+                                if (st === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
+                                if (st === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
 
-                            if (typeof st === 'object') {
-                                if (st.status === 'SICK') {
-                                    disp = 'SICK'; cls = 'st-SICK';
-                                    sub = `<br><small style="color:#7c3aed; font-weight:600;">Regreso: ${st.date}</small>`;
+                                if (typeof st === 'object') {
+                                    if (st.status === 'SICK') {
+                                        disp = 'SICK'; cls = 'st-SICK';
+                                        sub = `<br><small style="color:#7c3aed; font-weight:600;">Regreso: ${st.date}</small>`;
+                                    }
+                                    if (st.status === 'ON' && st.cov) {
+                                        disp = '✓'; cls = 'st-WORKING';
+                                        sub = `<span class="st-COV">Cubriendo: ${st.cov}</span>`;
+                                    }
                                 }
-                                if (st.status === 'ON' && st.cov) {
-                                    disp = '✓'; cls = 'st-WORKING';
-                                    sub = `<span class="st-COV">Cubriendo: ${st.cov}</span>`;
-                                }
-                            }
 
-                            h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
+                                html += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
+                            });
+                            html += `</tr>`;
                         });
-                        h += `</tr>`;
-                    });
+                        return html;
+                    };
+
+                    // GROUPS
+                    const chatters = list.filter(e => !e.role || e.role === 'Chatter');
+                    const shadowers = list.filter(e => e.role === 'Shadower');
+                    const backups = list.filter(e => e.role === 'Backup');
+
+                    h += renderRows(chatters, 'CHATTERS'); // Added 'CHATTERS' header for consistency
+                    h += renderRows(shadowers, 'SHADOWERS');
+                    h += renderRows(backups, 'BACKUPS');
+
                     area.innerHTML += h + `</tbody></table></div></div>`;
                 });
             } catch (e) {
@@ -534,7 +558,8 @@
                 team: document.getElementById('add-team').value,
                 model: document.getElementById('add-model').value,
                 pod: document.getElementById('add-pod').value,
-                shift: document.getElementById('add-shift').value
+                shift: document.getElementById('add-shift').value,
+                role: document.getElementById('add-role').value
             });
             save();
         }
