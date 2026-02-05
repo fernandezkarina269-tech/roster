@@ -337,7 +337,7 @@
     <div id="view-login">
         <div class="login-card">
             <h1 style="margin-bottom:10px;">ShiftFlow</h1>
-            <p style="font-weight:900; color:#10b981; font-size:13px; margin-bottom:20px;">V109 - STABLE</p>
+            <p style="font-weight:900; color:#10b981; font-size:13px; margin-bottom:20px;">V110 - TABBED</p>
             <input type="password" id="pass-in" placeholder="CLAVE DE ACCESO">
             <button class="btn-main" onclick="startApp()">ENTRAR AL SISTEMA</button>
             <button class="btn-main" style="background:#ef4444; margin-top:20px;" onclick="hardReset()">REINICIAR APP
@@ -357,12 +357,14 @@
                     onclick="logout()">SALIR</button>
             </div>
         </div>
-        <div class="shift-tabs" id="shift-tabs">
-            <div class="shift-tab active" onclick="setShift('1st')">1ST SHIFT</div>
-            <div class="shift-tab" onclick="setShift('2nd')">2ND SHIFT</div>
-            <div class="shift-tab" onclick="setShift('3rd')">3RD SHIFT</div>
+
+        <div class="shift-tabs">
+            <div class="shift-tab active" onclick="setShift('1st')">1st Shift</div>
+            <div class="shift-tab" onclick="setShift('2nd')">2nd Shift</div>
+            <div class="shift-tab" onclick="setShift('3rd')">3rd Shift</div>
         </div>
-        <div id="sheets-container" style="padding:1px;"></div>
+
+        <div id="sheets-container" style="padding:20px;"></div>
     </div>
 
     <!-- MODALS -->
@@ -918,8 +920,6 @@
 </body>
 
 </html>
-
-
 
 
 
