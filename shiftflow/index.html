@@ -279,34 +279,34 @@
             opacity: 0.9;
         }
 
-        /* SHIFT TABS */
-        .shift-tabs {
-            display: flex;
-            background: #fff;
-            padding: 10px 24px;
-            gap: 10px;
-            border-bottom: 1px solid #e2e8f0;
+        /* SHIFT SHEETS */
+        .shift-sheet {
+            margin-bottom: 60px;
+            border-top: 5px solid #0f172a;
+        }
+
+        .shift-sheet-header {
+            background: #0f172a;
+            color: white;
+            padding: 20px 40px;
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             position: sticky;
             top: 0;
             z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .shift-tab {
-            padding: 10px 25px;
+        .shift-sheet-header .badge {
+            background: var(--gold);
+            color: #000;
+            padding: 5px 15px;
             border-radius: 99px;
-            font-weight: 800;
-            cursor: pointer;
             font-size: 14px;
-            color: #64748b;
-            transition: all 0.2s;
-            border: 1px solid #e2e8f0;
-        }
-
-        .shift-tab.active {
-            background: #0f172a;
-            color: #fff;
-            border-color: #0f172a;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -336,12 +336,7 @@
                     onclick="logout()">SALIR</button>
             </div>
         </div>
-        <div class="shift-tabs">
-            <div class="shift-tab active" id="tab-1st" onclick="setShift('1st')">1st Shift</div>
-            <div class="shift-tab" id="tab-2nd" onclick="setShift('2nd')">2nd Shift</div>
-            <div class="shift-tab" id="tab-3rd" onclick="setShift('3rd')">3rd Shift</div>
-        </div>
-        <div id="pods-area"></div>
+        <div id="sheets-container"></div>
     </div>
 
     <!-- MODALS -->
@@ -472,19 +467,11 @@
         let db = { emps: [], sched: {}, sales: {}, notes: {} };
         let act = null;
         let salesChartInst = null;
-        let currentShift = '1st';
 
         function getIsoDate(dStr) {
             const [d, m] = dStr.split('/').map(Number);
             const year = (m >= 10) ? 2025 : 2026; // Manual fix for Jan/Feb overlap
             return `${year}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
-        }
-
-        function setShift(s) {
-            currentShift = s;
-            document.querySelectorAll('.shift-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + s).classList.add('active');
-            render();
         }
 
         function initData() {
@@ -516,97 +503,86 @@
 
         function render() {
             try {
-                const area = document.getElementById('pods-area');
-                if (!area) return;
-                area.innerHTML = '';
+                const container = document.getElementById('sheets-container');
+                if (!container) return;
+                container.innerHTML = '';
 
+                const shifts = ['1st', '2nd', '3rd'];
                 const days = ['28/1', '29/1', '30/1', '31/1', '01/2', '02/2', '03/2'];
 
-                const renderCard = (title, list, labelOverride, bgColor) => {
-                    const safeList = list || [];
-                    const podId = title; // Use title as ID for notes
-                    const noteVal = (db.notes && db.notes[podId]) ? db.notes[podId] : '';
-
-                    let h = `<div class="pod-card">
-                    <div class="pod-header" style="background:${bgColor || '#f1f5f9'};"><span>${title}</span></div>
-                    
-                    <!-- NOTES SECTION -->
-                    <div style="padding:10px 20px; background:#fff; border-bottom:1px solid #e2e8f0;">
-                        <textarea placeholder="Notas del equipo..." 
-                            style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; font-family:'Inter',sans-serif; height:60px; resize:vertical;"
-                            onblur="saveNote('${podId}', this.value)">${noteVal}</textarea>
+                shifts.forEach(shiftName => {
+                    const sheetDiv = document.createElement('div');
+                    sheetDiv.className = 'shift-sheet';
+                    sheetDiv.innerHTML = `<div class="shift-sheet-header">
+                        <span>${shiftName} SHIFT</span>
+                        <span class="badge" id="badge-${shiftName}">0 Salidas</span>
                     </div>
+                    <div id="area-${shiftName}"></div>`;
+                    container.appendChild(sheetDiv);
 
-                    <div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
+                    const area = document.getElementById(`area-${shiftName}`);
+                    const shiftEmps = db.emps.filter(e => e.shift === shiftName || (shiftName === '1st' && !e.shift));
 
-                    days.forEach(d => h += `<th>${d}</th>`);
-                    h += `</tr></thead><tbody>`;
+                    const renderCard = (title, list, labelOverride, bgColor) => {
+                        const safeList = list || [];
+                        const podId = `${shiftName}-${title}`; // Unique note ID per shift/pod
+                        const noteVal = (db.notes && db.notes[podId]) ? db.notes[podId] : '';
 
-                    if (safeList.length === 0) {
-                        h += `<tr><td colspan="${3 + days.length}" style="padding:20px; color:#94a3b8; font-style:italic;">Sin miembros asignados</td></tr>`;
-                    } else {
-                        safeList.forEach(e => {
-                            h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3" style="cursor:pointer; color:#2563eb; font-weight:800;" onclick="editMember(${e.id})">${e.name} <span style="font-size:10px; opacity:0.7;">✎</span></td>`;
+                        let h = `<div class="pod-card">
+                        <div class="pod-header" style="background:${bgColor || '#f1f5f9'};"><span>${title}</span></div>
+                        
+                        <div style="padding:10px 20px; background:#fff; border-bottom:1px solid #e2e8f0;">
+                            <textarea placeholder="Notas del equipo..." 
+                                style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; font-family:'Inter',sans-serif; height:60px; resize:vertical;"
+                                onblur="saveNote('${podId}', this.value)">${noteVal}</textarea>
+                        </div>
 
-                            days.forEach(d => {
-                                const st = db.sched[e.id]?.[d] || 'WORKING';
-                                let cls = 'st-WORKING', disp = '✓', sub = '';
+                        <div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
+                        days.forEach(d => h += `<th>${d}</th>`);
+                        h += `</tr></thead><tbody>`;
 
-                                // Normalize status
-                                const status = (typeof st === 'object') ? st.status : st;
-
-                                if (status === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
-                                if (status === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
-
-                                if (typeof st === 'object') {
-                                    if (st.status === 'SICK') {
-                                        disp = '🚑 SICK'; cls = 'st-SICK';
-                                        sub = `<br><small style="color:#7c3aed; font-weight:600;">Regreso: ${st.date}</small>`;
-                                    }
-                                    if (st.status === 'ON' && st.cov) {
-                                        disp = '✓'; cls = 'st-WORKING';
-                                        if (st.cov !== 'Lugar Vacío') {
-                                            sub = `<span class="st-COV">Covering... ${st.cov}</span>`;
+                        if (safeList.length === 0) {
+                            h += `<tr><td colspan="${3 + days.length}" style="padding:20px; color:#94a3b8; font-style:italic;">Sin miembros asignados</td></tr>`;
+                        } else {
+                            safeList.forEach(e => {
+                                h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3" style="cursor:pointer; color:#2563eb; font-weight:800;" onclick="editMember(${e.id})">${e.name} <span style="font-size:10px; opacity:0.7;">✎</span></td>`;
+                                days.forEach(d => {
+                                    const st = db.sched[e.id]?.[d] || 'WORKING';
+                                    let cls = 'st-WORKING', disp = '✓', sub = '';
+                                    const status = (typeof st === 'object') ? st.status : st;
+                                    if (status === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
+                                    if (status === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
+                                    if (typeof st === 'object') {
+                                        if (st.status === 'SICK') {
+                                            disp = '🚑 SICK'; cls = 'st-SICK';
+                                            sub = `<br><small style="color:#7c3aed; font-weight:600;">Regreso: ${st.date}</small>`;
+                                        }
+                                        if (st.status === 'ON' && st.cov) {
+                                            disp = '✓'; cls = 'st-WORKING';
+                                            if (st.cov !== 'Lugar Vacío') { sub = `<span class="st-COV">Covering... ${st.cov}</span>`; }
                                         }
                                     }
-                                }
-
-                                const isoDate = getIsoDate(d);
-                                if (isoDate && db.sales && db.sales[e.id] && db.sales[e.id][isoDate]) {
-                                    sub += `<span style="color:#10b981; font-weight:900; font-size:12px; margin-left:4px;">$${db.sales[e.id][isoDate]}</span>`;
-                                }
-
-                                h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
+                                    const isoDate = getIsoDate(d);
+                                    if (isoDate && db.sales && db.sales[e.id] && db.sales[e.id][isoDate]) {
+                                        sub += `<span style="color:#10b981; font-weight:900; font-size:12px; margin-left:4px;">$${db.sales[e.id][isoDate]}</span>`;
+                                    }
+                                    h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
+                                });
+                                h += `</tr>`;
                             });
-                            h += `</tr>`;
-                        });
-                    }
-                    h += `</tbody></table></div></div>`;
-                    area.innerHTML += h;
-                };
+                        }
+                        h += `</tbody></table></div></div>`;
+                        area.innerHTML += h;
+                    };
 
-                // Filter employees by current shift
-                const shiftEmps = db.emps.filter(e => e.shift === currentShift || (currentShift === '1st' && !e.shift));
-
-                const pods = [
-                    { id: 'A', color: '#dbeafe' }, // Blue-100
-                    { id: 'B', color: '#dcfce7' }, // Green-100
-                    { id: 'F', color: '#fae8ff' }  // Fuchsia-100 (Pinkish)
-                ];
-
-                pods.forEach(p => {
-                    const chatters = shiftEmps.filter(e => e.pod === p.id && (!e.role || e.role === 'Chatter'));
-                    renderCard(`POD ${p.id}`, chatters, 'CHATTER', p.color);
+                    const pods = [{ id: 'A', color: '#dbeafe' }, { id: 'B', color: '#dcfce7' }, { id: 'F', color: '#fae8ff' }];
+                    pods.forEach(p => {
+                        const chatters = shiftEmps.filter(e => e.pod === p.id && (!e.role || e.role === 'Chatter'));
+                        renderCard(`POD ${p.id}`, chatters, 'CHATTER', p.color);
+                    });
+                    renderCard('BACKUP TEAM', shiftEmps.filter(e => e.role === 'Backup' || e.pod === 'BACKUP'), 'BACKUP', '#ffedd5');
+                    renderCard('SHADOWERS TEAM', shiftEmps.filter(e => e.role === 'Shadower'), 'SHADOWER', '#f3e8ff');
                 });
-
-                // 3. RENDER BACKUP TEAM
-                const backups = shiftEmps.filter(e => e.role === 'Backup' || e.pod === 'BACKUP');
-                renderCard('BACKUP TEAM', backups, 'BACKUP', '#ffedd5'); // Orange-100
-
-                // 4. RENDER SHADOWERS TEAM
-                const shadowers = shiftEmps.filter(e => e.role === 'Shadower');
-                renderCard('SHADOWERS TEAM', shadowers, 'SHADOWER', '#f3e8ff'); // Purple-100
-
             } catch (e) {
                 console.error("Render Error", e);
                 alert("Error mostrando la tabla: " + e.message);
@@ -663,30 +639,26 @@
         }
 
         function showStats() {
-            let work = 0, off = 0, abs = 0, sick = 0;
-            const days = ['28/1', '29/1', '30/1', '31/1', '01/2', '02/2', '03/2']; // Visible days
+            let totalSales = 0;
+            let totalWork = 0, totalOff = 0, totalAbs = 0, totalSick = 0;
+            const days = ['28/1', '29/1', '30/1', '31/1', '01/2', '02/2', '03/2'];
 
             db.emps.forEach(e => {
-                if (e.shift !== currentShift && !(currentShift === '1st' && !e.shift)) return;
-
                 days.forEach(d => {
                     const st = db.sched[e.id]?.[d] || 'WORKING';
-                    if (st === 'WORKING') work++;
-                    else if (st === 'OFF') off++;
-                    else if (st === 'ABSENT') abs++;
-                    else if (typeof st === 'object') {
-                        if (st.status === 'SICK') sick++;
-                        if (st.status === 'ON') work++;
-                    }
+                    if (st === 'WORKING' || (typeof st === 'object' && st.status === 'ON')) totalWork++;
+                    else if (st === 'OFF') totalOff++;
+                    else if (st === 'ABSENT' || (typeof st === 'object' && st.status === 'ABSENT')) totalAbs++;
+                    else if (typeof st === 'object' && st.status === 'SICK') totalSick++;
                 });
             });
 
-            document.getElementById('st-work').innerText = work;
-            document.getElementById('st-off').innerText = off;
-            document.getElementById('st-absent').innerText = abs;
-            document.getElementById('st-sick').innerText = sick;
+            document.getElementById('st-work').innerText = totalWork;
+            document.getElementById('st-off').innerText = totalOff;
+            document.getElementById('st-absent').innerText = totalAbs;
+            document.getElementById('st-sick').innerText = totalSick;
 
-            filterSales(0); // Default to Today
+            filterSales(0); // Today global sales for chart/total summary
             document.getElementById('modal-stats').classList.remove('hidden');
         }
 
@@ -713,8 +685,6 @@
 
             let totalSum = 0;
             db.emps.forEach(emp => {
-                if (emp.shift !== currentShift && !(currentShift === '1st' && !emp.shift)) return;
-
                 const empPod = emp.pod || 'A';
                 if (db.sales && db.sales[emp.id]) {
                     Object.entries(db.sales[emp.id]).forEach(([dateStr, amount]) => {
@@ -905,12 +875,34 @@
         }
 
         function save() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); closeM(); render(); }
+
+        function logout() { localStorage.removeItem('SF_LOGGED'); location.reload(); }
+        
+        function hardReset() {
+            if (confirm("¿Reiniciar base de datos completa?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function startApp() {
+             const pin = document.getElementById('pass-in').value;
+             if (pin === '0129') {
+                 localStorage.setItem('SF_LOGGED', 'true');
+                 initData();
+             } else {
+                 alert("PIN INCORRECTO");
+             }
+        }
+
+        // Auto-login check
+        if (localStorage.getItem('SF_LOGGED')) {
+            initData();
+        }
     </script>
 </body>
 
 </html>
-
-
 
 
 
