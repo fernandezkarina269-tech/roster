@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +11,6 @@
             --bg: #121212;
             --accent: #1e293b;
         }
-
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
@@ -20,11 +18,9 @@
             color: #0f172a;
             padding-bottom: 60px;
         }
-
         .hidden {
             display: none !important;
         }
-
         /* LOGIN PREMIUM */
         #view-login {
             position: fixed;
@@ -35,7 +31,6 @@
             align-items: center;
             z-index: 9999;
         }
-
         .login-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
@@ -48,7 +43,6 @@
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
             color: white;
         }
-
         /* PREMIUM INPUTS */
         input,
         select {
@@ -66,7 +60,6 @@
             transition: 0.3s;
             outline: none;
         }
-
         /* Modal Inputs override - Modals are white, so inputs need dark text */
         .modal-box input,
         .modal-box select {
@@ -74,20 +67,17 @@
             border: 1px solid #e2e8f0;
             color: #0f172a;
         }
-
         .modal-box input:focus,
         .modal-box select:focus {
             border-color: var(--gold);
             background: white;
         }
-
         /* Login Input Focus */
         .login-card input:focus {
             border-color: var(--gold);
             background: rgba(0, 0, 0, 0.3);
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
         }
-
         /* BUTTONS */
         .btn-main {
             padding: 18px;
@@ -104,17 +94,14 @@
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
         }
-
         .btn-main:hover {
             transform: translateY(-2px);
             box-shadow: 0 15px 30px rgba(255, 215, 0, 0.3);
         }
-
         .btn-gold {
             background: var(--gold);
             color: #000;
         }
-
         /* NAV */
         .nav {
             background: #000;
@@ -125,12 +112,10 @@
             align-items: center;
             border-bottom: 5px solid var(--gold);
         }
-
         .nav-actions {
             display: flex;
             gap: 10px;
         }
-
         /* TABLES */
         .pod-card {
             background: white;
@@ -140,7 +125,6 @@
             overflow: hidden;
             border: 1px solid #e2e8f0;
         }
-
         .pod-header {
             background: #f1f5f9;
             padding: 16px 20px;
@@ -149,13 +133,11 @@
             display: flex;
             justify-content: space-between;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             min-width: 1300px;
         }
-
         th {
             background: #0f172a;
             color: white;
@@ -163,7 +145,6 @@
             font-size: 12px;
             text-transform: uppercase;
         }
-
         td {
             padding: 14px;
             text-align: center;
@@ -171,7 +152,6 @@
             font-weight: 700;
             font-size: 14px;
         }
-
         /* FIXED COLS */
         .sc-1 {
             position: sticky;
@@ -181,7 +161,6 @@
             width: 100px;
             border-right: 1px solid #e2e8f0;
         }
-
         .sc-2 {
             position: sticky;
             left: 100px;
@@ -190,7 +169,6 @@
             width: 120px;
             border-right: 1px solid #e2e8f0;
         }
-
         .sc-3 {
             position: sticky;
             left: 220px;
@@ -201,29 +179,24 @@
             text-align: left;
             padding-left: 15px;
         }
-
         /* STATUS COLORS */
         .st-WORKING {
             color: #10b981 !important;
             font-weight: 900 !important;
             font-size: 18px;
         }
-
         .st-OFF {
             color: #f97316 !important;
             font-weight: 900 !important;
         }
-
         .st-SICK {
             color: #a855f7 !important;
             font-weight: 800;
         }
-
         .st-ABSENT {
             color: #ef4444 !important;
             font-weight: 900 !important;
         }
-
         .st-COV {
             color: #3b82f6;
             font-size: 11px;
@@ -231,7 +204,6 @@
             margin-top: 4px;
             font-weight: bold;
         }
-
         .modal {
             position: fixed;
             inset: 0;
@@ -242,7 +214,6 @@
             z-index: 2000;
             padding: 20px;
         }
-
         .modal-box {
             background: white;
             padding: 35px;
@@ -252,39 +223,38 @@
             text-align: center;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
         }
-
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-top: 20px;
         }
-
         .stat-item {
             padding: 15px;
             border-radius: 12px;
             color: white;
             text-align: center;
         }
-
         .stat-val {
             font-size: 24px;
             font-weight: 900;
             display: block;
         }
-
         .stat-lbl {
             font-size: 12px;
             font-weight: 700;
             opacity: 0.9;
         }
-
+        .stat-lbl {
+            font-size: 12px;
+            font-weight: 700;
+            opacity: 0.9;
+        }
         /* SHIFT SHEETS */
         .shift-sheet {
             margin-bottom: 60px;
             border-top: 5px solid #0f172a;
         }
-
         .shift-sheet-header {
             background: #0f172a;
             color: white;
@@ -300,7 +270,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .shift-sheet-header .badge {
             background: var(--gold);
             color: #000;
@@ -310,9 +279,7 @@
         }
     </style>
 </head>
-
 <body>
-
     <div id="view-login">
         <div class="login-card">
             <h1 style="margin-bottom:10px;">ShiftFlow</h1>
@@ -323,7 +290,6 @@
                 (FIX)</button>
         </div>
     </div>
-
     <div id="view-app" class="hidden">
         <div class="nav">
             <div style="font-weight:900; letter-spacing:1px;">DREAMART SYSTEM</div>
@@ -338,7 +304,6 @@
         </div>
         <div id="sheets-container"></div>
     </div>
-
     <!-- MODALS -->
     <div id="modal-status" class="modal hidden">
         <div class="modal-box">
@@ -364,7 +329,6 @@
                 <button class="btn-main" style="background:#a855f7;"
                     onclick="document.getElementById('sick-zone').classList.toggle('hidden')">SICK</button>
             </div>
-
             <!-- SALES SECTION -->
             <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:20px;">
                 <label style="font-size:12px; font-weight:800; display:block; margin-bottom:10px; color:#0f172a;">VENTA
@@ -375,11 +339,9 @@
                         onclick="saveSale()">GUARDAR</button>
                 </div>
             </div>
-
             <button class="btn-main" style="background:#64748b; margin-top:20px;" onclick="closeM()">CANCELAR</button>
         </div>
     </div>
-
     <div id="modal-add" class="modal hidden">
         <div class="modal-box">
             <h2 id="modal-title" style="margin-top:0;">Nuevo Miembro</h2>
@@ -409,7 +371,6 @@
             <button class="btn-main" style="background:#64748b; margin-top:10px;" onclick="closeM()">CANCELAR</button>
         </div>
     </div>
-
     <div id="modal-stats" class="modal hidden">
         <div class="modal-box">
             <h2 style="margin-top:0;">Estadísticas Generales</h2>
@@ -431,7 +392,6 @@
                     <span class="stat-lbl">OFF</span>
                 </div>
             </div>
-
             <div style="margin-top:25px; border-top:2px solid #f1f5f9; padding-top:20px;">
                 <label style="font-weight:900; font-size:14px; text-transform:uppercase; color:#64748b;">Ventas por
                     POD</label>
@@ -453,27 +413,22 @@
                         onclick="filterSales(30)">30 DÍAS</button>
                 </div>
             </div>
-
             <button class="btn-main" style="background:#64748b; margin-top:20px;" onclick="closeM()">CERRAR</button>
         </div>
     </div>
-
     <script>
         // ERROR TRAP
         window.onerror = function (msg, url, line) {
             alert("Error Detectado: " + msg + "\nIntenta el botón REINICIAR APP.");
         };
-
         let db = { emps: [], sched: {}, sales: {}, notes: {} };
         let act = null;
         let salesChartInst = null;
-
         function getIsoDate(dStr) {
             const [d, m] = dStr.split('/').map(Number);
-            const year = (m >= 10) ? 2025 : 2026; // Manual fix for Jan/Feb overlap
+            const year = (m >= 10) ? 2025 : 2026;
             return `${year}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
         }
-
         function initData() {
             try {
                 const saved = localStorage.getItem('SF_V107_FINAL');
@@ -481,9 +436,8 @@
                     db = JSON.parse(saved);
                     if (!Array.isArray(db.emps)) throw new Error("Datos Corruptos");
                     if (!db.sales) db.sales = {};
-                    if (!db.notes) db.notes = {}; // Initialize notes
+                    if (!db.notes) db.notes = {};
                 } else {
-                    // SEED
                     db.emps = [
                         { id: 1, name: 'User Demo 1', team: 'T1', model: 'M1', pod: 'A', shift: '1st' },
                         { id: 2, name: 'User Demo 2', team: 'T2', model: 'M2', pod: 'B', shift: '2nd' }
@@ -491,25 +445,23 @@
                     db.sched = {}; db.sales = {}; db.notes = {};
                 }
             } catch (e) {
-                alert("Error cargando datos. Se reiniciará la base de datos.");
+                console.error("Load Error", e);
                 localStorage.removeItem('SF_V107_FINAL');
                 db = { emps: [], sched: {}, sales: {}, notes: {} };
             }
-
-            document.getElementById('view-login').classList.add('hidden');
-            document.getElementById('view-app').classList.remove('hidden');
+            const loginView = document.getElementById('view-login');
+            const appView = document.getElementById('view-app');
+            if (loginView) loginView.classList.add('hidden');
+            if (appView) appView.classList.remove('hidden');
             render();
         }
-
         function render() {
             try {
                 const container = document.getElementById('sheets-container');
                 if (!container) return;
                 container.innerHTML = '';
-
                 const shifts = ['1st', '2nd', '3rd'];
                 const days = ['28/1', '29/1', '30/1', '31/1', '01/2', '02/2', '03/2'];
-
                 shifts.forEach(shiftName => {
                     const sheetDiv = document.createElement('div');
                     sheetDiv.className = 'shift-sheet';
@@ -519,28 +471,22 @@
                     </div>
                     <div id="area-${shiftName}"></div>`;
                     container.appendChild(sheetDiv);
-
                     const area = document.getElementById(`area-${shiftName}`);
                     const shiftEmps = db.emps.filter(e => e.shift === shiftName || (shiftName === '1st' && !e.shift));
-
                     const renderCard = (title, list, labelOverride, bgColor) => {
                         const safeList = list || [];
-                        const podId = `${shiftName}-${title}`; // Unique note ID per shift/pod
+                        const podId = `${shiftName}-${title}`;
                         const noteVal = (db.notes && db.notes[podId]) ? db.notes[podId] : '';
-
                         let h = `<div class="pod-card">
                         <div class="pod-header" style="background:${bgColor || '#f1f5f9'};"><span>${title}</span></div>
-                        
                         <div style="padding:10px 20px; background:#fff; border-bottom:1px solid #e2e8f0;">
                             <textarea placeholder="Notas del equipo..." 
                                 style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; font-family:'Inter',sans-serif; height:60px; resize:vertical;"
                                 onblur="saveNote('${podId}', this.value)">${noteVal}</textarea>
                         </div>
-
                         <div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
                         days.forEach(d => h += `<th>${d}</th>`);
                         h += `</tr></thead><tbody>`;
-
                         if (safeList.length === 0) {
                             h += `<tr><td colspan="${3 + days.length}" style="padding:20px; color:#94a3b8; font-style:italic;">Sin miembros asignados</td></tr>`;
                         } else {
@@ -574,7 +520,6 @@
                         h += `</tbody></table></div></div>`;
                         area.innerHTML += h;
                     };
-
                     const pods = [{ id: 'A', color: '#dbeafe' }, { id: 'B', color: '#dcfce7' }, { id: 'F', color: '#fae8ff' }];
                     pods.forEach(p => {
                         const chatters = shiftEmps.filter(e => e.pod === p.id && (!e.role || e.role === 'Chatter'));
@@ -588,61 +533,45 @@
                 alert("Error mostrando la tabla: " + e.message);
             }
         }
-
         function handleWorking() {
             try {
                 const me = db.emps.find(e => e.id === act.id);
-                // Check if user is backup (role or pod)
                 const isBackup = (me.role === 'Backup' || me.pod === 'BACKUP');
-
                 if (!isBackup) {
                     saveSt('WORKING');
                     return;
                 }
-
-                // It is a backup, find targets (SICK or ABSENT)
                 const others = db.emps.filter(e => e.id !== act.id);
                 const targets = others.filter(o => {
                     const stRaw = db.sched[o.id]?.[act.key];
                     const status = (typeof stRaw === 'object') ? stRaw.status : stRaw;
                     return ['SICK', 'ABSENT'].includes(status);
                 });
-
                 const sel = document.getElementById('cov-select');
                 sel.innerHTML = '<option value="">-- SELECCIONA OPCIÓN --</option>';
                 sel.innerHTML += '<option value="Lugar Vacío">LUGAR VACÍO</option>';
-
                 targets.forEach(t => {
                     sel.innerHTML += `<option value="${t.name}">${t.name} (${t.pod})</option>`;
                 });
-
                 document.getElementById('cov-zone').classList.remove('hidden');
-
             } catch (e) { alert("Error: " + e.message); }
         }
-
         function confirmCov() {
             const covName = document.getElementById('cov-select').value;
             if (covName) saveSt({ status: 'ON', cov: covName });
             else saveSt('WORKING');
         }
-
         function confirmSick() {
             const date = document.getElementById('sick-date').value;
             if (!date) return alert("Selecciona fecha");
-
             const admin = prompt("¿Quién eres? (Admin que resuelve)");
             if (!admin) return alert("Se requiere nombre de Admin para procesar la alerta.");
-
             alert(`🔴 ALERTA: ${admin} resolvió alerta de ${act.n} -> SICK`);
             saveSt({ status: 'SICK', date: date, resolver: admin });
         }
-
         function showStats() {
-            let totalSales = 0;
             let totalWork = 0, totalOff = 0, totalAbs = 0, totalSick = 0;
             const days = ['28/1', '29/1', '30/1', '31/1', '01/2', '02/2', '03/2'];
-
             db.emps.forEach(e => {
                 days.forEach(d => {
                     const st = db.sched[e.id]?.[d] || 'WORKING';
@@ -652,28 +581,22 @@
                     else if (typeof st === 'object' && st.status === 'SICK') totalSick++;
                 });
             });
-
             document.getElementById('st-work').innerText = totalWork;
             document.getElementById('st-off').innerText = totalOff;
             document.getElementById('st-absent').innerText = totalAbs;
             document.getElementById('st-sick').innerText = totalSick;
-
-            filterSales(0); // Today global sales for chart/total summary
+            filterSales(0);
             document.getElementById('modal-stats').classList.remove('hidden');
         }
-
         function filterSales(range) {
             const cutoff = new Date();
             const today = new Date(); today.setHours(0, 0, 0, 0);
             cutoff.setDate(today.getDate() - range);
             cutoff.setHours(0, 0, 0, 0);
-
-            // Prep Chart Labels
             const labels = [];
             const podSales = { 'A': {}, 'B': {}, 'F': {}, 'BACKUP': {} };
             const startChart = new Date(today);
             startChart.setDate(today.getDate() - (range || 6));
-
             for (let d = new Date(startChart); d <= today; d.setDate(d.getDate() + 1)) {
                 const day = d.getDate().toString().padStart(2, '0');
                 const month = (d.getMonth() + 1).toString().padStart(2, '0');
@@ -682,7 +605,6 @@
                 labels.push({ label, iso });
                 Object.keys(podSales).forEach(p => podSales[p][iso] = 0);
             }
-
             let totalSum = 0;
             db.emps.forEach(emp => {
                 const empPod = emp.pod || 'A';
@@ -691,22 +613,19 @@
                         const [y, m, d] = dateStr.split('-').map(Number);
                         const date = new Date(y, m - 1, d);
                         date.setHours(0, 0, 0, 0);
-
                         if (range === 0) {
                             if (date.getTime() === today.getTime()) totalSum += amount;
                         } else {
                             if (date >= cutoff && date <= today) totalSum += amount;
                         }
-
                         if (podSales[empPod] && podSales[empPod].hasOwnProperty(dateStr)) {
                             podSales[empPod][dateStr] += amount;
                         }
                     });
                 }
             });
-
-            document.getElementById('st-sales-total').innerText = "$" + totalSum.toFixed(2);
-
+            const totalEl = document.getElementById('st-sales-total');
+            if (totalEl) totalEl.innerText = "$" + totalSum.toFixed(2);
             const chartLabels = labels.map(l => l.label);
             const chartData = {
                 'A': labels.map(l => podSales['A'][l.iso]),
@@ -716,13 +635,11 @@
             };
             renderSalesChart(chartLabels, chartData);
         }
-
         function renderSalesChart(labels, data) {
             const canvas = document.getElementById('salesChart');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             if (salesChartInst) salesChartInst.destroy();
-
             salesChartInst = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -747,39 +664,32 @@
                 }
             });
         }
-
         function openM(id, k, n) {
             act = { id, key: k, n };
-            document.getElementById('target-name').innerText = n;
-
+            const titleEl = document.getElementById('target-name');
+            if (titleEl) titleEl.innerText = n;
             act.isoDate = getIsoDate(k);
-
             const amount = (db.sales && db.sales[id] && db.sales[id][act.isoDate]) ? db.sales[id][act.isoDate] : "";
-            document.getElementById('sale-amount').value = amount;
-
-            // RESET ZONES
+            const amountInp = document.getElementById('sale-amount');
+            if (amountInp) amountInp.value = amount;
             document.getElementById('cov-zone').classList.add('hidden');
             document.getElementById('sick-zone').classList.add('hidden');
-
             document.getElementById('modal-status').classList.remove('hidden');
         }
-
         function saveSale() {
             if (!act) return;
-            const amount = parseFloat(document.getElementById('sale-amount').value);
-
+            const amountVal = document.getElementById('sale-amount').value;
+            const amount = parseFloat(amountVal);
             if (!db.sales) db.sales = {};
             if (!db.sales[act.id]) db.sales[act.id] = {};
-
             if (isNaN(amount) || amount === 0) {
                 if (db.sales[act.id][act.isoDate]) delete db.sales[act.id][act.isoDate];
             } else {
                 db.sales[act.id][act.isoDate] = amount;
             }
             alert("¡Venta Guardada: $" + amount + "!\nFecha: " + act.isoDate);
-            save(); // Closes modal
+            save();
         }
-
         function showAdd() {
             document.getElementById('modal-title').innerText = "Nuevo Miembro";
             document.getElementById('edit-id').value = "";
@@ -793,7 +703,6 @@
             document.getElementById('btn-delete').classList.add('hidden');
             document.getElementById('modal-add').classList.remove('hidden');
         }
-
         function editMember(id) {
             const e = db.emps.find(x => x.id === id);
             if (!e) return;
@@ -809,9 +718,9 @@
             document.getElementById('btn-delete').classList.remove('hidden');
             document.getElementById('modal-add').classList.remove('hidden');
         }
-
         function doDelete() {
-            const id = parseInt(document.getElementById('edit-id').value);
+            const idVal = document.getElementById('edit-id').value;
+            const id = parseInt(idVal);
             if (!id) return;
             if (confirm("¿Eliminar este miembro permanentemente?")) {
                 db.emps = db.emps.filter(e => e.id !== id);
@@ -819,35 +728,28 @@
                 save();
             }
         }
-
         function closeM() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
+        
         function saveSt(s) {
             if (!act) return;
-
-            // Intercept ABSENT for Alert
             if (s === 'ABSENT') {
                 const admin = prompt("¿Quién eres? (Admin que resuelve)");
                 if (!admin) return alert("Se requiere nombre de Admin para procesar la alerta.");
                 alert(`🔴 ALERTA: ${admin} resolvió alerta de ${act.n} -> ABSENT`);
                 s = { status: 'ABSENT', resolver: admin };
             }
-
             if (!db.sched[act.id]) db.sched[act.id] = {};
             db.sched[act.id][act.key] = s;
             save();
         }
-
         function saveNote(podId, text) {
             if (!db.notes) db.notes = {};
             db.notes[podId] = text;
             localStorage.setItem('SF_V107_FINAL', JSON.stringify(db));
-            // No render needed as it handles onblur
         }
-
         function doAdd() {
             const name = document.getElementById('add-name').value;
             if (!name) return alert("Nombre requerido");
-
             const editId = document.getElementById('edit-id').value;
             if (editId) {
                 const id = parseInt(editId);
@@ -873,10 +775,15 @@
             }
             save();
         }
-
-        function save() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); closeM(); render(); }
-
-        function logout() { localStorage.removeItem('SF_LOGGED'); location.reload(); }
+        function save() { 
+            localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); 
+            closeM(); 
+            render(); 
+        }
+        function logout() { 
+            localStorage.removeItem('SF_LOGGED'); 
+            location.reload(); 
+        }
         
         function hardReset() {
             if (confirm("¿Reiniciar base de datos completa?")) {
@@ -884,7 +791,6 @@
                 location.reload();
             }
         }
-
         function startApp() {
              const pin = document.getElementById('pass-in').value;
              if (pin === '0129') {
@@ -894,15 +800,13 @@
                  alert("PIN INCORRECTO");
              }
         }
-
-        // Auto-login check
         if (localStorage.getItem('SF_LOGGED')) {
             initData();
         }
     </script>
 </body>
-
 </html>
+
 
 
 
