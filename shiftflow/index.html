@@ -337,7 +337,7 @@
     <div id="view-login">
         <div class="login-card">
             <h1 style="margin-bottom:10px;">ShiftFlow</h1>
-            <p style="font-weight:900; color:#10b981; font-size:13px; margin-bottom:20px;">V110 - TABBED</p>
+            <p style="font-weight:900; color:#10b981; font-size:13px; margin-bottom:20px;">V109 - STABLE</p>
             <input type="password" id="pass-in" placeholder="CLAVE DE ACCESO">
             <button class="btn-main" onclick="startApp()">ENTRAR AL SISTEMA</button>
             <button class="btn-main" style="background:#ef4444; margin-top:20px;" onclick="hardReset()">REINICIAR APP
@@ -443,6 +443,14 @@
     <div id="modal-stats" class="modal hidden">
         <div class="modal-box">
             <h2 style="margin-top:0;">Estadísticas Generales</h2>
+
+            <!-- MODAL SHIFT TABS -->
+            <div class="shift-tabs" style="justify-content:center; margin-bottom:20px; position:static;">
+                <div class="shift-tab active" onclick="setStatsShift('ALL')">GLOBAL</div>
+                <div class="shift-tab" onclick="setStatsShift('1st')">1st</div>
+                <div class="shift-tab" onclick="setStatsShift('2nd')">2nd</div>
+                <div class="shift-tab" onclick="setStatsShift('3rd')">3rd</div>
+            </div>
             <div class="stats-grid">
                 <div class="stat-item" style="background:#10b981;">
                     <span class="stat-val" id="st-work">0</span>
@@ -499,6 +507,21 @@
         let act = null;
         let salesChartInst = null;
         let currentShift = '1st';
+        let statsShift = 'ALL';
+        let currentRange = 0;
+
+        function setStatsShift(s) {
+            statsShift = s;
+            const modalTabs = document.querySelector('#modal-stats .shift-tabs');
+            modalTabs.querySelectorAll('.shift-tab').forEach(t => t.classList.remove('active'));
+
+            const tabs = modalTabs.querySelectorAll('.shift-tab');
+            if (s === 'ALL') tabs[0].classList.add('active');
+            if (s === '1st') tabs[1].classList.add('active');
+            if (s === '2nd') tabs[2].classList.add('active');
+            if (s === '3rd') tabs[3].classList.add('active');
+            showStats();
+        }
 
         function setShift(s) {
             currentShift = s;
@@ -671,7 +694,14 @@
         function showStats() {
             let totalWork = 0, totalOff = 0, totalAbs = 0, totalSick = 0;
             const days = ['28/1', '29/1', '30/1', '31/1', '01/2', '02/2', '03/2'];
-            db.emps.forEach(e => {
+
+            const filteredEmps = db.emps.filter(e => {
+                if (statsShift === 'ALL') return true;
+                const eShift = e.shift || '1st';
+                return eShift === statsShift;
+            });
+
+            filteredEmps.forEach(e => {
                 days.forEach(d => {
                     const st = db.sched[e.id]?.[d] || 'WORKING';
                     if (st === 'WORKING' || (typeof st === 'object' && st.status === 'ON')) totalWork++;
@@ -684,11 +714,12 @@
             document.getElementById('st-off').innerText = totalOff;
             document.getElementById('st-absent').innerText = totalAbs;
             document.getElementById('st-sick').innerText = totalSick;
-            filterSales(0);
+            filterSales(currentRange);
             document.getElementById('modal-stats').classList.remove('hidden');
         }
 
         function filterSales(range) {
+            currentRange = range;
             const cutoff = new Date();
             const today = new Date(); today.setHours(0, 0, 0, 0);
             cutoff.setDate(today.getDate() - range);
@@ -706,7 +737,13 @@
                 Object.keys(podSales).forEach(p => podSales[p][iso] = 0);
             }
             let totalSum = 0;
-            db.emps.forEach(emp => {
+            const filteredEmpsSales = db.emps.filter(e => {
+                if (statsShift === 'ALL') return true;
+                const eShift = e.shift || '1st';
+                return eShift === statsShift;
+            });
+
+            filteredEmpsSales.forEach(emp => {
                 const empPod = emp.pod || 'A';
                 if (db.sales && db.sales[emp.id]) {
                     Object.entries(db.sales[emp.id]).forEach(([dateStr, amount]) => {
@@ -920,6 +957,7 @@
 </body>
 
 </html>
+
 
 
 
