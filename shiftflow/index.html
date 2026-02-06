@@ -321,6 +321,32 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
+        /* MODAL SPECIFIC TABS */
+        .modal-tabs {
+            display: flex;
+            background: #f1f5f9;
+            padding: 8px;
+            gap: 8px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+
+        .modal-tabs .shift-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 11px;
+            background: transparent;
+            color: #64748b;
+        }
+
+        .modal-tabs .shift-tab.active {
+            background: #fff;
+            color: #0f172a;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
         .shift-sheet {
             margin-bottom: 20px;
         }
@@ -445,7 +471,7 @@
             <h2 style="margin-top:0;">Estadísticas Generales</h2>
 
             <!-- MODAL SHIFT TABS -->
-            <div class="shift-tabs" style="justify-content:center; margin-bottom:20px; position:static;">
+            <div class="modal-tabs">
                 <div class="shift-tab active" onclick="setStatsShift('ALL')">GLOBAL</div>
                 <div class="shift-tab" onclick="setStatsShift('1st')">1st</div>
                 <div class="shift-tab" onclick="setStatsShift('2nd')">2nd</div>
@@ -512,7 +538,7 @@
 
         function setStatsShift(s) {
             statsShift = s;
-            const modalTabs = document.querySelector('#modal-stats .shift-tabs');
+            const modalTabs = document.querySelector('#modal-stats .modal-tabs');
             modalTabs.querySelectorAll('.shift-tab').forEach(t => t.classList.remove('active'));
 
             const tabs = modalTabs.querySelectorAll('.shift-tab');
@@ -957,6 +983,7 @@
 </body>
 
 </html>
+
 
 
 
