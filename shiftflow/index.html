@@ -571,15 +571,15 @@
                 const saved = localStorage.getItem('SF_V107_FINAL');
                 if (saved) {
                     db = JSON.parse(saved);
-                    if (!Array.isArray(db.emps)) throw new Error("Datos Corruptos");
                     if (!db.sales) db.sales = {};
                     if (!db.notes) db.notes = {};
+                    if (!db.goals) db.goals = {};
                 } else {
                     db.emps = [
                         { id: 1, name: 'User Demo 1', team: 'T1', model: 'M1', pod: 'A', shift: '1st' },
                         { id: 2, name: 'User Demo 2', team: 'T2', model: 'M2', pod: 'B', shift: '2nd' }
                     ];
-                    db.sched = {}; db.sales = {}; db.notes = {};
+                    db.sched = {}; db.sales = {}; db.notes = {}; db.goals = {};
                 }
             } catch (e) {
                 console.error("Load Error", e);
@@ -592,6 +592,22 @@
             if (loginView) loginView.classList.add('hidden');
             if (appView) appView.classList.remove('hidden');
             render();
+        }
+
+        function editGoal(podId) {
+            const pin = prompt("PIN DE ADMINISTRADOR PARA EDITAR META:");
+            if (pin !== '0129') return alert("PIN INCORRECTO");
+
+            const current = (db.goals && db.goals[podId]) ? db.goals[podId] : 0;
+            const newVal = prompt(`EDITAR META PARA ${podId}:\n(Valor actual: $${current})`, current);
+
+            if (newVal !== null) {
+                const val = parseFloat(newVal);
+                if (isNaN(val)) return alert("VALOR INVÁLIDO");
+                if (!db.goals) db.goals = {};
+                db.goals[podId] = val;
+                save();
+            }
         }
 
         function render() {
@@ -616,10 +632,16 @@
                         const safeList = list || [];
                         const podId = `${shiftName}-${title}`;
                         const noteVal = (db.notes && db.notes[podId]) ? db.notes[podId] : '';
+                        const goalVal = (db.goals && db.goals[podId]) ? db.goals[podId] : '0';
 
                         let h = `<div class="pod-card">
                         <div class="pod-header" style="background:${bgColor || '#f1f5f9'};">
                             <span>${title} (${shiftName})</span>
+                            <span onclick="editGoal('${podId}')" style="cursor:pointer; background:rgba(0,0,0,0.05); padding:4px 12px; border-radius:20px; font-size:11px; color:#475569; display:flex; align-items:center; gap:5px;">
+                                <small style="font-weight:800; opacity:0.6;">META:</small>
+                                <b style="color:#0f172a;">$${goalVal}</b>
+                                <span style="font-size:10px; opacity:0.5;">✎</span>
+                            </span>
                         </div>
                         <div style="padding:10px 20px; background:#fff; border-bottom:1px solid #e2e8f0;">
                             <textarea placeholder="Notas del equipo..." 
