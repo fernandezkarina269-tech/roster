@@ -310,6 +310,17 @@
             background: #fef2f2;
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
         }
+
+        /* HISTORY */
+        .hist-item {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+        }
+        .hist-time { color: #94a3b8; font-weight: 800; margin-bottom: 4px; display: block; }
+        .hist-desc { font-weight: 600; color: var(--slate-800); line-height: 1.4; }
+        .hist-user { color: #3b82f6; font-weight: 900; }
     </style>
 </head>
 
@@ -333,6 +344,7 @@
             </div>
             <div style="display:flex; gap:12px;">
                 <button class="btn-main" style="width:auto; padding:10px 18px; margin:0; background:#fff; color:#000;" onclick="downloadBackup()">📥 Backup</button>
+                <button class="btn-main btn-gold" style="width:auto; padding:10px 18px; margin:0;" onclick="askHistory()">📜 History</button>
                 <button class="btn-main btn-gold" style="width:auto; padding:10px 18px; margin:0;" onclick="showStats()">Statistics</button>
                 <button class="btn-main btn-gold" style="width:auto; padding:10px 18px; margin:0;" onclick="showAdd()">+ Member</button>
                 <button class="btn-main" style="width:auto; padding:10px 18px; margin:0; background:#ef4444; color:#fff;" onclick="logout()">Logout</button>
@@ -382,7 +394,7 @@
                 <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; display:block; margin-bottom:10px;">Daily Sales ($)</label>
                 <div style="display:flex; gap:10px;">
                     <input type="number" id="sale-amount" placeholder="0.00" style="margin:0;">
-                    <button class="btn-main" style="width:auto; margin:0; background:var(--slate-900);" onclick="saveSale()">Save</button>
+                    <button class="btn-main" style="width:auto; margin:0; background:var(--slate-900);" onclick="saveSale()">Save Sale</button>
                 </div>
             </div>
             <button class="btn-main btn-reset" style="margin-top:25px; border:none; background:#f1f5f9; color:#64748b;" onclick="closeM()">Cancel</button>
@@ -437,7 +449,6 @@
                 <div class="shift-tab" onclick="setStatsShift('3rd')" id="tab-3rd">3rd</div>
             </div>
 
-            <!-- DATE FILTER -->
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:15px; margin-bottom:20px;">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <div>
@@ -491,9 +502,21 @@
         </div>
     </div>
 
+    <!-- HISTORY MODAL -->
+    <div id="modal-history" class="modal hidden">
+        <div class="modal-box" style="max-width: 500px; padding: 30px;">
+            <h2 style="margin-top:0;">Change History Log</h2>
+            <p style="font-size:11px; color:#64748b; margin-bottom:20px; font-weight:700;">STORING LAST 500 ACTIONS (~1 WEEK+)</p>
+            <div id="hist-list" style="max-height: 400px; overflow-y: auto; background: #fff; border:1px solid var(--border); border-radius:16px; margin-bottom:20px;">
+                <!-- Logs will appear here -->
+            </div>
+            <button class="btn-main" style="background:var(--slate-900); color:#fff;" onclick="closeM()">Close History</button>
+        </div>
+    </div>
+
     <script>
         // GLOBAL STATE
-        let db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {} };
+        let db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {}, history: [] };
         let act = null;
         let salesChartInst = null;
         let currentShift = '1st';
@@ -503,7 +526,44 @@
 
         window.onerror = (msg) => alert("Error: " + msg);
 
-        // STICKY ACTIONS
+        // LOGGING SYSTEM
+        function logAction(desc) {
+            if (!db.history) db.history = [];
+            const user = prompt("Who is making this change? (Username Required)") || "Anonymous";
+            const item = {
+                time: new Date().toLocaleString('en-US', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }),
+                user: user,
+                desc: desc
+            };
+            db.history.unshift(item);
+            if (db.history.length > 500) db.history = db.history.slice(0, 500);
+            saveSilent();
+        }
+
+        function askHistory() {
+            const pin = prompt("Admin Access PIN Required:");
+            if (pin === '0129') showHistory();
+            else alert("Unauthorized Access");
+        }
+
+        function showHistory() {
+            const list = document.getElementById('hist-list');
+            list.innerHTML = '';
+            if (!db.history || db.history.length === 0) {
+                list.innerHTML = '<div style="padding:40px; color:#94a3b8; font-weight:800;">No actions logged yet</div>';
+            } else {
+                db.history.forEach(h => {
+                    list.innerHTML += `
+                    <div class="hist-item">
+                        <span class="hist-time">${h.time}</span>
+                        <div class="hist-desc"><span class="hist-user">${h.user}</span>: ${h.desc}</div>
+                    </div>`;
+                });
+            }
+            document.getElementById('modal-history').classList.remove('hidden');
+        }
+
+        // ACTIONS (Intercepted for Logging)
         function openM(id, k) {
             const e = db.emps.find(x => x.id == id);
             if (!e) return;
@@ -520,13 +580,28 @@
 
         function saveSt(s) {
             if (!act) return;
+            let logMsg = "";
+            const e = db.emps.find(x => x.id == act.id);
+            
             if (s === 'ABSENT') {
                 const admin = prompt("Enter your name to confirm absence:");
                 if (!admin) return;
                 s = { status: 'ABSENT', resolver: admin };
+                logMsg = `Marked ${e.name} as ABSENT on ${act.key} (Auth: ${admin})`;
+            } else if (typeof s === 'object' && s.status === 'SICK') {
+                logMsg = `Marked ${e.name} as SICK until ${fmtDate(s.date)} on ${act.key}`;
+            } else if (typeof s === 'object' && s.status === 'ON') {
+                logMsg = `Marked ${e.name} as WORKING (Covering ${s.cov}) on ${act.key}`;
+            } else if (s === 'OFF') {
+                logMsg = `Marked ${e.name} as OFF on ${act.key}`;
+            } else {
+                logMsg = `Marked ${e.name} as WORKING on ${act.key}`;
             }
+
             if (!db.sched[act.id]) db.sched[act.id] = {};
             db.sched[act.id][act.key] = s;
+            
+            logAction(logMsg);
             save();
         }
 
@@ -566,14 +641,66 @@
         function saveSale() {
             if (!act) return;
             const val = parseFloat(document.getElementById('sale-amount').value);
+            const e = db.emps.find(x => x.id == act.id);
             if (!db.sales) db.sales = {};
             if (!db.sales[act.id]) db.sales[act.id] = {};
-            if (isNaN(val) || val <= 0) delete db.sales[act.id][act.isoDate];
-            else db.sales[act.id][act.isoDate] = val;
+            
+            if (isNaN(val) || val <= 0) {
+                delete db.sales[act.id][act.isoDate];
+                logAction(`Deleted sales entry for ${e.name} on ${act.isoDate}`);
+            } else {
+                db.sales[act.id][act.isoDate] = val;
+                logAction(`Added $${val} sales to ${e.name} for ${act.isoDate}`);
+            }
             save();
             alert("Sale Saved!");
         }
 
+        function doAdd() {
+            const n = document.getElementById('add-name').value; if (!n) return alert("Name required");
+            const eid = document.getElementById('edit-id').value;
+            const obj = { name: n, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, shift: document.getElementById('add-shift').value, role: document.getElementById('add-role').value, startDate: document.getElementById('add-start-date').value };
+            
+            if (eid) { 
+                const idx = db.emps.findIndex(e => e.id == eid); 
+                if (idx !== -1) {
+                    Object.assign(db.emps[idx], obj); 
+                    logAction(`Edited member details: ${n} (${obj.pod} ${obj.shift})`);
+                }
+            } else { 
+                obj.id = Date.now(); 
+                db.emps.push(obj); 
+                logAction(`Added new member: ${n} (${obj.pod} ${obj.shift})`);
+            }
+            save();
+        }
+
+        function doDelete() { 
+            const id = parseInt(document.getElementById('edit-id').value); 
+            const e = db.emps.find(x => x.id == id);
+            if (confirm("Delete this member?")) { 
+                db.emps = db.emps.filter(e => e.id !== id); 
+                logAction(`DELETED MEMBER: ${e.name}`);
+                save(); 
+            } 
+        }
+
+        function editGoal(podId) {
+            const p = prompt("Admin PIN:"); if (p !== '0129') return;
+            const res = prompt(`New goal for ${podId}:`, db.goals?.[podId] || 0);
+            if (res !== null) { 
+                if (!db.goals) db.goals = {}; 
+                const old = db.goals[podId] || 0;
+                db.goals[podId] = parseFloat(res) || 0; 
+                logAction(`Changed Goal for ${podId} from $${old} to $${res}`);
+                save(); 
+            }
+        }
+
+        // PERSISTENCE
+        function save() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); closeM(); render(); }
+        function saveSilent() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); }
+        
         // UTILS
         function fmtDate(iso) {
             if (!iso) return "";
@@ -612,6 +739,7 @@
             const saved = localStorage.getItem('SF_V107_FINAL');
             if (saved) db = JSON.parse(saved);
             if (!db.version) db.version = "110";
+            if (!db.history) db.history = [];
             document.getElementById('view-login').classList.add('hidden');
             document.getElementById('view-app').classList.remove('hidden');
             setInterval(updateClock, 1000);
@@ -623,8 +751,7 @@
             if (el) el.innerText = new Date().toLocaleTimeString('en-US', { hour12: false });
         }
 
-        function save() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); closeM(); render(); }
-        function saveNote(pod, val) { if (!db.notes) db.notes = {}; db.notes[pod] = val; localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); }
+        function saveNote(pod, val) { if (!db.notes) db.notes = {}; db.notes[pod] = val; saveSilent(); }
         function closeM() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
 
         // RENDERING
@@ -717,21 +844,7 @@
             makeCard('SHADOWERS', shiftEmps.filter(e => e.role === 'Shadower'), 'SHADOWER', '#8b5cf6');
         }
 
-        // STATS LOGIC
-        function showStats() {
-            if (!statsRange.start || !statsRange.end) {
-                const today = new Date();
-                statsRange.start = today.toISOString().split('T')[0];
-                statsRange.end = today.toISOString().split('T')[0];
-            }
-
-            document.getElementById('stats-start').value = statsRange.start;
-            document.getElementById('stats-end').value = statsRange.end;
-
-            updateStatsData();
-            document.getElementById('modal-stats').classList.remove('hidden');
-        }
-
+        // STATS VIEW
         function setStatsShift(s) {
             statsShift = s;
             ['tab-all', 'tab-1st', 'tab-2nd', 'tab-3rd'].forEach(id => document.getElementById(id).classList.remove('active'));
@@ -839,33 +952,18 @@
             });
         }
 
-        function showAdd() {
-            document.getElementById('modal-title').innerText = "New Member"; document.getElementById('edit-id').value = "";
-            ['add-name', 'add-team', 'add-model', 'add-start-date'].forEach(id => document.getElementById(id).value = "");
-            document.getElementById('add-pod').value = "A"; document.getElementById('add-shift').value = "1st"; document.getElementById('add-role').value = "Chatter";
-            document.getElementById('btn-delete').classList.add('hidden'); document.getElementById('modal-add').classList.remove('hidden');
+        function showStats() {
+            if (!statsRange.start || !statsRange.end) {
+                const today = new Date();
+                statsRange.start = today.toISOString().split('T')[0];
+                statsRange.end = today.toISOString().split('T')[0];
+            }
+            document.getElementById('stats-start').value = statsRange.start;
+            document.getElementById('stats-end').value = statsRange.end;
+            updateStatsData();
+            document.getElementById('modal-stats').classList.remove('hidden');
         }
 
-        function editMember(id) {
-            const e = db.emps.find(x => x.id === id); if (!e) return;
-            document.getElementById('modal-title').innerText = "Edit Member"; document.getElementById('edit-id').value = e.id;
-            document.getElementById('add-name').value = e.name; document.getElementById('add-team').value = e.team || "";
-            document.getElementById('add-model').value = e.model || ""; document.getElementById('add-pod').value = e.pod || "A";
-            document.getElementById('add-role').value = e.role || "Chatter"; document.getElementById('add-shift').value = e.shift || "1st";
-            document.getElementById('add-start-date').value = e.startDate || "";
-            document.getElementById('btn-delete').classList.remove('hidden'); document.getElementById('modal-add').classList.remove('hidden');
-        }
-
-        function doAdd() {
-            const n = document.getElementById('add-name').value; if (!n) return alert("Name required");
-            const eid = document.getElementById('edit-id').value;
-            const obj = { name: n, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, shift: document.getElementById('add-shift').value, role: document.getElementById('add-role').value, startDate: document.getElementById('add-start-date').value };
-            if (eid) { const idx = db.emps.findIndex(e => e.id == eid); if (idx !== -1) Object.assign(db.emps[idx], obj); }
-            else { obj.id = Date.now(); db.emps.push(obj); }
-            save();
-        }
-
-        function doDelete() { const id = parseInt(document.getElementById('edit-id').value); if (confirm("Delete this member?")) { db.emps = db.emps.filter(e => e.id !== id); save(); } }
         function downloadBackup() {
             const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
             const a = document.createElement('a'); a.setAttribute("href", s); a.setAttribute("download", `ShiftFlow_Backup_${new Date().toISOString().split('T')[0]}.json`);
@@ -874,17 +972,13 @@
         function startApp() { if (document.getElementById('pass-in').value === '0129') { localStorage.setItem('SF_LOGGED', 'true'); initData(); } else alert("PIN Error"); }
         function logout() { localStorage.removeItem('SF_LOGGED'); location.reload(); }
         function hardReset() { if (confirm("WIPE ALL DATA?")) { localStorage.clear(); location.reload(); } }
-        function editGoal(podId) {
-            const p = prompt("Admin PIN:"); if (p !== '0129') return;
-            const res = prompt(`New goal for ${podId}:`, db.goals?.[podId] || 0);
-            if (res !== null) { if (!db.goals) db.goals = {}; db.goals[podId] = parseFloat(res) || 0; save(); }
-        }
 
         if (localStorage.getItem('SF_LOGGED')) initData();
     </script>
 </body>
 
 </html>
+
 
 
 
