@@ -1016,7 +1016,103 @@
         }
 
         function doDelete() {
+            const idVal = document.getElementById('edit-id').value;
+            const id = parseInt(idVal);
+            if (!id) return;
+            if (confirm("¿Eliminar este miembro permanentemente?")) {
+                db.emps = db.emps.filter(e => e.id !== id);
+                delete db.sched[id];
+                save();
+            }
+        }
+
+        function closeM() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
+
+        function saveSt(s) {
+            if (!act) return;
+            if (s === 'ABSENT') {
+                const admin = prompt("¿Quién eres? (Admin que resuelve)");
+                if (!admin) return alert("Se requiere nombre de Admin para procesar la alerta.");
+                alert(`🔴 ALERTA: ${admin} resolvió alerta de ${act.n} -> ABSENT`);
+                s = { status: 'ABSENT', resolver: admin };
+            }
+            if (!db.sched[act.id]) db.sched[act.id] = {};
+            db.sched[act.id][act.key] = s;
+            save();
+        }
+
+        function saveNote(podId, text) {
+            if (!db.notes) db.notes = {};
+            db.notes[podId] = text;
+            localStorage.setItem('SF_V107_FINAL', JSON.stringify(db));
+        }
+
+        function doAdd() {
+            const name = document.getElementById('add-name').value;
+            if (!name) return alert("Nombre requerido");
+            const editId = document.getElementById('edit-id').value;
+            if (editId) {
+                const id = parseInt(editId);
+                const idx = db.emps.findIndex(e => e.id === id);
+                if (idx !== -1) {
+                    db.emps[idx].name = name;
+                    db.emps[idx].team = document.getElementById('add-team').value;
+                    db.emps[idx].model = document.getElementById('add-model').value;
+                    db.emps[idx].pod = document.getElementById('add-pod').value;
+                    db.emps[idx].shift = document.getElementById('add-shift').value;
+                    db.emps[idx].role = document.getElementById('add-role').value;
+                }
+            } else {
+                db.emps.push({
+                    id: Date.now(),
+                    name: name,
+                    team: document.getElementById('add-team').value,
+                    model: document.getElementById('add-model').value,
+                    pod: document.getElementById('add-pod').value,
+                    shift: document.getElementById('add-shift').value,
+                    role: document.getElementById('add-role').value
+                });
+            }
+            save();
+        }
+
+        function save() {
+            localStorage.setItem('SF_V107_FINAL', JSON.stringify(db));
+            closeM();
+            render();
+        }
+
+        function logout() {
+            localStorage.removeItem('SF_LOGGED');
+            location.reload();
+        }
+
+        function hardReset() {
+            if (confirm("¿Reiniciar base de datos completa?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function startApp() {
+            const pin = document.getElementById('pass-in').value;
+            if (pin === '0129') {
+                localStorage.setItem('SF_LOGGED', 'true');
+                initData();
+            } else {
+                alert("PIN INCORRECTO");
+            }
+        }
+
+        if (localStorage.getItem('SF_LOGGED')) {
+            initData();
+        }
+    </script>
+</body>
+
+</html>
        
+
 
 
 
