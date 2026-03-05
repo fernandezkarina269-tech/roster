@@ -7,364 +7,53 @@
     <title>DreamArt V110 - PROTECTED & DYNAMIC</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --gold: #FFD700;
-            --bg: #121212;
-            --accent: #1e293b;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            background: #f8fafc;
-            color: #0f172a;
-            padding-bottom: 60px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* LOGIN PREMIUM */
-        #view-login {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at top right, #1e293b, #0f172a);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 50px 40px;
-            border-radius: 32px;
-            text-align: center;
-            width: 360px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            color: white;
-        }
-
-        /* PREMIUM INPUTS */
-        input,
-        select {
-            width: 100%;
-            padding: 16px;
-            margin: 12px 0;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            font-size: 16px;
-            color: #fff;
-            font-weight: 500;
-            transition: 0.3s;
-            outline: none;
-        }
-
-        .modal-box input,
-        .modal-box select {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            color: #0f172a;
-        }
-
-        .modal-box input:focus,
-        .modal-box select:focus {
-            border-color: var(--gold);
-            background: white;
-        }
-
-        .login-card input:focus {
-            border-color: var(--gold);
-            background: rgba(0, 0, 0, 0.3);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
-        }
-
-        /* BUTTONS */
-        .btn-main {
-            padding: 18px;
-            width: 100%;
-            background: linear-gradient(135deg, #FFD700, #FDB931);
-            color: #000;
-            border: none;
-            font-weight: 900;
-            cursor: pointer;
-            border-radius: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
-        }
-
-        .btn-main:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.3);
-        }
-
-        .btn-gold {
-            background: var(--gold);
-            color: #000;
-        }
-
-        /* NAV */
-        .nav {
-            background: #000;
-            color: #fff;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 5px solid var(--gold);
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        /* TABLES */
-        .pod-card {
-            background: white;
-            border-radius: 16px;
-            margin: 24px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-            transition: opacity 0.3s;
-        }
-
-        .btn-backup {
-            background: linear-gradient(135deg, #FFD700, #FDB931);
-            color: #000 !important;
-            font-weight: 900;
-            padding: 8px 16px;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
-            transition: 0.3s;
-        }
-
-        .btn-backup:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 16px rgba(255, 214, 0, 0.4);
-        }
-
-        .pod-header {
-            background: #f1f5f9;
-            padding: 16px 20px;
-            font-weight: 800;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1300px;
-        }
-
-        th {
-            background: #0f172a;
-            color: white;
-            padding: 14px;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 14px;
-            text-align: center;
-            border-bottom: 1px solid #f1f5f9;
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        /* FIXED COLS */
-        .sc-1 {
-            position: sticky;
-            left: 0;
-            background: #fff !important;
-            z-index: 10;
-            width: 100px;
-            border-right: 1px solid #e2e8f0;
-        }
-
-        .sc-2 {
-            position: sticky;
-            left: 100px;
-            background: #fff !important;
-            z-index: 10;
-            width: 120px;
-            border-right: 1px solid #e2e8f0;
-        }
-
-        .sc-3 {
-            position: sticky;
-            left: 220px;
-            background: #fff !important;
-            z-index: 10;
-            border-right: 2px solid #cbd5e1;
-            width: 180px;
-            text-align: left;
-            padding-left: 15px;
-        }
-
-        /* STATUS COLORS */
-        .st-WORKING {
-            color: #10b981 !important;
-            font-weight: 900 !important;
-            font-size: 18px;
-        }
-
-        .st-OFF {
-            color: #f97316 !important;
-            font-weight: 900 !important;
-        }
-
-        .st-SICK {
-            color: #a855f7 !important;
-            font-weight: 800;
-        }
-
-        .st-ABSENT {
-            color: #ef4444 !important;
-            font-weight: 900 !important;
-        }
-
-        .st-COV {
-            color: #3b82f6;
-            font-size: 11px;
-            display: block;
-            margin-top: 4px;
-            font-weight: bold;
-        }
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-
-        .modal-box {
-            background: white;
-            padding: 35px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-        }
-
-        .shift-tabs {
-            display: flex;
-            background: #fff;
-            padding: 10px 24px;
-            gap: 12px;
-            border-bottom: 1px solid #e2e8f0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .shift-tab {
-            padding: 12px 24px;
-            cursor: pointer;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 14px;
-            color: #64748b;
-            transition: 0.3s;
-            border: 1px solid transparent;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .shift-tab:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-        }
-
-        .shift-tab.active {
-            background: #0f172a;
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-item {
-            padding: 15px;
-            border-radius: 12px;
-            color: white;
-            text-align: center;
-        }
-
-        .stat-val {
-            font-size: 24px;
-            font-weight: 900;
-            display: block;
-        }
-
-        .stat-lbl {
-            font-size: 12px;
-            font-weight: 700;
-            opacity: 0.9;
-        }
-
-        .modal-tabs {
-            display: flex;
-            background: #f1f5f9;
-            padding: 8px;
-            gap: 8px;
-            border-radius: 16px;
-            margin-bottom: 25px;
-            justify-content: center;
-        }
-
-        .modal-tabs .shift-tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            font-size: 11px;
-            background: transparent;
-            color: #64748b;
-        }
-
-        .modal-tabs .shift-tab.active {
-            background: #fff;
-            color: #0f172a;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .shift-sheet {
-            margin-bottom: 20px;
-        }
+        :root { --gold: #FFD700; --bg: #121212; --accent: #1e293b; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f8fafc; color: #0f172a; padding-bottom: 60px; }
+        .hidden { display: none !important; }
+        #view-login { position: fixed; inset: 0; background: radial-gradient(circle at top right, #1e293b, #0f172a); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 50px 40px; border-radius: 32px; text-align: center; width: 360px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5); color: white; }
+        input, select { width: 100%; padding: 16px; margin: 12px 0; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; font-size: 16px; color: #fff; font-weight: 500; transition: 0.3s; outline: none; }
+        .modal-box input, .modal-box select { background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a; }
+        .modal-box input:focus, .modal-box select:focus { border-color: var(--gold); background: white; }
+        .login-card input:focus { border-color: var(--gold); background: rgba(0, 0, 0, 0.3); box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        .btn-main { padding: 18px; width: 100%; background: linear-gradient(135deg, #FFD700, #FDB931); color: #000; border: none; font-weight: 900; cursor: pointer; border-radius: 16px; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2); }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(255, 215, 0, 0.3); }
+        .btn-gold { background: var(--gold); color: #000; }
+        .nav { background: #000; color: #fff; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--gold); }
+        .nav-actions { display: flex; gap: 10px; }
+        .pod-card { background: white; border-radius: 16px; margin: 24px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); overflow: hidden; border: 1px solid #e2e8f0; transition: opacity 0.3s; }
+        .btn-backup { background: linear-gradient(135deg, #FFD700, #FDB931); color: #000 !important; font-weight: 900; padding: 8px 16px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3); transition: 0.3s; }
+        .btn-backup:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(255, 214, 0, 0.4); }
+        .pod-header { background: #f1f5f9; padding: 16px 20px; font-weight: 800; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
+        table { width: 100%; border-collapse: collapse; min-width: 1300px; }
+        th { background: #0f172a; color: white; padding: 14px; font-size: 12px; text-transform: uppercase; }
+        td { padding: 14px; text-align: center; border-bottom: 1px solid #f1f5f9; font-weight: 700; font-size: 14px; }
+        .sc-1 { position: sticky; left: 0; background: #fff !important; z-index: 10; width: 100px; border-right: 1px solid #e2e8f0; }
+        .sc-2 { position: sticky; left: 100px; background: #fff !important; z-index: 10; width: 120px; border-right: 1px solid #e2e8f0; }
+        .sc-3 { position: sticky; left: 220px; background: #fff !important; z-index: 10; border-right: 2px solid #cbd5e1; width: 180px; text-align: left; padding-left: 15px; }
+        .st-WORKING { color: #10b981 !important; font-weight: 900 !important; font-size: 18px; }
+        .st-OFF { color: #f97316 !important; font-weight: 900 !important; }
+        .st-SICK { color: #a855f7 !important; font-weight: 800; }
+        .st-ABSENT { color: #ef4444 !important; font-weight: 900 !important; }
+        .st-COV { color: #3b82f6; font-size: 11px; display: block; margin-top: 4px; font-weight: bold; }
+        .modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-box { background: white; padding: 35px; border-radius: 24px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3); }
+        .shift-tabs { display: flex; background: #fff; padding: 10px 24px; gap: 12px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .shift-tab { padding: 12px 24px; cursor: pointer; border-radius: 12px; font-weight: 800; font-size: 14px; color: #64748b; transition: 0.3s; border: 1px solid transparent; text-transform: uppercase; letter-spacing: 1px; }
+        .shift-tab:hover { background: #f1f5f9; color: #0f172a; }
+        .shift-tab.active { background: #0f172a; color: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-item { padding: 15px; border-radius: 12px; color: white; text-align: center; }
+        .stat-val { font-size: 24px; font-weight: 900; display: block; }
+        .stat-lbl { font-size: 12px; font-weight: 700; opacity: 0.9; }
+        .modal-tabs { display: flex; background: #f1f5f9; padding: 8px; gap: 8px; border-radius: 16px; margin-bottom: 25px; justify-content: center; }
+        .modal-tabs .shift-tab { flex: 1; padding: 10px; text-align: center; font-size: 11px; background: transparent; color: #64748b; }
+        .modal-tabs .shift-tab.active { background: #fff; color: #0f172a; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); }
+        .shift-sheet { margin-bottom: 20px; }
     </style>
 </head>
 
 <body>
-
     <div id="view-login">
         <div class="login-card">
             <h1 style="margin-bottom:10px;">ShiftFlow</h1>
@@ -382,9 +71,7 @@
                 <div id="clock-display" style="font-family:monospace; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:8px; font-size:14px; color:var(--gold);">00:00:00</div>
             </div>
             <div class="nav-actions">
-                <button class="btn-backup" onclick="downloadBackup()">
-                    <span>📥</span> RESPALDO
-                </button>
+                <button class="btn-backup" onclick="downloadBackup()"><span>📥</span> RESPALDO</button>
                 <button class="btn-main btn-gold" style="width:auto; padding:10px 20px; margin:0;" onclick="showStats()">ESTADÍSTICAS</button>
                 <button class="btn-main btn-gold" style="width:auto; padding:10px 20px; margin:0;" onclick="showAdd()">+ MIEMBRO</button>
                 <button class="btn-main" style="width:auto; padding:10px 20px; margin:0; background:#ef4444;" onclick="logout()">SALIR</button>
@@ -405,7 +92,6 @@
                 <button class="shift-tab" onclick="moveView(7)" style="padding: 10px 15px;">Sem »</button>
             </div>
         </div>
-
         <div id="sheets-container" style="padding:20px;"></div>
     </div>
 
@@ -429,8 +115,6 @@
                 <button class="btn-main" style="background:#ef4444;" onclick="saveSt('ABSENT')">ABSENT</button>
                 <button class="btn-main" style="background:#a855f7;" onclick="document.getElementById('sick-zone').classList.toggle('hidden')">SICK</button>
             </div>
-
-            <!-- SALES SECTION -->
             <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:20px;">
                 <label style="font-size:12px; font-weight:800; display:block; margin-bottom:10px; color:#0f172a;">VENTA DIARIA ($)</label>
                 <div style="display:flex; gap:10px;">
@@ -438,7 +122,6 @@
                     <button class="btn-main" style="width:auto; margin:0; background:#0f172a;" onclick="saveSale()">GUARDAR</button>
                 </div>
             </div>
-
             <button class="btn-main" style="background:#64748b; margin-top:20px;" onclick="closeM()">CANCELAR</button>
         </div>
     </div>
@@ -499,7 +182,8 @@
                 <div style="display:flex; gap:5px; justify-content:center;">
                     <button class="btn-main" style="padding:8px; font-size:11px; margin:0; background:#94a3b8;" onclick="filterSales(0)">HOY</button>
                     <button class="btn-main" style="padding:8px; font-size:11px; margin:0; background:#64748b;" onclick="filterSales(7)">7 DÍAS</button>
-                    <button class="btn-main" style="padding:8px; font-size:11px; margin:0; background:#475569;" onclick="filterSales(30)">30 DÍAS</button>
+                    <button class="btn-main" style="padding:8px; font-size:11px; margin:0; background:#475569;" onclick="filterSales(14)">14 DÍAS</button>
+                    <button class="btn-main" style="padding:8px; font-size:11px; margin:0; background:#0f172a;" onclick="filterSales(30)">30 DÍAS</button>
                 </div>
             </div>
             <button class="btn-main" style="background:#64748b; margin-top:20px;" onclick="closeM()">CERRAR</button>
@@ -508,181 +192,202 @@
 
     <script>
         window.onerror = function (msg) { alert("Error Detectado: " + msg + "\nIntenta el botón REINICIAR APP."); };
-
-        let db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {}, version: "110" };
-        let act = null;
-        let salesChartInst = null;
-        let currentShift = '1st';
-        let statsShift = 'ALL';
-        let currentRange = 0;
+        let db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {} };
+        let act = null; let salesChartInst = null; let currentShift = '1st'; let statsShift = 'ALL'; let currentRange = 0;
         let viewOffset = parseInt(localStorage.getItem('SF_VIEW_OFFSET')) || -2;
 
         function getViewDays() {
-            const days = [];
-            const today = new Date();
+            const days = []; const today = new Date();
             for (let i = 0; i < 7; i++) {
-                const d = new Date(today);
-                d.setDate(today.getDate() + viewOffset + i);
+                const d = new Date(today); d.setDate(today.getDate() + viewOffset + i);
                 days.push(`${d.getDate()}/${d.getMonth() + 1}`);
             }
             return days;
         }
-
         function moveView(delta) { viewOffset += delta; localStorage.setItem('SF_VIEW_OFFSET', viewOffset); render(); }
         function resetView() { viewOffset = -2; localStorage.setItem('SF_VIEW_OFFSET', viewOffset); render(); }
-
+        function setStatsShift(s) {
+            statsShift = s; const tabs = document.querySelectorAll('#modal-stats .shift-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            if (s === 'ALL') tabs[0].classList.add('active'); else if (s === '1st') tabs[1].classList.add('active');
+            else if (s === '2nd') tabs[2].classList.add('active'); else if (s === '3rd') tabs[3].classList.add('active');
+            showStats();
+        }
+        function setShift(s) {
+            currentShift = s; const tabs = document.querySelectorAll('.shift-tabs .shift-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            if (s === '1st') tabs[0].classList.add('active'); else if (s === '2nd') tabs[1].classList.add('active'); else if (s === '3rd') tabs[2].classList.add('active');
+            render();
+        }
         function getIsoDate(dStr) {
             try {
-                const [d, m] = dStr.split('/').map(Number);
-                const today = new Date();
-                let year = today.getFullYear();
-                const dateTest = new Date(year, m - 1, d);
-                if (Math.abs(dateTest.getTime() - today.getTime()) > 1000 * 60 * 60 * 24 * 180) {
-                    if (dateTest > today) year--; else year++;
-                }
+                const [d, m] = dStr.split('/').map(Number); const today = new Date(); let year = today.getFullYear();
+                const dTest = new Date(year, m - 1, d);
+                if (Math.abs(dTest - today) > 15552000000) { if (dTest > today) year--; else year++; }
                 return `${year}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
             } catch (e) { return "2026-01-01"; }
         }
-
         function validateDB() {
-            const VERSION = "110";
-            if (!db) db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {}, version: VERSION };
-            if (!db.emps) db.emps = [];
-            if (!db.sched) db.sched = {};
-            if (!db.sales) db.sales = {};
-            if (!db.notes) db.notes = {};
-            if (!db.goals) db.goals = {};
-            if (!db.version) db.version = VERSION;
+            const V = "110"; if (!db) db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {}, version: V };
+            if (!db.emps) db.emps = []; if (!db.sched) db.sched = {}; if (!db.sales) db.sales = {}; if (!db.notes) db.notes = {}; if (!db.goals) db.goals = {};
+            if (db.version !== V) { db.version = V; save(); }
             db.emps = db.emps.filter(e => e && e.id && e.name);
         }
-
         function initData() {
-            try {
-                const saved = localStorage.getItem('SF_V107_FINAL');
-                if (saved) { db = JSON.parse(saved); validateDB(); }
-                else validateDB();
-            } catch (e) { db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {}, version: "110" }; }
-            document.getElementById('view-login').classList.add('hidden');
-            document.getElementById('view-app').classList.remove('hidden');
-            setInterval(updateClock, 1000);
-            render();
+            try { const s = localStorage.getItem('SF_V107_FINAL'); if (s) { db = JSON.parse(s); validateDB(); } else { validateDB(); } } catch (e) { db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {} }; }
+            document.getElementById('view-login').classList.add('hidden'); document.getElementById('view-app').classList.remove('hidden');
+            setInterval(updateClock, 1000); render();
         }
-
         function updateClock() {
-            const clockEl = document.getElementById('clock-display');
-            if (clockEl) {
-                const now = new Date();
-                clockEl.innerText = now.toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit' });
+            const el = document.getElementById('clock-display'); if (el) {
+                const n = new Date(); el.innerText = n.toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit' });
             }
         }
-
+        function downloadBackup() {
+            const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+            const a = document.createElement('a'); a.setAttribute("href", s); a.setAttribute("download", `ShiftFlow_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(a); a.click(); a.remove(); alert("Respaldo descargado.");
+        }
+        function editGoal(podId) {
+            const p = prompt("PIN ADMIN:"); if (p !== '0129') return alert("PIN INCORRECTO");
+            const cur = (db.goals && db.goals[podId]) ? db.goals[podId] : 0;
+            const res = prompt(`META PARA ${podId}:`, cur);
+            if (res !== null) { const v = parseFloat(res); if (!isNaN(v)) { if (!db.goals) db.goals = {}; db.goals[podId] = v; save(); } }
+        }
         function render() {
             try {
-                const container = document.getElementById('sheets-container');
-                if (!container) return;
-                container.innerHTML = '';
+                const container = document.getElementById('sheets-container'); container.innerHTML = '';
                 const days = getViewDays();
-                const todayStr = `${new Date().getDate()}/${new Date().getMonth() + 1}`;
-                const shiftEmps = db.emps.filter(e => e.shift === currentShift || (currentShift === '1st' && !e.shift));
-
-                const renderCard = (title, list, labelOverride, bgColor) => {
-                    const podId = `${currentShift}-${title}`;
-                    const noteVal = db.notes[podId] || '';
-                    const goalVal = db.goals[podId] || '0';
-
-                    let h = `<div class="pod-card">
-                        <div class="pod-header" style="background:${bgColor || '#f1f5f9'};">
-                            <span>${title} (${currentShift})</span>
-                            <span onclick="editGoal('${podId}')" style="cursor:pointer; background:rgba(0,0,0,0.05); padding:4px 12px; border-radius:20px; font-size:11px; color:#475569;">
-                                META: <b>$${goalVal}</b>
-                            </span>
-                        </div>
-                        <div style="padding:10px 20px; background:#fff border-bottom:1px solid #e2e8f0;">
-                            <textarea placeholder="Notas..." style="width:100% border:1px solid #cbd5e1; border-radius:8px; padding:8px; height:60px;" onblur="saveNote('${podId}', this.value)">${noteVal}</textarea>
-                        </div>
-                        <div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
-                    
-                    days.forEach(d => {
-                        const isToday = (d === todayStr && viewOffset >= -7 && viewOffset <= 0);
-                        const style = isToday ? 'background:#fff7ed; color:#f97316; border-bottom:2px solid #f97316;' : '';
-                        h += `<th style="${style}">${d}${isToday ? ' <small>(HOY)</small>' : ''}</th>`;
-                    });
+                const shiftName = currentShift;
+                const sheetDiv = document.createElement('div'); sheetDiv.className = 'shift-sheet';
+                sheetDiv.innerHTML = `<div id="area-${shiftName}"></div>`; container.appendChild(sheetDiv);
+                const area = document.getElementById(`area-${shiftName}`);
+                const shiftEmps = db.emps.filter(e => e.shift === shiftName || (shiftName === '1st' && !e.shift));
+                const renderCard = (title, list, lbl, bg) => {
+                    const podId = `${shiftName}-${title}`; const goal = (db.goals && db.goals[podId]) ? db.goals[podId] : '0';
+                    let h = `<div class="pod-card"><div class="pod-header" style="background:${bg || '#f1f5f9'};"><span>${title} (${shiftName})</span><span onclick="editGoal('${podId}')" style="cursor:pointer; background:rgba(0,0,0,0.05); padding:4px 12px; border-radius:20px; font-size:11px;">META: <b>$${goal}</b> ✎</span></div><div style="padding:10px 20px;"><textarea placeholder="Notas..." style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; height:60px;" onblur="saveNote('${podId}', this.value)">${db.notes?.[podId] || ''}</textarea></div><div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${lbl}</th>`;
+                    const todayStr = `${new Date().getDate()}/${new Date().getMonth() + 1}`;
+                    days.forEach(d => { const isT = (d === todayStr && viewOffset >= -7 && viewOffset <= 0); h += `<th style="${isT ? 'background:#fff7ed;color:#f97316;' : ''}">${d}</th>`; });
                     h += `</tr></thead><tbody>`;
-
-                    if (!list || list.length === 0) h += `<tr><td colspan="${3 + days.length}">Sin miembros</td></tr>`;
-                    else {
-                        list.forEach(e => {
-                            const startStr = e.startDate ? `<br><small style="color:#64748b; font-size:10px;">Ingreso: ${e.startDate}</small>` : '';
-                            h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3" style="cursor:pointer; color:#2563eb; font-weight:800;" onclick="editMember(${e.id})">${e.name}${startStr} ✎</td>`;
-                            days.forEach(d => {
-                                const st = db.sched[e.id]?.[d] || 'WORKING';
-                                let cls = 'st-WORKING', disp = '✓', sub = '';
-                                const status = (typeof st === 'object') ? st.status : st;
-                                if (status === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
-                                if (status === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
-                                if (status === 'SICK' || (typeof st === 'object' && st.status === 'SICK')) { disp = '🚑 SICK'; cls = 'st-SICK'; if(st.date) sub = `<br><small>Regreso: ${st.date}</small>`; }
-                                if (typeof st === 'object' && st.status === 'ON' && st.cov) { disp = '✓'; if (st.cov !== 'Lugar Vacío') sub = `<span class="st-COV">Covering... ${st.cov}</span>`; }
-                                const iso = getIsoDate(d);
-                                if (db.sales[e.id]?.[iso]) sub += `<span style="color:#10b981; font-weight:900; margin-left:4px;">$${db.sales[e.id][iso]}</span>`;
-                                const isToday = (d === todayStr && viewOffset >= -7 && viewOffset <= 0);
-                                const tdStyle = isToday ? 'background:#fff7ed;' : '';
-                                h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer; ${tdStyle}"><span class="${cls}">${disp}</span>${sub}</td>`;
-                            });
-                            h += `</tr>`;
+                    if (list.length === 0) h += `<tr><td colspan="${3 + days.length}">Sin asignaciones</td></tr>`;
+                    else list.forEach(e => {
+                        h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3" onclick="editMember(${e.id})">${e.name} ${e.startDate ? `<br><small>Ingreso: ${e.startDate}</small>` : ''}</td>`;
+                        days.forEach(d => {
+                            const stRaw = db.sched[e.id]?.[d] || 'WORKING'; const status = (typeof stRaw === 'object') ? stRaw.status : stRaw;
+                            let cls = 'st-' + status, disp = status, sub = '';
+                            if (status === 'WORKING' || status === 'ON') { cls = 'st-WORKING'; disp = '✓'; if (stRaw.cov && stRaw.cov !== 'Lugar Vacío') sub = `<span class="st-COV">${stRaw.cov}</span>`; }
+                            if (status === 'SICK') { disp = '🚑 SICK'; sub = `<br><small>Regreso: ${stRaw.date}</small>`; }
+                            const iso = getIsoDate(d); if (db.sales?.[e.id]?.[iso]) sub += `<br><b style="color:#10b981;">$${db.sales[e.id][iso]}</b>`;
+                            h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer; ${d === todayStr ? 'background:#fff7ed;' : ''}"><span class="${cls}">${disp}</span>${sub}</td>`;
                         });
-                    }
-                    h += `</tbody></table></div></div>`;
-                    container.innerHTML += h;
+                        h += `</tr>`;
+                    });
+                    h += `</tbody></table></div></div>`; area.innerHTML += h;
                 };
-
-                const pods = [{ id: 'A', color: '#dbeafe' }, { id: 'B', color: '#dcfce green' }, { id: 'F', color: '#fae8ff' }];
-                pods.forEach(p => renderCard(`POD ${p.id}`, shiftEmps.filter(e => e.pod === p.id && (!e.role || e.role === 'Chatter')), 'CHATTER', p.color));
-                renderCard('BACKUP TEAM', shiftEmps.filter(e => e.role === 'Backup' || e.pod === 'BACKUP'), 'BACKUP', '#ffedd5');
-                renderCard('SHADOWERS TEAM', shiftEmps.filter(e => e.role === 'Shadower'), 'SHADOWER', '#f3e8ff');
-            } catch (e) {
-                const container = document.getElementById('sheets-container');
-                if (container) container.innerHTML = `<div style="padding:40px; text-align:center; color:#ef4444; font-weight:bold; background:white; border-radius:16px;">Error al cargar la tabla: ${e.message}<br><button class="btn-main" style="width:auto; margin-top:20px;" onclick="location.reload()">REINTENTAR</button></div>`;
-            }
+                const pods = [{ id: 'A', c: '#dbeafe' }, { id: 'B', c: '#dcfce7' }, { id: 'F', c: '#fae8ff' }];
+                pods.forEach(p => renderCard(`POD ${p.id}`, shiftEmps.filter(e => e.pod === p.id && (!e.role || e.role === 'Chatter')), 'CHATTER', p.c));
+                renderCard('BACKUP', shiftEmps.filter(e => e.role === 'Backup' || e.pod === 'BACKUP'), 'BACKUP', '#ffedd5');
+                renderCard('SHADOWERS', shiftEmps.filter(e => e.role === 'Shadower'), 'SHADOWER', '#f3e8ff');
+            } catch (e) { alert("Render Error: " + e.message); }
         }
-
         function handleWorking() {
-            try {
-                if (!act || !act.id) return;
-                const me = db.emps.find(e => e.id == act.id);
-                if ((me.role !== 'Backup' && me.pod !== 'BACKUP')) { saveSt('WORKING'); return; }
-                const targets = db.emps.filter(e => e.id != act.id).filter(o => {
-                    const st = db.sched[o.id]?.[act.key];
-                    const status = (typeof st === 'object') ? st.status : st;
-                    return (status === 'SICK' || status === 'ABSENT' || status === 'OFF');
-                });
-                const sel = document.getElementById('cov-select');
-                sel.innerHTML = '<option value="">-- SELECCIONA A QUIÉN CUBRE --</option>';
-                sel.innerHTML += '<option value="Lugar Vacío">LUGAR VACÍO</option>';
-                targets.forEach(t => { sel.innerHTML += `<option value="${t.name}">${t.name} (${t.pod})</option>`; });
-                document.getElementById('cov-zone').classList.remove('hidden');
-            } catch (e) { alert("Error: " + e.message); }
+            if (!act) return; const me = db.emps.find(e => e.id == act.id);
+            if (!(me.role === 'Backup' || me.pod === 'BACKUP')) return saveSt('WORKING');
+            const targets = db.emps.filter(e => e.id != act.id && ['SICK', 'ABSENT', 'OFF'].includes(typeof db.sched[e.id]?.[act.key] === 'object' ? db.sched[e.id][act.key].status : db.sched[e.id]?.[act.key]));
+            const sel = document.getElementById('cov-select'); sel.innerHTML = '<option value="">-- SELECCIONA --</option><option value="Lugar Vacío">LUGAR VACÍO</option>';
+            targets.forEach(t => sel.innerHTML += `<option value="${t.name}">${t.name} (${t.pod})</option>`);
+            document.getElementById('cov-zone').classList.remove('hidden');
         }
-
-        function confirmCov() { const v = document.getElementById('cov-select').value; if(v) saveSt({status:'ON', cov:v}); else saveSt('WORKING'); }
-        function openM(id, k, n) { act = {id, key:k, n, isoDate: getIsoDate(k)}; document.getElementById('target-name').innerText = n; document.getElementById('sale-amount').value = db.sales[id]?.[act.isoDate] || ""; document.getElementById('cov-zone').classList.add('hidden'); document.getElementById('sick-zone').classList.add('hidden'); document.getElementById('modal-status').classList.remove('hidden'); }
-        function saveSt(s) { if(!act) return; if(!db.sched[act.id]) db.sched[act.id] = {}; db.sched[act.id][act.key] = s; save(); }
-        function saveSale() { if(!act) return; const val = parseFloat(document.getElementById('sale-amount').value); if(!db.sales[act.id]) db.sales[act.id] = {}; if(isNaN(val)) delete db.sales[act.id][act.isoDate]; else db.sales[act.id][act.isoDate] = val; save(); }
-        function doAdd() { const name = document.getElementById('add-name').value; if(!name) return; const editId = document.getElementById('edit-id').value; const newEmp = { id: editId ? parseInt(editId) : Date.now(), name, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, role: document.getElementById('add-role').value, shift: document.getElementById('add-shift').value, startDate: document.getElementById('add-start-date').value }; if(editId) { const idx = db.emps.findIndex(e => e.id === newEmp.id); db.emps[idx] = newEmp; } else db.emps.push(newEmp); save(); }
-        function editMember(id) { const e = db.emps.find(x => x.id === id); if(!e) return; document.getElementById('modal-title').innerText = "Editar Miembro"; document.getElementById('edit-id').value = e.id; document.getElementById('add-name').value = e.name; document.getElementById('add-pod').value = e.pod || "A"; document.getElementById('add-role').value = e.role || "Chatter"; document.getElementById('add-shift').value = e.shift || "1st"; document.getElementById('add-start-date').value = e.startDate || ""; document.getElementById('btn-delete').classList.remove('hidden'); document.getElementById('modal-add').classList.remove('hidden'); }
-        function save() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); closeM(); render(); }
+        function confirmCov() { const v = document.getElementById('cov-select').value; if (v) saveSt({ status: 'ON', cov: v }); else saveSt('WORKING'); }
+        function confirmSick() {
+            const d = document.getElementById('sick-date').value; if (!d) return alert("Selecciona fecha");
+            const a = prompt("Admin:"); if (!a) return; saveSt({ status: 'SICK', date: d, resolver: a });
+        }
+        function showStats() {
+            let w = 0, o = 0, a = 0, s = 0; const days = getViewDays();
+            db.emps.filter(e => statsShift === 'ALL' || (e.shift || '1st') === statsShift).forEach(e => {
+                days.forEach(d => {
+                    const st = db.sched[e.id]?.[d] || 'WORKING'; const status = (typeof st === 'object') ? st.status : st;
+                    if (status === 'WORKING' || status === 'ON') w++; else if (status === 'OFF') o++; else if (status === 'ABSENT') a++; else if (status === 'SICK') s++;
+                });
+            });
+            document.getElementById('st-work').innerText = w; document.getElementById('st-off').innerText = o; document.getElementById('st-absent').innerText = a; document.getElementById('st-sick').innerText = s;
+            filterSales(currentRange); document.getElementById('modal-stats').classList.remove('hidden');
+        }
+        function filterSales(range) {
+            currentRange = range; const today = new Date(); today.setHours(0, 0, 0, 0); const cutoff = new Date(today); cutoff.setDate(today.getDate() - range);
+            const labels = []; const podS = { 'A': {}, 'B': {}, 'F': {} };
+            for (let i = range || 6; i >= 0; i--) {
+                const d = new Date(today); d.setDate(today.getDate() - i); const iso = d.toISOString().split('T')[0];
+                labels.push({ l: `${d.getDate()}/${d.getMonth() + 1}`, iso }); Object.keys(podS).forEach(p => podS[p][iso] = 0);
+            }
+            let total = 0;
+            db.emps.filter(e => statsShift === 'ALL' || (e.shift || '1st') === statsShift).forEach(emp => {
+                if (!db.sales?.[emp.id]) return;
+                Object.entries(db.sales[emp.id]).forEach(([iso, val]) => {
+                    const d = new Date(iso + 'T00:00:00'); if (d >= cutoff && d <= today) {
+                        let pod = emp.pod; if (pod === 'BACKUP' || emp.role === 'Backup') {
+                            const sc = db.sched[emp.id]?.[`${d.getDate()}/${d.getMonth() + 1}`];
+                            if (sc?.cov) pod = db.emps.find(x => x.name === sc.cov)?.pod || 'A';
+                        }
+                        if (podS[pod]) podS[pod][iso] += val; total += val;
+                    }
+                });
+            });
+            document.getElementById('st-sales-total').innerText = "$" + total.toFixed(2);
+            renderSalesChart(labels.map(x => x.l), { 'A': labels.map(x => podS['A'][x.iso]), 'B': labels.map(x => podS['B'][x.iso]), 'F': labels.map(x => podS['F'][x.iso]) });
+        }
+        function renderSalesChart(labels, data) {
+            const ctx = document.getElementById('salesChart').getContext('2d'); if (salesChartInst) salesChartInst.destroy();
+            salesChartInst = new Chart(ctx, { type: 'line', data: { labels, datasets: [
+                { label: 'POD A', data: data['A'], borderColor: '#3b82f6', tension: 0.3, fill: false },
+                { label: 'POD B', data: data['B'], borderColor: '#10b981', tension: 0.3, fill: false },
+                { label: 'POD F', data: data['F'], borderColor: '#f43f5e', tension: 0.3, fill: false }
+            ]}, options: { responsive: true, maintainAspectRatio: false }});
+        }
+        function saveSale() {
+            if (!act) return; const v = parseFloat(document.getElementById('sale-amount').value);
+            if (!db.sales) db.sales = {}; if (!db.sales[act.id]) db.sales[act.id] = {};
+            if (isNaN(v) || v === 0) delete db.sales[act.id][act.isoDate]; else db.sales[act.id][act.isoDate] = v;
+            save();
+        }
+        function showAdd() {
+            document.getElementById('modal-title').innerText = "Nuevo Miembro"; document.getElementById('edit-id').value = "";
+            ['add-name', 'add-team', 'add-model', 'add-start-date'].forEach(id => document.getElementById(id).value = "");
+            document.getElementById('btn-delete').classList.add('hidden'); document.getElementById('modal-add').classList.remove('hidden');
+        }
+        function editMember(id) {
+            const e = db.emps.find(x => x.id === id); if (!e) return;
+            document.getElementById('modal-title').innerText = "Editar Miembro"; document.getElementById('edit-id').value = e.id;
+            document.getElementById('add-name').value = e.name; document.getElementById('add-team').value = e.team || "";
+            document.getElementById('add-model').value = e.model || ""; document.getElementById('add-pod').value = e.pod || "A";
+            document.getElementById('add-role').value = e.role || "Chatter"; document.getElementById('add-shift').value = e.shift || "1st";
+            document.getElementById('add-start-date').value = e.startDate || "";
+            document.getElementById('btn-delete').classList.remove('hidden'); document.getElementById('modal-add').classList.remove('hidden');
+        }
+        function doDelete() { const id = parseInt(document.getElementById('edit-id').value); if (confirm("¿Eliminar?")) { db.emps = db.emps.filter(e => e.id !== id); save(); } }
         function closeM() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
-        function showAdd() { document.getElementById('edit-id').value = ""; document.getElementById('add-name').value = ""; document.getElementById('modal-add').classList.remove('hidden'); }
-        function setShift(s) { currentShift = s; document.querySelectorAll('.shift-tab').forEach(t => { if(t.innerText.includes(s)) t.classList.add('active'); else t.classList.remove('active'); }); render(); }
-        function startApp() { if(document.getElementById('pass-in').value === '0129') initData(); else alert("Clave Incorrecta"); }
-        function logout() { location.reload(); }
-        function downloadBackup() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2)); const dl = document.createElement('a'); dl.setAttribute("href", data); dl.setAttribute("download", `ShiftFlow_Backup.json`); dl.click(); }
-        function saveNote(pid, txt) { if(!db.notes) db.notes = {}; db.notes[pid] = txt; save(); }
-        function hardReset() { if(confirm("¿Borrar base de datos?")) { localStorage.clear(); location.reload(); } }
+        function saveSt(s) {
+            if (!act) return; if (s === 'ABSENT') { const a = prompt("Admin:"); if (!a) return; s = { status: 'ABSENT', resolver: a }; }
+            if (!db.sched[act.id]) db.sched[act.id] = {}; db.sched[act.id][act.key] = s; save();
+        }
+        function saveNote(p, t) { if (!db.notes) db.notes = {}; db.notes[p] = t; localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); }
+        function doAdd() {
+            const n = document.getElementById('add-name').value; if (!n) return alert("Nombre requerido");
+            const eid = document.getElementById('edit-id').value;
+            const obj = { name: n, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, shift: document.getElementById('add-shift').value, role: document.getElementById('add-role').value, startDate: document.getElementById('add-start-date').value };
+            if (eid) { const idx = db.emps.findIndex(e => e.id == eid); if (idx !== -1) Object.assign(db.emps[idx], obj); }
+            else { obj.id = Date.now(); db.emps.push(obj); }
+            save();
+        }
+        function save() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); closeM(); render(); }
+        function logout() { localStorage.removeItem('SF_LOGGED'); location.reload(); }
+        function hardReset() { if (confirm("¿Reiniciar todo?")) { localStorage.clear(); location.reload(); } }
+        function startApp() { if (document.getElementById('pass-in').value === '0129') { localStorage.setItem('SF_LOGGED', 'true'); initData(); } else alert("PIN INCORRECTO"); }
+        if (localStorage.getItem('SF_LOGGED')) initData();
     </script>
 </body>
 </html>
-
-
 
 
 
