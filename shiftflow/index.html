@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DreamArt V110 - SALES FIXED</title>
+    <title>DreamArt V110 - PROTECTED & DYNAMIC</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -56,18 +56,15 @@
             padding: 16px;
             margin: 12px 0;
             background: rgba(255, 255, 255, 0.05);
-            /* Darker glass for inputs */
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
             font-size: 16px;
             color: #fff;
-            /* White text for dark backgrounds */
             font-weight: 500;
             transition: 0.3s;
             outline: none;
         }
 
-        /* Modal Inputs override - Modals are white, so inputs need dark text */
         .modal-box input,
         .modal-box select {
             background: #f8fafc;
@@ -81,7 +78,6 @@
             background: white;
         }
 
-        /* Login Input Focus */
         .login-card input:focus {
             border-color: var(--gold);
             background: rgba(0, 0, 0, 0.3);
@@ -279,12 +275,6 @@
             opacity: 0.9;
         }
 
-        .stat-lbl {
-            font-size: 12px;
-            font-weight: 700;
-            opacity: 0.9;
-        }
-
         /* SHIFT TABS */
         .shift-tabs {
             display: flex;
@@ -350,11 +340,6 @@
         .shift-sheet {
             margin-bottom: 20px;
         }
-
-        .shift-header-label {
-            display: none;
-            /* Hidden because we use tabs now */
-        }
     </style>
 </head>
 
@@ -363,7 +348,7 @@
     <div id="view-login">
         <div class="login-card">
             <h1 style="margin-bottom:10px;">ShiftFlow</h1>
-            <p style="font-weight:900; color:#10b981; font-size:13px; margin-bottom:20px;">V109 - STABLE</p>
+            <p style="font-weight:900; color:#10b981; font-size:13px; margin-bottom:20px;">V110 - PROTECTED</p>
             <input type="password" id="pass-in" placeholder="CLAVE DE ACCESO">
             <button class="btn-main" onclick="startApp()">ENTRAR AL SISTEMA</button>
             <button class="btn-main" style="background:#ef4444; margin-top:20px;" onclick="hardReset()">REINICIAR APP
@@ -375,9 +360,7 @@
         <div class="nav">
             <div style="display:flex; align-items:center; gap:20px;">
                 <div style="font-weight:900; letter-spacing:1px;">DREAMART SYSTEM</div>
-                <div id="clock-display"
-                    style="font-family:monospace; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:8px; font-size:14px; color:var(--gold);">
-                    00:00:00</div>
+                <div id="clock-display" style="font-family:monospace; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:8px; font-size:14px; color:var(--gold);">00:00:00</div>
             </div>
             <div class="nav-actions">
                 <button class="btn-main btn-gold" style="width:auto; padding:10px 20px; margin:0;"
@@ -400,8 +383,7 @@
             <div style="display:flex; gap:8px; align-items:center;">
                 <button class="shift-tab" onclick="moveView(-7)" style="padding: 10px 15px;">« Sem</button>
                 <button class="shift-tab" onclick="moveView(-1)" style="padding: 10px 15px;">‹</button>
-                <button class="shift-tab" onclick="resetView()"
-                    style="padding: 10px 20px; background:#f1f5f9; color:#0f172a;">HOY</button>
+                <button class="shift-tab" onclick="resetView()" style="padding: 10px 20px; background:#f1f5f9; color:#0f172a;">HOY</button>
                 <button class="shift-tab" onclick="moveView(1)" style="padding: 10px 15px;">›</button>
                 <button class="shift-tab" onclick="moveView(7)" style="padding: 10px 15px;">Sem »</button>
             </div>
@@ -438,7 +420,6 @@
                     onclick="document.getElementById('sick-zone').classList.toggle('hidden')">SICK</button>
             </div>
 
-            <!-- SALES SECTION -->
             <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:20px;">
                 <label style="font-size:12px; font-weight:800; display:block; margin-bottom:10px; color:#0f172a;">VENTA
                     DIARIA ($)</label>
@@ -476,6 +457,10 @@
                 <option value="2nd">2nd Shift</option>
                 <option value="3rd">3rd Shift</option>
             </select>
+            <div style="text-align:left; margin-top:10px;">
+                <label style="font-size:12px; font-weight:800; color:#475569; margin-left:5px;">FECHA DE INGRESO:</label>
+                <input type="date" id="add-start-date">
+            </div>
             <button id="btn-save" class="btn-main" onclick="doAdd()">GUARDAR MIEMBRO</button>
             <button id="btn-delete" class="btn-main hidden" style="background:#ef4444; margin-top:10px;"
                 onclick="doDelete()">ELIMINAR MIEMBRO</button>
@@ -487,7 +472,6 @@
         <div class="modal-box">
             <h2 style="margin-top:0;">Estadísticas Generales</h2>
 
-            <!-- MODAL SHIFT TABS -->
             <div class="modal-tabs">
                 <div class="shift-tab active" onclick="setStatsShift('ALL')">GLOBAL</div>
                 <div class="shift-tab" onclick="setStatsShift('1st')">1st</div>
@@ -552,7 +536,7 @@
         let currentShift = '1st';
         let statsShift = 'ALL';
         let currentRange = 0;
-        let viewOffset = -2; // Start 2 days ago to show recent context
+        let viewOffset = -2;
 
         function getViewDays() {
             const days = [];
@@ -560,9 +544,7 @@
             for (let i = 0; i < 7; i++) {
                 const d = new Date(today);
                 d.setDate(today.getDate() + viewOffset + i);
-                const day = d.getDate();
-                const month = d.getMonth() + 1;
-                days.push(`${day}/${month}`);
+                days.push(`${d.getDate()}/${d.getMonth() + 1}`);
             }
             return days;
         }
@@ -581,7 +563,6 @@
             statsShift = s;
             const modalTabs = document.querySelector('#modal-stats .modal-tabs');
             modalTabs.querySelectorAll('.shift-tab').forEach(t => t.classList.remove('active'));
-
             const tabs = modalTabs.querySelectorAll('.shift-tab');
             if (s === 'ALL') tabs[0].classList.add('active');
             if (s === '1st') tabs[1].classList.add('active');
@@ -592,12 +573,10 @@
 
         function setShift(s) {
             currentShift = s;
-            document.querySelectorAll('.shift-tab').forEach(t => t.classList.remove('active'));
-            // Find tab by text content or adding IDs
-            const tabs = document.querySelectorAll('.shift-tab');
-            if (s === '1st') tabs[0].classList.add('active');
-            if (s === '2nd') tabs[1].classList.add('active');
-            if (s === '3rd') tabs[2].classList.add('active');
+            document.querySelectorAll('.shift-tabs .shift-tab').forEach(t => {
+                if (t.innerText.includes(s)) t.classList.add('active');
+                else t.classList.remove('active');
+            });
             render();
         }
 
@@ -606,18 +585,14 @@
                 const [d, m] = dStr.split('/').map(Number);
                 const today = new Date();
                 let year = today.getFullYear();
-
-                // If it's Jan/Feb but we are viewing Dec, or vice versa, adjust year
-                // For simplicity, we assume the date is within 6 months of today
                 const dateTest = new Date(year, m - 1, d);
                 const diff = Math.abs(dateTest.getTime() - today.getTime());
-                if (diff > 1000 * 60 * 60 * 24 * 180) { // More than 6 months
+                if (diff > 1000 * 60 * 60 * 24 * 180) {
                     if (dateTest > today) year--;
                     else year++;
                 }
                 return `${year}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
             } catch (e) {
-                console.error("ISO Date error", e);
                 return "2026-01-01";
             }
         }
@@ -629,8 +604,6 @@
             if (!db.sales) db.sales = {};
             if (!db.notes) db.notes = {};
             if (!db.goals) db.goals = {};
-
-            // Clean up any corrupted entries if necessary
             db.emps = db.emps.filter(e => e && e.id && e.name);
         }
 
@@ -641,23 +614,13 @@
                     db = JSON.parse(saved);
                     validateDB();
                 } else {
-                    db.emps = [
-                        { id: 1, name: 'User Demo 1', team: 'T1', model: 'M1', pod: 'A', shift: '1st' },
-                        { id: 2, name: 'User Demo 2', team: 'T2', model: 'M2', pod: 'B', shift: '2nd' }
-                    ];
                     validateDB();
                 }
             } catch (e) {
-                console.error("Load Error", e);
                 db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {} };
             }
-
-            const loginView = document.getElementById('view-login');
-            const appView = document.getElementById('view-app');
-            if (loginView) loginView.classList.add('hidden');
-            if (appView) appView.classList.remove('hidden');
-
-            // Start real-time clock
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-app').classList.remove('hidden');
             setInterval(updateClock, 1000);
             render();
         }
@@ -672,299 +635,84 @@
 
         function downloadBackup() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", `ShiftFlow_Backup_${new Date().toISOString().split('T')[0]}.json`);
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-            alert("Respaldo descargado con éxito.");
-        }
-
-        function editGoal(podId) {
-            const pin = prompt("PIN DE ADMINISTRADOR PARA EDITAR META:");
-            if (pin !== '0129') return alert("PIN INCORRECTO");
-
-            const current = (db.goals && db.goals[podId]) ? db.goals[podId] : 0;
-            const newVal = prompt(`EDITAR META PARA ${podId}:\n(Valor actual: $${current})`, current);
-
-            if (newVal !== null) {
-                const val = parseFloat(newVal);
-                if (isNaN(val)) return alert("VALOR INVÁLIDO");
-                if (!db.goals) db.goals = {};
-                db.goals[podId] = val;
-                save();
-            }
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `ShiftFlow_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            dl.click();
+            alert("Respaldo descargado.");
         }
 
         function render() {
-            try {
-                const container = document.getElementById('sheets-container');
-                if (!container) return;
-                container.innerHTML = '';
+            const container = document.getElementById('sheets-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const days = getViewDays();
+            const todayStr = `${new Date().getDate()}/${new Date().getMonth() + 1}`;
 
-                const shifts = [currentShift];
-                const days = getViewDays();
+            const shiftEmps = db.emps.filter(e => e.shift === currentShift || (currentShift === '1st' && !e.shift));
 
-                shifts.forEach(shiftName => {
-                    const sheetDiv = document.createElement('div');
-                    sheetDiv.className = 'shift-sheet';
-                    sheetDiv.innerHTML = `<div id="area-${shiftName}"></div>`;
-                    container.appendChild(sheetDiv);
+            const renderCard = (title, list, labelOverride, bgColor) => {
+                const podId = `${currentShift}-${title}`;
+                const noteVal = db.notes[podId] || '';
+                const goalVal = db.goals[podId] || '0';
 
-                    const area = document.getElementById(`area-${shiftName}`);
-                    const shiftEmps = db.emps.filter(e => e.shift === shiftName || (shiftName === '1st' && !e.shift));
-
-                    const renderCard = (title, list, labelOverride, bgColor) => {
-                        const safeList = list || [];
-                        const podId = `${shiftName}-${title}`;
-                        const noteVal = (db.notes && db.notes[podId]) ? db.notes[podId] : '';
-                        const goalVal = (db.goals && db.goals[podId]) ? db.goals[podId] : '0';
-
-                        let h = `<div class="pod-card">
-                        <div class="pod-header" style="background:${bgColor || '#f1f5f9'};">
-                            <span>${title} (${shiftName})</span>
-                            <span onclick="editGoal('${podId}')" style="cursor:pointer; background:rgba(0,0,0,0.05); padding:4px 12px; border-radius:20px; font-size:11px; color:#475569; display:flex; align-items:center; gap:5px;">
-                                <small style="font-weight:800; opacity:0.6;">META:</small>
-                                <b style="color:#0f172a;">$${goalVal}</b>
-                                <span style="font-size:10px; opacity:0.5;">✎</span>
-                            </span>
-                        </div>
-                        <div style="padding:10px 20px; background:#fff; border-bottom:1px solid #e2e8f0;">
-                            <textarea placeholder="Notas del equipo..." 
-                                style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; font-family:'Inter',sans-serif; height:60px; resize:vertical;"
-                                onblur="saveNote('${podId}', this.value)">${noteVal}</textarea>
-                        </div>
-                        <div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
-                        const todayStr = `${new Date().getDate()}/${new Date().getMonth() + 1}`;
-                        days.forEach(d => {
-                            const isToday = (d === todayStr && viewOffset >= -7 && viewOffset <= 0);
-                            const style = isToday ? 'background:#fff7ed; color:#f97316; border-bottom:2px solid #f97316;' : '';
-                            h += `<th style="${style}">${d}${isToday ? ' <small>(HOY)</small>' : ''}</th>`;
-                        });
-                        h += `</tr></thead><tbody>`;
-
-                        if (safeList.length === 0) {
-                            h += `<tr><td colspan="${3 + days.length}" style="padding:20px; color:#94a3b8; font-style:italic;">Sin miembros asignados</td></tr>`;
-                        } else {
-                            safeList.forEach(e => {
-                                h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3" style="cursor:pointer; color:#2563eb; font-weight:800;" onclick="editMember(${e.id})">${e.name} <span style="font-size:10px; opacity:0.7;">✎</span></td>`;
-                                days.forEach(d => {
-                                    const st = db.sched[e.id]?.[d] || 'WORKING';
-                                    let cls = 'st-WORKING', disp = '✓', sub = '';
-                                    const status = (typeof st === 'object') ? st.status : st;
-                                    if (status === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
-                                    if (status === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
-                                    if (typeof st === 'object') {
-                                        if (st.status === 'SICK') {
-                                            disp = '🚑 SICK'; cls = 'st-SICK';
-                                            sub = `<br><small style="color:#7c3aed; font-weight:600;">Regreso: ${st.date}</small>`;
-                                        }
-                                        if (st.status === 'ON' && st.cov) {
-                                            disp = '✓'; cls = 'st-WORKING';
-                                            if (st.cov !== 'Lugar Vacío') { sub = `<span class="st-COV">Covering... ${st.cov}</span>`; }
-                                        }
-                                    }
-                                    const isoDate = getIsoDate(d);
-                                    if (isoDate && db.sales && db.sales[e.id] && db.sales[e.id][isoDate]) {
-                                        sub += `<span style="color:#10b981; font-weight:900; font-size:12px; margin-left:4px;">$${db.sales[e.id][isoDate]}</span>`;
-                                    }
-                                    const isToday = (d === todayStr && viewOffset >= -7 && viewOffset <= 0);
-                                    const tdStyle = isToday ? 'background:#fff7ed;' : '';
-                                    h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer; ${tdStyle}"><span class="${cls}">${disp}</span>${sub}</td>`;
-                                });
-                                h += `</tr>`;
-                            });
-                        }
-                        h += `</tbody></table></div></div>`;
-                        area.innerHTML += h;
-                    };
-
-                    const pods = [{ id: 'A', color: '#dbeafe' }, { id: 'B', color: '#dcfce7' }, { id: 'F', color: '#fae8ff' }];
-                    pods.forEach(p => {
-                        const chatters = shiftEmps.filter(e => e.pod === p.id && (!e.role || e.role === 'Chatter'));
-                        renderCard(`POD ${p.id}`, chatters, 'CHATTER', p.color);
-                    });
-                    renderCard('BACKUP TEAM', shiftEmps.filter(e => e.role === 'Backup' || e.pod === 'BACKUP'), 'BACKUP', '#ffedd5');
-                    renderCard('SHADOWERS TEAM', shiftEmps.filter(e => e.role === 'Shadower'), 'SHADOWER', '#f3e8ff');
-                });
-            } catch (e) {
-                console.error("Render Error", e);
-                alert("Error mostrando la tabla: " + e.message);
-            }
-        }
-
-        function handleWorking() {
-            try {
-                const me = db.emps.find(e => e.id === act.id);
-                const isBackup = (me.role === 'Backup' || me.pod === 'BACKUP');
-                if (!isBackup) {
-                    saveSt('WORKING');
-                    return;
-                }
-                const others = db.emps.filter(e => e.id !== act.id);
-                const targets = others.filter(o => {
-                    const stRaw = db.sched[o.id]?.[act.key];
-                    const status = (typeof stRaw === 'object') ? stRaw.status : stRaw;
-                    return ['SICK', 'ABSENT'].includes(status);
-                });
-                const sel = document.getElementById('cov-select');
-                sel.innerHTML = '<option value="">-- SELECCIONA OPCIÓN --</option>';
-                sel.innerHTML += '<option value="Lugar Vacío">LUGAR VACÍO</option>';
-                targets.forEach(t => {
-                    sel.innerHTML += `<option value="${t.name}">${t.name} (${t.pod})</option>`;
-                });
-                document.getElementById('cov-zone').classList.remove('hidden');
-            } catch (e) { alert("Error: " + e.message); }
-        }
-
-        function confirmCov() {
-            const covName = document.getElementById('cov-select').value;
-            if (covName) saveSt({ status: 'ON', cov: covName });
-            else saveSt('WORKING');
-        }
-
-        function confirmSick() {
-            const date = document.getElementById('sick-date').value;
-            if (!date) return alert("Selecciona fecha");
-            const admin = prompt("¿Quién eres? (Admin que resuelve)");
-            if (!admin) return alert("Se requiere nombre de Admin para procesar la alerta.");
-            alert(`🔴 ALERTA: ${admin} resolvió alerta de ${act.n} -> SICK`);
-            saveSt({ status: 'SICK', date: date, resolver: admin });
-        }
-
-        function showStats() {
-            let totalWork = 0, totalOff = 0, totalAbs = 0, totalSick = 0;
-            const days = ['28/1', '29/1', '30/1', '31/1', '01/2', '02/2', '03/2'];
-
-            const filteredEmps = db.emps.filter(e => {
-                if (statsShift === 'ALL') return true;
-                const eShift = e.shift || '1st';
-                return eShift === statsShift;
-            });
-
-            filteredEmps.forEach(e => {
+                let h = `<div class="pod-card">
+                <div class="pod-header" style="background:${bgColor || '#f1f5f9'};">
+                    <span>${title} (${currentShift})</span>
+                    <span onclick="editGoal('${podId}')" style="cursor:pointer; background:rgba(0,0,0,0.05); padding:4px 12px; border-radius:20px; font-size:11px; color:#475569; display:flex; align-items:center; gap:5px;">
+                        <small style="font-weight:800; opacity:0.6;">META:</small>
+                        <b style="color:#0f172a;">$${goalVal}</b>
+                    </span>
+                </div>
+                <div style="padding:10px 20px; background:#fff border-bottom:1px solid #e2e8f0;">
+                    <textarea placeholder="Notas..." style="width:100% border:1px solid #cbd5e1; border-radius:8px; padding:8px; height:60px;" onblur="saveNote('${podId}', this.value)">${noteVal}</textarea>
+                </div>
+                <div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
+                
                 days.forEach(d => {
-                    const st = db.sched[e.id]?.[d] || 'WORKING';
-                    if (st === 'WORKING' || (typeof st === 'object' && st.status === 'ON')) totalWork++;
-                    else if (st === 'OFF') totalOff++;
-                    else if (st === 'ABSENT' || (typeof st === 'object' && st.status === 'ABSENT')) totalAbs++;
-                    else if (typeof st === 'object' && st.status === 'SICK') totalSick++;
+                    const isToday = (d === todayStr && viewOffset >= -7 && viewOffset <= 0);
+                    const style = isToday ? 'background:#fff7ed; color:#f97316; border-bottom:2px solid #f97316;' : '';
+                    h += `<th style="${style}">${d}${isToday ? ' <small>(HOY)</small>' : ''}</th>`;
                 });
-            });
-            document.getElementById('st-work').innerText = totalWork;
-            document.getElementById('st-off').innerText = totalOff;
-            document.getElementById('st-absent').innerText = totalAbs;
-            document.getElementById('st-sick').innerText = totalSick;
-            filterSales(currentRange);
-            document.getElementById('modal-stats').classList.remove('hidden');
-        }
+                h += `</tr></thead><tbody>`;
 
-        function filterSales(range) {
-            currentRange = range;
-            const cutoff = new Date();
-            const today = new Date(); today.setHours(0, 0, 0, 0);
-            cutoff.setDate(today.getDate() - range);
-            cutoff.setHours(0, 0, 0, 0);
-            const labels = [];
-            const podSales = { 'A': {}, 'B': {}, 'F': {} };
-            const startChart = new Date(today);
-            startChart.setDate(today.getDate() - (range || 6));
-            for (let d = new Date(startChart); d <= today; d.setDate(d.getDate() + 1)) {
-                const day = d.getDate().toString().padStart(2, '0');
-                const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                const label = `${day}/${month}`;
-                const iso = `${d.getFullYear()}-${month}-${day}`;
-                labels.push({ label, iso });
-                Object.keys(podSales).forEach(p => podSales[p][iso] = 0);
-            }
-            let totalSum = 0;
-            const filteredEmpsSales = db.emps.filter(e => {
-                if (statsShift === 'ALL') return true;
-                const eShift = e.shift || '1st';
-                return eShift === statsShift;
-            });
-
-            filteredEmpsSales.forEach(emp => {
-                let empPod = emp.pod || 'A';
-                if (db.sales && db.sales[emp.id]) {
-                    Object.entries(db.sales[emp.id]).forEach(([dateStr, amount]) => {
-                        const [y, m, d] = dateStr.split('-').map(Number);
-                        const dateNum = d + '/' + m; // Keys in db.sched are like '29/1'
-
-                        // If backup, find who they cover
-                        if (empPod === 'BACKUP' || emp.role === 'Backup') {
-                            const schedData = db.sched[emp.id]?.[dateNum];
-                            if (schedData && typeof schedData === 'object' && schedData.status === 'ON' && schedData.cov) {
-                                const targetName = schedData.cov;
-                                const targetEmp = db.emps.find(e => e.name === targetName);
-                                if (targetEmp) empPod = targetEmp.pod || 'A';
-                            }
-                        }
-
-                        if (empPod === 'BACKUP') return; // Skip if still backup (unassigned)
-
-                        const date = new Date(y, m - 1, d);
-                        date.setHours(0, 0, 0, 0);
-                        if (range === 0) {
-                            if (date.getTime() === today.getTime()) totalSum += amount;
-                        } else {
-                            if (date >= cutoff && date <= today) totalSum += amount;
-                        }
-                        if (podSales[empPod] && podSales[empPod].hasOwnProperty(dateStr)) {
-                            podSales[empPod][dateStr] += amount;
-                        }
+                if (!list || list.length === 0) {
+                    h += `<tr><td colspan="${3 + days.length}">Sin miembros</td></tr>`;
+                } else {
+                    list.forEach(e => {
+                        const startDateStr = e.startDate ? `<br><small style="color:#64748b; font-size:10px;">Ingreso: ${e.startDate}</small>` : '';
+                        h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3" style="cursor:pointer; color:#2563eb; font-weight:800;" onclick="editMember(${e.id})">${e.name}${startDateStr} ✎</td>`;
+                        days.forEach(d => {
+                            const st = db.sched[e.id]?.[d] || 'WORKING';
+                            let cls = 'st-WORKING', disp = '✓', sub = '';
+                            const status = (typeof st === 'object') ? st.status : st;
+                            if (status === 'OFF') { cls = 'st-OFF'; disp = 'OFF'; }
+                            if (status === 'ABSENT') { cls = 'st-ABSENT'; disp = 'ABSENT'; }
+                            if (typeof st === 'object' && st.status === 'SICK') { disp = '🚑 SICK'; cls = 'st-SICK'; sub = `<br><small>Regreso: ${st.date}</small>`; }
+                            if (typeof st === 'object' && st.status === 'ON' && st.cov) { disp = '✓'; if (st.cov !== 'Lugar Vacío') sub = `<span class="st-COV">Covering... ${st.cov}</span>`; }
+                            const iso = getIsoDate(d);
+                            if (db.sales[e.id]?.[iso]) sub += `<span style="color:#10b981; font-weight:900; margin-left:4px;">$${db.sales[e.id][iso]}</span>`;
+                            const isToday = (d === todayStr && viewOffset >= -7 && viewOffset <= 0);
+                            const tdStyle = isToday ? 'background:#fff7ed;' : '';
+                            h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer; ${tdStyle}"><span class="${cls}">${disp}</span>${sub}</td>`;
+                        });
+                        h += `</tr>`;
                     });
                 }
-            });
-            const totalEl = document.getElementById('st-sales-total');
-            if (totalEl) totalEl.innerText = "$" + totalSum.toFixed(2);
-            const chartLabels = labels.map(l => l.label);
-            const chartData = {
-                'A': labels.map(l => podSales['A'][l.iso]),
-                'B': labels.map(l => podSales['B'][l.iso]),
-                'F': labels.map(l => podSales['F'][l.iso])
+                h += `</tbody></table></div></div>`;
+                container.innerHTML += h;
             };
-            renderSalesChart(chartLabels, chartData);
-        }
 
-        function renderSalesChart(labels, data) {
-            const canvas = document.getElementById('salesChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (salesChartInst) salesChartInst.destroy();
-            salesChartInst = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'POD A', data: data['A'], borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
-                        { label: 'POD B', data: data['B'], borderColor: '#10b981', backgroundColor: '#10b981', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
-                        { label: 'POD F', data: data['F'], borderColor: '#f43f5e', backgroundColor: '#f43f5e', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { font: { size: 10 } }, grid: { color: '#f1f5f9' } },
-                        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
-                    }
-                }
-            });
+            const pods = [{ id: 'A', color: '#dbeafe' }, { id: 'B', color: '#dcfce7' }, { id: 'F', color: '#fae8ff' }];
+            pods.forEach(p => renderCard(`POD ${p.id}`, shiftEmps.filter(e => e.pod === p.id && (!e.role || e.role === 'Chatter')), 'CHATTER', p.color));
+            renderCard('BACKUP TEAM', shiftEmps.filter(e => e.role === 'Backup' || e.pod === 'BACKUP'), 'BACKUP', '#ffedd5');
+            renderCard('SHADOWERS TEAM', shiftEmps.filter(e => e.role === 'Shadower'), 'SHADOWER', '#f3e8ff');
         }
 
         function openM(id, k, n) {
-            act = { id, key: k, n };
-            const titleEl = document.getElementById('target-name');
-            if (titleEl) titleEl.innerText = n;
-            act.isoDate = getIsoDate(k);
-            const amount = (db.sales && db.sales[id] && db.sales[id][act.isoDate]) ? db.sales[id][act.isoDate] : "";
-            const amountInp = document.getElementById('sale-amount');
-            if (amountInp) amountInp.value = amount;
+            act = { id, key: k, n, isoDate: getIsoDate(k) };
+            document.getElementById('target-name').innerText = n;
+            document.getElementById('sale-amount').value = db.sales[id]?.[act.isoDate] || "";
             document.getElementById('cov-zone').classList.add('hidden');
             document.getElementById('sick-zone').classList.add('hidden');
             document.getElementById('modal-status').classList.remove('hidden');
@@ -972,31 +720,32 @@
 
         function saveSale() {
             if (!act) return;
-            const amountVal = document.getElementById('sale-amount').value;
-            const amount = parseFloat(amountVal);
-            if (!db.sales) db.sales = {};
+            const amount = parseFloat(document.getElementById('sale-amount').value);
             if (!db.sales[act.id]) db.sales[act.id] = {};
-            if (isNaN(amount) || amount === 0) {
-                if (db.sales[act.id][act.isoDate]) delete db.sales[act.id][act.isoDate];
-            } else {
-                db.sales[act.id][act.isoDate] = amount;
-            }
-            alert("¡Venta Guardada: $" + amount + "!\nFecha: " + act.isoDate);
+            if (isNaN(amount) || amount === 0) delete db.sales[act.id][act.isoDate];
+            else db.sales[act.id][act.isoDate] = amount;
             save();
         }
 
-        function showAdd() {
-            document.getElementById('modal-title').innerText = "Nuevo Miembro";
-            document.getElementById('edit-id').value = "";
-            document.getElementById('add-name').value = "";
-            document.getElementById('add-team').value = "";
-            document.getElementById('add-model').value = "";
-            document.getElementById('add-pod').value = "A";
-            document.getElementById('add-role').value = "Chatter";
-            document.getElementById('add-shift').value = "1st";
-            document.getElementById('btn-save').innerText = "GUARDAR MIEMBRO";
-            document.getElementById('btn-delete').classList.add('hidden');
-            document.getElementById('modal-add').classList.remove('hidden');
+        function doAdd() {
+            const name = document.getElementById('add-name').value;
+            if (!name) return alert("Nombre requerido");
+            const editId = document.getElementById('edit-id').value;
+            const newEmp = {
+                id: editId ? parseInt(editId) : Date.now(),
+                name: name,
+                team: document.getElementById('add-team').value,
+                model: document.getElementById('add-model').value,
+                pod: document.getElementById('add-pod').value,
+                role: document.getElementById('add-role').value,
+                shift: document.getElementById('add-shift').value,
+                startDate: document.getElementById('add-start-date').value
+            };
+            if (editId) {
+                const idx = db.emps.findIndex(e => e.id === newEmp.id);
+                if (idx !== -1) db.emps[idx] = newEmp;
+            } else db.emps.push(newEmp);
+            save();
         }
 
         function editMember(id) {
@@ -1010,109 +759,26 @@
             document.getElementById('add-pod').value = e.pod || "A";
             document.getElementById('add-role').value = e.role || "Chatter";
             document.getElementById('add-shift').value = e.shift || "1st";
-            document.getElementById('btn-save').innerText = "ACTUALIZAR DATOS";
+            document.getElementById('add-start-date').value = e.startDate || "";
+            document.getElementById('btn-save').innerText = "ACTUALIZAR";
             document.getElementById('btn-delete').classList.remove('hidden');
             document.getElementById('modal-add').classList.remove('hidden');
         }
 
-        function doDelete() {
-            const idVal = document.getElementById('edit-id').value;
-            const id = parseInt(idVal);
-            if (!id) return;
-            if (confirm("¿Eliminar este miembro permanentemente?")) {
-                db.emps = db.emps.filter(e => e.id !== id);
-                delete db.sched[id];
-                save();
-            }
-        }
-
+        function save() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); closeM(); render(); }
         function closeM() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
-
-        function saveSt(s) {
-            if (!act) return;
-            if (s === 'ABSENT') {
-                const admin = prompt("¿Quién eres? (Admin que resuelve)");
-                if (!admin) return alert("Se requiere nombre de Admin para procesar la alerta.");
-                alert(`🔴 ALERTA: ${admin} resolvió alerta de ${act.n} -> ABSENT`);
-                s = { status: 'ABSENT', resolver: admin };
-            }
-            if (!db.sched[act.id]) db.sched[act.id] = {};
-            db.sched[act.id][act.key] = s;
-            save();
+        function showAdd() { 
+            document.getElementById('edit-id').value = ""; 
+            document.getElementById('add-start-date').value = "";
+            document.getElementById('modal-add').classList.remove('hidden'); 
         }
-
-        function saveNote(podId, text) {
-            if (!db.notes) db.notes = {};
-            db.notes[podId] = text;
-            localStorage.setItem('SF_V107_FINAL', JSON.stringify(db));
-        }
-
-        function doAdd() {
-            const name = document.getElementById('add-name').value;
-            if (!name) return alert("Nombre requerido");
-            const editId = document.getElementById('edit-id').value;
-            if (editId) {
-                const id = parseInt(editId);
-                const idx = db.emps.findIndex(e => e.id === id);
-                if (idx !== -1) {
-                    db.emps[idx].name = name;
-                    db.emps[idx].team = document.getElementById('add-team').value;
-                    db.emps[idx].model = document.getElementById('add-model').value;
-                    db.emps[idx].pod = document.getElementById('add-pod').value;
-                    db.emps[idx].shift = document.getElementById('add-shift').value;
-                    db.emps[idx].role = document.getElementById('add-role').value;
-                }
-            } else {
-                db.emps.push({
-                    id: Date.now(),
-                    name: name,
-                    team: document.getElementById('add-team').value,
-                    model: document.getElementById('add-model').value,
-                    pod: document.getElementById('add-pod').value,
-                    shift: document.getElementById('add-shift').value,
-                    role: document.getElementById('add-role').value
-                });
-            }
-            save();
-        }
-
-        function save() {
-            localStorage.setItem('SF_V107_FINAL', JSON.stringify(db));
-            closeM();
-            render();
-        }
-
-        function logout() {
-            localStorage.removeItem('SF_LOGGED');
-            location.reload();
-        }
-
-        function hardReset() {
-            if (confirm("¿Reiniciar base de datos completa?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        function startApp() {
-            const pin = document.getElementById('pass-in').value;
-            if (pin === '0129') {
-                localStorage.setItem('SF_LOGGED', 'true');
-                initData();
-            } else {
-                alert("PIN INCORRECTO");
-            }
-        }
-
-        if (localStorage.getItem('SF_LOGGED')) {
-            initData();
-        }
+        function startApp() { if (document.getElementById('pass-in').value === '0129') initData(); else alert("Clave Incorrecta"); }
+        function logout() { location.reload(); }
+        function hardReset() { if (confirm("¿Borrar todo?")) { localStorage.clear(); location.reload(); } }
+        function saveNote(pid, txt) { db.notes[pid] = txt; save(); }
     </script>
 </body>
-
 </html>
-       
-
 
 
 
