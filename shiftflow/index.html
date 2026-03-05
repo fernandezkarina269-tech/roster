@@ -373,8 +373,15 @@
 
     <div id="view-app" class="hidden">
         <div class="nav">
-            <div style="font-weight:900; letter-spacing:1px;">DREAMART SYSTEM</div>
+            <div style="display:flex; align-items:center; gap:20px;">
+                <div style="font-weight:900; letter-spacing:1px;">DREAMART SYSTEM</div>
+                <div id="clock-display"
+                    style="font-family:monospace; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:8px; font-size:14px; color:var(--gold);">
+                    00:00:00</div>
+            </div>
             <div class="nav-actions">
+                <button class="btn-main btn-gold" style="width:auto; padding:10px 20px; margin:0;"
+                    onclick="downloadBackup()">📥 RESPALDO</button>
                 <button class="btn-main btn-gold" style="width:auto; padding:10px 20px; margin:0;"
                     onclick="showStats()">ESTADÍSTICAS</button>
                 <button class="btn-main btn-gold" style="width:auto; padding:10px 20px; margin:0;" onclick="showAdd()">+
@@ -384,10 +391,20 @@
             </div>
         </div>
 
-        <div class="shift-tabs">
-            <div class="shift-tab active" onclick="setShift('1st')">1st Shift</div>
-            <div class="shift-tab" onclick="setShift('2nd')">2nd Shift</div>
-            <div class="shift-tab" onclick="setShift('3rd')">3rd Shift</div>
+        <div class="shift-tabs" style="justify-content: space-between; align-items: center;">
+            <div style="display:flex; gap:12px;">
+                <div class="shift-tab active" onclick="setShift('1st')">1st Shift</div>
+                <div class="shift-tab" onclick="setShift('2nd')">2nd Shift</div>
+                <div class="shift-tab" onclick="setShift('3rd')">3rd Shift</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button class="shift-tab" onclick="moveView(-7)" style="padding: 10px 15px;">« Sem</button>
+                <button class="shift-tab" onclick="moveView(-1)" style="padding: 10px 15px;">‹</button>
+                <button class="shift-tab" onclick="resetView()"
+                    style="padding: 10px 20px; background:#f1f5f9; color:#0f172a;">HOY</button>
+                <button class="shift-tab" onclick="moveView(1)" style="padding: 10px 15px;">›</button>
+                <button class="shift-tab" onclick="moveView(7)" style="padding: 10px 15px;">Sem »</button>
+            </div>
         </div>
 
         <div id="sheets-container" style="padding:20px;"></div>
@@ -529,12 +546,36 @@
             alert("Error Detectado: " + msg + "\nIntenta el botón REINICIAR APP.");
         };
 
-        let db = { emps: [], sched: {}, sales: {}, notes: {} };
+        let db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {} };
         let act = null;
         let salesChartInst = null;
         let currentShift = '1st';
         let statsShift = 'ALL';
         let currentRange = 0;
+        let viewOffset = -2; // Start 2 days ago to show recent context
+
+        function getViewDays() {
+            const days = [];
+            const today = new Date();
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(today);
+                d.setDate(today.getDate() + viewOffset + i);
+                const day = d.getDate();
+                const month = d.getMonth() + 1;
+                days.push(`${day}/${month}`);
+            }
+            return days;
+        }
+
+        function moveView(delta) {
+            viewOffset += delta;
+            render();
+        }
+
+        function resetView() {
+            viewOffset = -2;
+            render();
+        }
 
         function setStatsShift(s) {
             statsShift = s;
@@ -561,9 +602,36 @@
         }
 
         function getIsoDate(dStr) {
-            const [d, m] = dStr.split('/').map(Number);
-            const year = (m >= 10) ? 2025 : 2026;
-            return `${year}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+            try {
+                const [d, m] = dStr.split('/').map(Number);
+                const today = new Date();
+                let year = today.getFullYear();
+
+                // If it's Jan/Feb but we are viewing Dec, or vice versa, adjust year
+                // For simplicity, we assume the date is within 6 months of today
+                const dateTest = new Date(year, m - 1, d);
+                const diff = Math.abs(dateTest.getTime() - today.getTime());
+                if (diff > 1000 * 60 * 60 * 24 * 180) { // More than 6 months
+                    if (dateTest > today) year--;
+                    else year++;
+                }
+                return `${year}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+            } catch (e) {
+                console.error("ISO Date error", e);
+                return "2026-01-01";
+            }
+        }
+
+        function validateDB() {
+            if (!db) db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {} };
+            if (!db.emps) db.emps = [];
+            if (!db.sched) db.sched = {};
+            if (!db.sales) db.sales = {};
+            if (!db.notes) db.notes = {};
+            if (!db.goals) db.goals = {};
+
+            // Clean up any corrupted entries if necessary
+            db.emps = db.emps.filter(e => e && e.id && e.name);
         }
 
         function initData() {
@@ -571,27 +639,46 @@
                 const saved = localStorage.getItem('SF_V107_FINAL');
                 if (saved) {
                     db = JSON.parse(saved);
-                    if (!db.sales) db.sales = {};
-                    if (!db.notes) db.notes = {};
-                    if (!db.goals) db.goals = {};
+                    validateDB();
                 } else {
                     db.emps = [
                         { id: 1, name: 'User Demo 1', team: 'T1', model: 'M1', pod: 'A', shift: '1st' },
                         { id: 2, name: 'User Demo 2', team: 'T2', model: 'M2', pod: 'B', shift: '2nd' }
                     ];
-                    db.sched = {}; db.sales = {}; db.notes = {}; db.goals = {};
+                    validateDB();
                 }
             } catch (e) {
                 console.error("Load Error", e);
-                localStorage.removeItem('SF_V107_FINAL');
-                db = { emps: [], sched: {}, sales: {}, notes: {} };
+                db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {} };
             }
 
             const loginView = document.getElementById('view-login');
             const appView = document.getElementById('view-app');
             if (loginView) loginView.classList.add('hidden');
             if (appView) appView.classList.remove('hidden');
+
+            // Start real-time clock
+            setInterval(updateClock, 1000);
             render();
+        }
+
+        function updateClock() {
+            const clockEl = document.getElementById('clock-display');
+            if (clockEl) {
+                const now = new Date();
+                clockEl.innerText = now.toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit' });
+            }
+        }
+
+        function downloadBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `ShiftFlow_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            alert("Respaldo descargado con éxito.");
         }
 
         function editGoal(podId) {
@@ -617,7 +704,7 @@
                 container.innerHTML = '';
 
                 const shifts = [currentShift];
-                const days = ['28/1', '29/1', '30/1', '31/1', '01/2', '02/2', '03/2'];
+                const days = getViewDays();
 
                 shifts.forEach(shiftName => {
                     const sheetDiv = document.createElement('div');
@@ -649,7 +736,12 @@
                                 onblur="saveNote('${podId}', this.value)">${noteVal}</textarea>
                         </div>
                         <div style="overflow-x:auto;"><table><thead><tr><th class="sc-1">TEAM</th><th class="sc-2">MODEL</th><th class="sc-3">${labelOverride || 'CHATTER'}</th>`;
-                        days.forEach(d => h += `<th>${d}</th>`);
+                        const todayStr = `${new Date().getDate()}/${new Date().getMonth() + 1}`;
+                        days.forEach(d => {
+                            const isToday = (d === todayStr && viewOffset >= -7 && viewOffset <= 0);
+                            const style = isToday ? 'background:#fff7ed; color:#f97316; border-bottom:2px solid #f97316;' : '';
+                            h += `<th style="${style}">${d}${isToday ? ' <small>(HOY)</small>' : ''}</th>`;
+                        });
                         h += `</tr></thead><tbody>`;
 
                         if (safeList.length === 0) {
@@ -677,7 +769,9 @@
                                     if (isoDate && db.sales && db.sales[e.id] && db.sales[e.id][isoDate]) {
                                         sub += `<span style="color:#10b981; font-weight:900; font-size:12px; margin-left:4px;">$${db.sales[e.id][isoDate]}</span>`;
                                     }
-                                    h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer;"><span class="${cls}">${disp}</span>${sub}</td>`;
+                                    const isToday = (d === todayStr && viewOffset >= -7 && viewOffset <= 0);
+                                    const tdStyle = isToday ? 'background:#fff7ed;' : '';
+                                    h += `<td onclick="openM(${e.id},'${d}','${e.name}')" style="cursor:pointer; ${tdStyle}"><span class="${cls}">${disp}</span>${sub}</td>`;
                                 });
                                 h += `</tr>`;
                             });
@@ -773,7 +867,7 @@
             cutoff.setDate(today.getDate() - range);
             cutoff.setHours(0, 0, 0, 0);
             const labels = [];
-            const podSales = { 'A': {}, 'B': {}, 'F': {}, 'BACKUP': {} };
+            const podSales = { 'A': {}, 'B': {}, 'F': {} };
             const startChart = new Date(today);
             startChart.setDate(today.getDate() - (range || 6));
             for (let d = new Date(startChart); d <= today; d.setDate(d.getDate() + 1)) {
@@ -792,10 +886,24 @@
             });
 
             filteredEmpsSales.forEach(emp => {
-                const empPod = emp.pod || 'A';
+                let empPod = emp.pod || 'A';
                 if (db.sales && db.sales[emp.id]) {
                     Object.entries(db.sales[emp.id]).forEach(([dateStr, amount]) => {
                         const [y, m, d] = dateStr.split('-').map(Number);
+                        const dateNum = d + '/' + m; // Keys in db.sched are like '29/1'
+
+                        // If backup, find who they cover
+                        if (empPod === 'BACKUP' || emp.role === 'Backup') {
+                            const schedData = db.sched[emp.id]?.[dateNum];
+                            if (schedData && typeof schedData === 'object' && schedData.status === 'ON' && schedData.cov) {
+                                const targetName = schedData.cov;
+                                const targetEmp = db.emps.find(e => e.name === targetName);
+                                if (targetEmp) empPod = targetEmp.pod || 'A';
+                            }
+                        }
+
+                        if (empPod === 'BACKUP') return; // Skip if still backup (unassigned)
+
                         const date = new Date(y, m - 1, d);
                         date.setHours(0, 0, 0, 0);
                         if (range === 0) {
@@ -815,8 +923,7 @@
             const chartData = {
                 'A': labels.map(l => podSales['A'][l.iso]),
                 'B': labels.map(l => podSales['B'][l.iso]),
-                'F': labels.map(l => podSales['F'][l.iso]),
-                'BACKUP': labels.map(l => podSales['BACKUP'][l.iso])
+                'F': labels.map(l => podSales['F'][l.iso])
             };
             renderSalesChart(chartLabels, chartData);
         }
@@ -833,8 +940,7 @@
                     datasets: [
                         { label: 'POD A', data: data['A'], borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
                         { label: 'POD B', data: data['B'], borderColor: '#10b981', backgroundColor: '#10b981', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
-                        { label: 'POD F', data: data['F'], borderColor: '#f43f5e', backgroundColor: '#f43f5e', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 },
-                        { label: 'BACKUP', data: data['BACKUP'], borderColor: '#f59e0b', backgroundColor: '#f59e0b', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 }
+                        { label: 'POD F', data: data['F'], borderColor: '#f43f5e', backgroundColor: '#f43f5e', tension: 0.3, fill: false, borderWidth: 3, pointRadius: 4 }
                     ]
                 },
                 options: {
@@ -910,105 +1016,7 @@
         }
 
         function doDelete() {
-            const idVal = document.getElementById('edit-id').value;
-            const id = parseInt(idVal);
-            if (!id) return;
-            if (confirm("¿Eliminar este miembro permanentemente?")) {
-                db.emps = db.emps.filter(e => e.id !== id);
-                delete db.sched[id];
-                save();
-            }
-        }
-
-        function closeM() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
-
-        function saveSt(s) {
-            if (!act) return;
-            if (s === 'ABSENT') {
-                const admin = prompt("¿Quién eres? (Admin que resuelve)");
-                if (!admin) return alert("Se requiere nombre de Admin para procesar la alerta.");
-                alert(`🔴 ALERTA: ${admin} resolvió alerta de ${act.n} -> ABSENT`);
-                s = { status: 'ABSENT', resolver: admin };
-            }
-            if (!db.sched[act.id]) db.sched[act.id] = {};
-            db.sched[act.id][act.key] = s;
-            save();
-        }
-
-        function saveNote(podId, text) {
-            if (!db.notes) db.notes = {};
-            db.notes[podId] = text;
-            localStorage.setItem('SF_V107_FINAL', JSON.stringify(db));
-        }
-
-        function doAdd() {
-            const name = document.getElementById('add-name').value;
-            if (!name) return alert("Nombre requerido");
-            const editId = document.getElementById('edit-id').value;
-            if (editId) {
-                const id = parseInt(editId);
-                const idx = db.emps.findIndex(e => e.id === id);
-                if (idx !== -1) {
-                    db.emps[idx].name = name;
-                    db.emps[idx].team = document.getElementById('add-team').value;
-                    db.emps[idx].model = document.getElementById('add-model').value;
-                    db.emps[idx].pod = document.getElementById('add-pod').value;
-                    db.emps[idx].shift = document.getElementById('add-shift').value;
-                    db.emps[idx].role = document.getElementById('add-role').value;
-                }
-            } else {
-                db.emps.push({
-                    id: Date.now(),
-                    name: name,
-                    team: document.getElementById('add-team').value,
-                    model: document.getElementById('add-model').value,
-                    pod: document.getElementById('add-pod').value,
-                    shift: document.getElementById('add-shift').value,
-                    role: document.getElementById('add-role').value
-                });
-            }
-            save();
-        }
-
-        function save() {
-            localStorage.setItem('SF_V107_FINAL', JSON.stringify(db));
-            closeM();
-            render();
-        }
-
-        function logout() {
-            localStorage.removeItem('SF_LOGGED');
-            location.reload();
-        }
-
-        function hardReset() {
-            if (confirm("¿Reiniciar base de datos completa?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        function startApp() {
-            const pin = document.getElementById('pass-in').value;
-            if (pin === '0129') {
-                localStorage.setItem('SF_LOGGED', 'true');
-                initData();
-            } else {
-                alert("PIN INCORRECTO");
-            }
-        }
-
-        if (localStorage.getItem('SF_LOGGED')) {
-            initData();
-        }
-    </script>
-</body>
-
-</html>
-
-
-
-
+       
 
 
 
