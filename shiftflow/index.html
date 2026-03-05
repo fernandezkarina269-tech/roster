@@ -663,6 +663,15 @@
         }
 
         // UTILS
+        function fmtDate(iso) {
+            if (!iso) return "";
+            try {
+                const [y, m, d] = iso.split('-');
+                if (!y || !m || !d) return iso;
+                return `${d}/${m}/${y}`;
+            } catch (e) { return iso; }
+        }
+
         function getViewDays() {
             const days = [];
             const today = new Date();
@@ -771,7 +780,7 @@
 
                     if (list.length === 0) h += `<tr><td colspan="${3 + days.length}">Sin asignaciones</td></tr>`;
                     else list.forEach(e => {
-                        h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3" onclick="editMember(${e.id})">${e.name} ${e.startDate ? `<br><small>Ingresó: ${e.startDate}</small>` : ''}</td>`;
+                        h += `<tr><td class="sc-1">${e.team || '-'}</td><td class="sc-2">${e.model || '-'}</td><td class="sc-3" onclick="editMember(${e.id})">${e.name} ${e.startDate ? `<br><small>Ingresó: ${fmtDate(e.startDate)}</small>` : ''}</td>`;
                         days.forEach(d => {
                             const stRaw = db.sched[e.id]?.[d] || 'WORKING';
                             const st = (typeof stRaw === 'object') ? stRaw.status : stRaw;
@@ -780,7 +789,7 @@
                                 cls = 'st-WORKING'; disp = '✓';
                                 if (stRaw.cov && stRaw.cov !== 'Lugar Vacío') sub = `<span class="st-COV">Cubriendo a ${stRaw.cov}</span>`;
                             }
-                            if (st === 'SICK') { disp = '🚑 SICK'; sub = `<br><small>Regreso: ${stRaw.date}</small>`; }
+                            if (st === 'SICK') { disp = '🚑 SICK'; sub = `<br><small>Regreso: ${fmtDate(stRaw.date)}</small>`; }
                             const iso = getIsoDate(d);
                             if (db.sales?.[e.id]?.[iso]) sub += `<br><b style="color:#10b981;">$${db.sales[e.id][iso]}</b>`;
                             const isT = (d === todayStr && viewOffset >= -7 && viewOffset <= 0);
