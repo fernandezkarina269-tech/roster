@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DreamArt V113 - SLOT-BASED GRID</title>
+    <title>DreamArt V115 - DYNAMIC TEAMS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -199,25 +199,25 @@
         .st-WORKING {
             color: #10b981;
             font-weight: 950;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .st-OFF {
             color: #f97316;
             font-weight: 800;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .st-SICK {
             color: #8b5cf6;
             font-weight: 800;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .st-ABSENT {
             color: #ef4444;
             font-weight: 900;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         /* TABS */
@@ -269,10 +269,12 @@
             padding: 40px;
             border-radius: 28px;
             width: 100%;
-            max-width: 440px;
+            max-width: 500px;
             text-align: center;
             box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.25);
             border: 1px solid var(--border);
+            overflow-y: auto;
+            max-height: 90vh;
         }
 
         /* HISTORY */
@@ -301,11 +303,52 @@
             font-weight: 900;
         }
 
-        /* SELECT CUSTOM */
-        select.compact {
+        /* CUSTOM */
+        .member-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
             padding: 10px;
-            font-size: 12px;
-            margin: 5px 0;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .member-name {
+            flex: 1;
+            font-weight: 700;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .status-pill {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .pill-WORKING {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .pill-OFF {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .pill-ABSENT {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .pill-SICK {
+            background: #f3e8ff;
+            color: #6b21a8;
         }
     </style>
 </head>
@@ -317,10 +360,10 @@
             <h1>ShiftFlow</h1>
             <p
                 style="font-weight:900; color:#10b981; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:30px;">
-                Slot Grid Dashboard</p>
+                Dynamic Team Dashboard</p>
             <input type="password" id="pass-in" placeholder="ACCESS PIN">
             <button class="btn-main" onclick="startApp()">Enter System</button>
-            <button class="btn-main btn-reset"
+            <button class="btn-main"
                 style="background:#fff; border:1px solid #ef4444; color:#ef4444; margin-top:15px; font-weight:700;"
                 onclick="hardReset()">Factory Reset</button>
         </div>
@@ -369,50 +412,52 @@
         <div id="sheets-container" style="padding:0 10px;"></div>
     </div>
 
-    <!-- ASSIGNMENT MODAL -->
-    <div id="modal-status" class="modal hidden">
+    <!-- TEAM ASSIGNMENT MODAL -->
+    <div id="modal-team" class="modal hidden">
         <div class="modal-box">
-            <h2 id="modal-slot-title" style="margin-top:0; font-size:20px;">Slot Assignment</h2>
-            <p id="modal-date-label" style="font-size:12px; color:#64748b; font-weight:800;"></p>
+            <h2 id="modal-team-title" style="margin-top:0; font-size:22px;">Team Assignment</h2>
+            <p id="modal-team-date" style="font-size:12px; color:#64748b; font-weight:800; margin-bottom:20px;"></p>
 
             <div
                 style="background:#fcfdfe; border:1px solid var(--border); padding:20px; border-radius:18px; margin-bottom:20px; text-align:left;">
                 <label
-                    style="font-size:10px; font-weight:900; text-transform:uppercase; color:#64748b; margin-bottom:5px; display:block;">Select
-                    Employee:</label>
-                <select id="grid-emp-select" class="compact"></select>
+                    style="font-size:10px; font-weight:900; text-transform:uppercase; color:#64748b; margin-bottom:5px; display:block;">Model
+                    / Group Name:</label>
+                <input type="text" id="team-model-input" placeholder="e.g. Gaby / Poison"
+                    style="margin:0; padding:12px;">
+
+                <hr style="border:none; border-top:1px solid var(--border); margin:20px 0;">
 
                 <label
-                    style="font-size:10px; font-weight:900; text-transform:uppercase; color:#64748b; margin-top:10px; margin-bottom:5px; display:block;">Assigned
-                    Model:</label>
-                <input type="text" id="grid-model-input" placeholder="e.g. Poison - Alana"
-                    style="margin:0; padding:10px; font-size:12px;">
-            </div>
+                    style="font-size:10px; font-weight:900; text-transform:uppercase; color:#64748b; margin-bottom:10px; display:block;">Assigned
+                    Members:</label>
+                <div id="team-members-list"></div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                <button class="btn-main" style="background:#10b981;" onclick="saveGridSt('WORKING')">Working
-                    (✓)</button>
-                <button class="btn-main" style="background:#f97316;" onclick="saveGridSt('OFF')">Off</button>
-                <button class="btn-main" style="background:#ef4444;" onclick="saveGridSt('ABSENT')">Absent</button>
-                <button class="btn-main" style="background:#8b5cf6;" onclick="saveGridSt('SICK')">Sick</button>
-            </div>
-
-            <div style="margin-top:25px; border-top:1px solid var(--border); padding-top:25px;">
-                <label
-                    style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; display:block; margin-bottom:10px;">Daily
-                    Sales ($)</label>
-                <div style="display:flex; gap:10px;">
-                    <input type="number" id="grid-sale-amount" placeholder="0.00" style="margin:0;">
-                    <button class="btn-main" style="width:auto; margin:0; background:var(--slate-900);"
-                        onclick="saveGridSale()">Save Sale</button>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <select id="team-emp-add" style="margin:0; font-size:12px; height:45px;"></select>
+                    <button class="btn-main" style="width:auto; margin:0; height:45px; padding:0 15px;"
+                        onclick="addMemberToTeam()">+</button>
                 </div>
             </div>
 
-            <div style="margin-top:20px; display:flex; gap:10px;">
-                <button class="btn-main" style="border:none; background:#f1f5f9; color:#64748b;"
-                    onclick="closeM()">Cancel</button>
-                <button class="btn-main" style="border:none; background:#fef2f2; color:#ef4444;"
-                    onclick="clearSlot()">Reset Slot</button>
+            <div
+                style="margin-top:25px; background:#f8fafc; border:1px solid var(--border); padding:20px; border-radius:18px;">
+                <label
+                    style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; display:block; margin-bottom:10px;">Total
+                    Team Sales ($)</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="team-sale-amount" placeholder="0.00" style="margin:0;">
+                    <button class="btn-main"
+                        style="width:auto; margin:0; background:var(--slate-900); white-space:nowrap;"
+                        onclick="saveTeamSale()">Save Sales</button>
+                </div>
+            </div>
+
+            <div style="margin-top:25px; display:flex; gap:10px;">
+                <button class="btn-main" style="border:none; background:#f1f5f9; color:#64748b; margin:0;"
+                    onclick="closeM()">Close</button>
+                <button class="btn-main" style="border:none; background:#fef2f2; color:#ef4444; margin:0;"
+                    onclick="clearTeam()">Reset Team</button>
             </div>
         </div>
     </div>
@@ -420,16 +465,13 @@
     <!-- MEMBER POOL MODAL -->
     <div id="modal-add" class="modal hidden">
         <div class="modal-box">
-            <h2 id="modal-title" style="margin-top:0;">Member Details</h2>
+            <h2 style="margin-top:0;">Member Master Pool</h2>
             <div id="member-pool-list"
-                style="max-height:200px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; margin-bottom:20px; text-align:left; background:#f8fafc;">
-                <!-- Filled via JS -->
+                style="max-height:250px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; margin-bottom:20px; text-align:left; background:#f8fafc;">
             </div>
             <hr style="border: none; border-top: 1px solid var(--border); margin: 20px 0;">
             <input type="hidden" id="edit-id">
             <input type="text" id="add-name" placeholder="Full Name">
-            <input type="text" id="add-team" placeholder="Default Team (Optional)">
-            <input type="text" id="add-model" placeholder="Default Model (Optional)">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <select id="add-pod">
                     <option value="A">POD A</option>
@@ -453,8 +495,8 @@
 
     <!-- STATS MODAL -->
     <div id="modal-stats" class="modal hidden">
-        <div class="modal-box" style="max-width: 500px;">
-            <h2 style="margin-top:0;">System Statistics (Grid)</h2>
+        <div class="modal-box">
+            <h2 style="margin-top:0;">System Statistics</h2>
             <div style="display:flex; gap:8px; margin-bottom:20px; justify-content:center;">
                 <div class="shift-tab active" onclick="setStatsShift('ALL')" id="tab-all">All</div>
                 <div class="shift-tab" onclick="setStatsShift('1st')" id="tab-1st">1st</div>
@@ -499,7 +541,7 @@
 
     <!-- HISTORY MODAL -->
     <div id="modal-history" class="modal hidden">
-        <div class="modal-box" style="max-width: 500px; padding:30px;">
+        <div class="modal-box">
             <h2 style="margin-top:0;">Change History Log</h2>
             <div id="hist-list"
                 style="max-height: 400px; overflow-y: auto; background: #fff; border:1px solid var(--border); border-radius:16px;">
@@ -510,8 +552,8 @@
     </div>
 
     <script>
-        let db = { emps: [], grid: {}, history: [] };
-        let activeSlot = null;
+        let db = { emps: [], grid: {}, history: [], config: { teamCounts: { 'POD A': 12, 'POD B': 10, 'POD F': 6, 'BACKUP': 4 } } };
+        let activeTeam = null;
         let currentShift = '1st';
         let statsShift = 'ALL';
         let statsRange = { start: null, end: null };
@@ -522,173 +564,249 @@
         // LOGGING
         function logAction(desc) {
             if (!db.history) db.history = [];
-            const user = "Karina"; // Hardcoded for simplified admin feel
-            const item = {
-                time: new Date().toLocaleString('en-US', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }),
-                user: user,
-                desc: desc
-            };
+            const user = "Karina";
+            const item = { time: new Date().toLocaleString('en-US', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }), user, desc };
             db.history.unshift(item);
             if (db.history.length > 500) db.history = db.history.slice(0, 500);
             saveSilent();
         }
-
         function askHistory() { if (prompt("PIN:") === '0129') showHistory(); else alert("Denied"); }
         function showHistory() {
             const list = document.getElementById('hist-list');
-            list.innerHTML = db.history?.length ? '' : '<div style="padding:40px; color:#94a3b8;">No history logs</div>';
-            db.history.forEach(h => {
-                list.innerHTML += `<div class="hist-item"><span class="hist-time">${h.time}</span><div class="hist-desc"><span class="hist-user">${h.user}:</span> ${h.desc}</div></div>`;
-            });
+            list.innerHTML = db.history?.length ? '' : '<div style="padding:40px; color:#94a3b8;">No records</div>';
+            db.history.forEach(h => { list.innerHTML += `<div class="hist-item"><span class="hist-time">${h.time}</span><div class="hist-desc"><span class="hist-user">${h.user}:</span> ${h.desc}</div></div>`; });
             document.getElementById('modal-history').classList.remove('hidden');
         }
 
-        // GRID SLOTS
-        function openGridM(pod, slotIdx, dateStr) {
-            const dateKey = dateStr;
-            const shiftKey = currentShift;
-            activeSlot = { date: dateKey, shift: shiftKey, pod, index: slotIdx };
+        // GRID CORE
+        function openTeamM(pod, idx, date) {
+            activeTeam = { pod, idx, date, shift: currentShift };
+            const data = db.grid[date]?.[currentShift]?.[pod]?.[idx] || { model: "", members: [], sale: 0 };
 
-            const data = db.grid[dateKey]?.[shiftKey]?.[pod]?.[slotIdx] || {};
+            document.getElementById('modal-team-title').innerText = `${pod} - Team ${idx + 1}`;
+            document.getElementById('modal-team-date').innerText = `Date: ${date}`;
+            document.getElementById('team-model-input').value = data.model || "";
+            document.getElementById('team-sale-amount').value = data.sale || "";
 
-            document.getElementById('modal-slot-title').innerText = `${pod} - Slot ${slotIdx + 1}`;
-            document.getElementById('modal-date-label').innerText = `Date: ${dateStr}`;
-
-            // Fill Employee Dropdown
-            const sel = document.getElementById('grid-emp-select');
-            sel.innerHTML = '<option value="">-- No Employee --</option>';
+            // Employee Pool Select
+            const sel = document.getElementById('team-emp-add');
+            sel.innerHTML = '<option value="">-- Select Member --</option>';
             db.emps.sort((a, b) => a.name.localeCompare(b.name)).forEach(e => {
-                const opt = document.createElement('option');
-                opt.value = e.id;
-                opt.text = e.name;
-                if (e.id == data.empId) opt.selected = true;
-                sel.add(opt);
+                sel.add(new Option(e.name, e.id));
             });
 
-            document.getElementById('grid-model-input').value = data.model || "";
-            document.getElementById('grid-sale-amount').value = data.sale || "";
-
-            document.getElementById('modal-status').classList.remove('hidden');
+            renderTeamMembers(data.members || []);
+            document.getElementById('modal-team').classList.remove('hidden');
         }
 
-        function saveGridSt(st) {
-            if (!activeSlot) return;
-            const { date, shift, pod, index } = activeSlot;
-            const empId = document.getElementById('grid-emp-select').value;
-            const model = document.getElementById('grid-model-input').value;
+        function renderTeamMembers(members) {
+            const list = document.getElementById('team-members-list');
+            list.innerHTML = members.length ? '' : '<div style="padding:10px; color:#94a3b8; font-size:12px; text-align:center;">No members assigned</div>';
+            members.forEach((m, i) => {
+                const emp = db.emps.find(e => e.id == m.id);
+                const name = emp ? emp.name : "Unknown Member";
+                const row = document.createElement('div');
+                row.className = 'member-row';
+                row.innerHTML = `
+                    <div class="member-name">${name}</div>
+                    <div class="status-pill pill-${m.status}" onclick="cycleStatus(${i})">${m.status === 'WORKING' ? '✓' : m.status}</div>
+                    <button style="border:none; background:none; color:#ef4444; font-weight:800; cursor:pointer;" onclick="removeMemberFromTeam(${i})">✕</button>
+                `;
+                list.appendChild(row);
+            });
+        }
 
+        function addMemberToTeam() {
+            const id = document.getElementById('team-emp-add').value;
+            if (!id) return;
+            const data = getOrCreateTeamData();
+            if (!data.members) data.members = [];
+            if (data.members.find(m => m.id == id)) return alert("Already assigned");
+            data.members.push({ id, status: 'WORKING' });
+            save(); updateTeamModal();
+        }
+
+        function removeMemberFromTeam(i) { getOrCreateTeamData().members.splice(i, 1); save(); updateTeamModal(); }
+        function cycleStatus(i) {
+            const states = ['WORKING', 'OFF', 'ABSENT', 'SICK'];
+            const members = getOrCreateTeamData().members;
+            members[i].status = states[(states.indexOf(members[i].status) + 1) % states.length];
+            save(); updateTeamModal();
+        }
+
+        function getOrCreateTeamData() {
+            const { date, shift, pod, idx } = activeTeam;
             if (!db.grid[date]) db.grid[date] = {};
             if (!db.grid[date][shift]) db.grid[date][shift] = {};
             if (!db.grid[date][shift][pod]) db.grid[date][shift][pod] = {};
-
-            const existing = db.grid[date][shift][pod][index] || {};
-            db.grid[date][shift][pod][index] = {
-                ...existing,
-                empId,
-                model,
-                status: st
-            };
-
-            const empName = db.emps.find(e => e.id == empId)?.name || "Empty";
-            logAction(`Assigned Slot: ${pod} #${index + 1} -> ${empName} (${st}) on ${date}`);
-            save();
+            if (!db.grid[date][shift][pod][idx]) db.grid[date][shift][pod][idx] = { model: "", members: [], sale: 0 };
+            return db.grid[date][shift][pod][idx];
         }
 
-        function saveGridSale() {
-            if (!activeSlot) return;
-            const { date, shift, pod, index } = activeSlot;
-            const val = parseFloat(document.getElementById('grid-sale-amount').value);
+        function updateTeamModal() {
+            const data = getOrCreateTeamData();
+            document.getElementById('team-model-input').value = data.model;
+            renderTeamMembers(data.members);
+        }
 
-            if (!db.grid[date]?.[shift]?.[pod]?.[index]) return alert("Assign an employee first!");
-
-            db.grid[date][shift][pod][index].sale = isNaN(val) || val <= 0 ? 0 : val;
-            logAction(`Saved sale for ${activeSlot.pod} slot ${activeSlot.index + 1}: $${val || 0}`);
+        function saveTeamSale() {
+            const val = parseFloat(document.getElementById('team-sale-amount').value) || 0;
+            const data = getOrCreateTeamData();
+            data.sale = val;
+            data.model = document.getElementById('team-model-input').value;
+            logAction(`Saved Team Sale: ${activeTeam.pod} Team ${activeTeam.idx + 1} -> $${val}`);
             save(); alert("Saved!");
         }
 
-        function clearSlot() {
-            if (!activeSlot) return;
-            const { date, shift, pod, index } = activeSlot;
-            if (db.grid[date]?.[shift]?.[pod]) {
-                delete db.grid[date][shift][pod][index];
-                logAction(`Cleared Slot: ${pod} #${index + 1} on ${date}`);
+        function clearTeam() {
+            if (confirm("Wipe this team?")) {
+                const { date, shift, pod, idx } = activeTeam;
+                delete db.grid[date][shift][pod][idx];
+                logAction(`Cleared Team: ${pod} Team ${idx + 1} on ${date}`);
                 save();
             }
         }
 
-        // MEMBER POOL
+        // TEAM COUNT MGMT
+        function adjustTeams(pod, delta) {
+            const current = db.config.teamCounts[pod] || 0;
+            const next = Math.max(1, current + delta);
+            db.config.teamCounts[pod] = next;
+            logAction(`Adjusted teams for ${pod}: ${next}`);
+            save();
+        }
+
+        // POOL MGMT
         function updatePoolList() {
             const list = document.getElementById('member-pool-list');
             list.innerHTML = "";
-            db.emps.forEach(e => {
+            db.emps.sort((a, b) => a.name.localeCompare(b.name)).forEach(e => {
                 const div = document.createElement('div');
-                div.style = "padding:8px 12px; border-bottom:1px solid #e2e8f0; font-size:12px; cursor:pointer;";
-                div.innerHTML = `<strong>${e.name}</strong> <span style="font-size:10px; color:#64748b;">(${e.pod} POD, ${e.role})</span>`;
+                div.style = "padding:10px 15px; border-bottom:1px solid #e2e8f0; font-size:12px; cursor:pointer;";
+                div.innerHTML = `<strong>${e.name}</strong> <span style="font-size:10px; color:#64748b;">(Def: ${e.pod} POD)</span>`;
                 div.onclick = () => editMember(e.id);
                 list.appendChild(div);
             });
         }
-
+        function showAdd() { document.getElementById('edit-id').value = ""; document.getElementById('add-name').value = ""; document.getElementById('btn-delete').classList.add('hidden'); updatePoolList(); document.getElementById('modal-add').classList.remove('hidden'); }
         function doAdd() {
-            const n = document.getElementById('add-name').value; if (!n) return alert("Missing name");
+            const n = document.getElementById('add-name').value; if (!n) return alert("Name required");
             const eid = document.getElementById('edit-id').value;
-            const obj = { id: eid ? parseInt(eid) : Date.now(), name: n, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, shift: document.getElementById('add-shift').value, role: "Chatter" };
-            if (eid) { const i = db.emps.findIndex(e => e.id == eid); db.emps[i] = obj; logAction(`Edit Pool: ${n}`); }
-            else { db.emps.push(obj); logAction(`Add to Pool: ${n}`); }
+            const obj = { id: eid ? parseInt(eid) : Date.now(), name: n, pod: document.getElementById('add-pod').value, shift: document.getElementById('add-shift').value };
+            if (eid) { db.emps[db.emps.findIndex(e => e.id == eid)] = obj; logAction(`Edit Pool: ${n}`); }
+            else { db.emps.push(obj); logAction(`Add Pool: ${n}`); }
             save(); updatePoolList();
         }
-
         function editMember(id) {
             const e = db.emps.find(x => x.id == id); if (!e) return;
-            document.getElementById('edit-id').value = e.id;
-            document.getElementById('add-name').value = e.name;
-            document.getElementById('add-team').value = e.team || "";
-            document.getElementById('add-model').value = e.model || "";
-            document.getElementById('add-pod').value = e.pod;
-            document.getElementById('add-shift').value = e.shift;
+            document.getElementById('edit-id').value = e.id; document.getElementById('add-name').value = e.name;
+            document.getElementById('add-pod').value = e.pod; document.getElementById('add-shift').value = e.shift;
             document.getElementById('btn-delete').classList.remove('hidden');
         }
-
-        function showAdd() {
-            document.getElementById('edit-id').value = ""; document.getElementById('add-name').value = "";
-            document.getElementById('btn-delete').classList.add('hidden');
-            updatePoolList();
-            document.getElementById('modal-add').classList.remove('hidden');
-        }
-
-        function doDelete() {
-            const id = parseInt(document.getElementById('edit-id').value);
-            if (confirm("Delete from Pool? History in grid remains as ID.")) {
-                db.emps = db.emps.filter(emp => emp.id !== id);
-                logAction("Deleted from Pool");
-                save(); updatePoolList();
-            }
-        }
+        function doDelete() { if (confirm("Remove from master pool?")) { db.emps = db.emps.filter(emp => emp.id != document.getElementById('edit-id').value); logAction("Deleted Pool Member"); save(); updatePoolList(); } }
 
         // PERSISTENCE
-        function save() { localStorage.setItem('SF_V113_GRID', JSON.stringify(db)); closeM(); render(); }
-        function saveSilent() { localStorage.setItem('SF_V113_GRID', JSON.stringify(db)); }
+        function save() { localStorage.setItem('SF_V115_DYNAMIC', JSON.stringify(db)); render(); }
+        function saveSilent() { localStorage.setItem('SF_V115_DYNAMIC', JSON.stringify(db)); }
         function initData() {
-            const saved = localStorage.getItem('SF_V113_GRID');
+            const saved = localStorage.getItem('SF_V115_DYNAMIC');
             if (saved) db = JSON.parse(saved);
-            else migrateFromOld(); // One-time migration attempt
-
-            if (!db.grid) db.grid = {};
-            if (!db.history) db.history = [];
-
+            else migrateAll();
             document.getElementById('view-login').classList.add('hidden');
             document.getElementById('view-app').classList.remove('hidden');
             setInterval(updateClock, 1000); render();
         }
-
-        function migrateFromOld() {
-            const old = localStorage.getItem('SF_V107_FINAL');
-            if (!old) return;
-            const parsed = JSON.parse(old);
+        function migrateAll() {
+            const oldGrid = localStorage.getItem('SF_V113_GRID');
+            if (!oldGrid) return;
+            const parsed = JSON.parse(oldGrid);
             db.emps = parsed.emps || [];
             db.history = parsed.history || [];
             db.grid = {};
-            // Simplified migration: only emps for now to avoid mess
+            // Simplified grid migration logic would go here
+        }
+
+        // RENDERING
+        function render() {
+            const container = document.getElementById('sheets-container');
+            container.innerHTML = ''; const days = getViewDays();
+            const todayStr = `${new Date().getDate()}/${new Date().getMonth() + 1}`;
+
+            document.querySelectorAll('.shift-tab').forEach(t => t.classList.remove('active'));
+            const tabs = document.querySelectorAll('.shift-tab');
+            if (currentShift === '1st') tabs[0].classList.add('active'); if (currentShift === '2nd') tabs[1].classList.add('active'); if (currentShift === '3rd') tabs[2].classList.add('active');
+
+            const makePodTable = (podTitle, color) => {
+                const count = db.config.teamCounts[podTitle] || 5;
+                let html = `
+                <div class="pod-card">
+                    <div class="pod-header" style="background:${color}15; color:${color};">
+                        <strong>${podTitle}</strong>
+                        <div style="display:flex; gap:5px;">
+                            <button onclick="adjustTeams('${podTitle}', -1)" style="padding:2px 8px; border-radius:5px; border:1px solid #e2e8f0; background:#fff; cursor:pointer;">-</button>
+                            <span style="font-size:11px; align-self:center; margin:0 5px;">${count} Teams</span>
+                            <button onclick="adjustTeams('${podTitle}', 1)" style="padding:2px 8px; border-radius:5px; border:1px solid #e2e8f0; background:#fff; cursor:pointer;">+</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table><thead><tr>
+                            <th class="sc-sticky sc-1">Unit</th>
+                            ${days.map(d => `<th style="${d === todayStr ? 'background:#f97316;color:#fff;' : ''}">${d}</th>`).join('')}
+                        </tr></thead><tbody>`;
+
+                for (let i = 0; i < count; i++) {
+                    html += `<tr><td class="sc-sticky sc-1" style="font-size:10px; color:#64748b;">Team ${i + 1}</td>`;
+                    days.forEach(d => {
+                        const data = db.grid[d]?.[currentShift]?.[podTitle]?.[i] || { model: "", members: [], sale: 0 };
+                        const saleHtml = data.sale ? `<div style="color:#10b981; font-weight:950; font-size:12px; margin-top:5px;">$${data.sale}</div>` : "";
+                        const membersHtml = (data.members || []).map(m => {
+                            const emp = db.emps.find(e => e.id == m.id);
+                            return `<div style="font-size:11px; font-weight:900;">${emp ? emp.name : "..."} <span class="st-${m.status}" style="font-size:9px;">${m.status === 'WORKING' ? '✓' : m.status}</span></div>`;
+                        }).join('') || `<span style="color:#cbd5e1; font-size:10px;">(Empty)</span>`;
+
+                        html += `<td onclick="openTeamM('${podTitle}', ${i}, '${d}')" style="cursor:pointer; ${d === todayStr ? 'background:#fff7ed;' : ''}">
+                            <div style="font-size:10px; font-weight:800; color:#3b82f6; text-transform:uppercase; margin-bottom:5px;">${data.model || ""}</div>
+                            ${membersHtml}
+                            ${saleHtml}
+                        </td>`;
+                    });
+                    html += `</tr>`;
+                }
+                container.innerHTML += html + '</tbody></table></div></div>';
+            };
+
+            makePodTable('POD A', '#3b82f6');
+            makePodTable('POD B', '#22c55e');
+            makePodTable('POD F', '#ef4444');
+            makePodTable('BACKUP', '#f59e0b');
+        }
+
+        // STATS (Updated for new structure)
+        function showStats() { updateStatsData(); document.getElementById('modal-stats').classList.remove('hidden'); }
+        function applyCustomStats() { statsRange.start = document.getElementById('stats-start').value; statsRange.end = document.getElementById('stats-end').value; updateStatsData(); }
+        function setStatsShift(s) { statsShift = s; updateStatsData(); }
+        function updateStatsData() {
+            const startD = new Date((document.getElementById('stats-start').value || new Date().toISOString().split('T')[0]) + 'T00:00:00');
+            const endD = new Date((document.getElementById('stats-end').value || new Date().toISOString().split('T')[0]) + 'T23:59:59');
+            let w = 0, a = 0, s = 0, o = 0, revenue = 0;
+
+            for (let d = new Date(startD); d <= endD; d.setDate(d.getDate() + 1)) {
+                const key = `${d.getDate()}/${d.getMonth() + 1}`;
+                const dayData = db.grid[key] || {};
+                Object.entries(dayData).forEach(([shift, pods]) => {
+                    if (statsShift !== 'ALL' && shift !== statsShift) return;
+                    Object.values(pods).forEach(podTeams => {
+                        Object.values(podTeams).forEach(team => {
+                            revenue += (team.sale || 0);
+                            (team.members || []).forEach(m => {
+                                if (m.status === 'WORKING') w++; else if (m.status === 'ABSENT') a++; else if (m.status === 'SICK') s++; else if (m.status === 'OFF') o++;
+                            });
+                        });
+                    });
+                });
+            }
+            document.getElementById('st-work').innerText = w; document.getElementById('st-absent').innerText = a; document.getElementById('st-sick').innerText = s; document.getElementById('st-off').innerText = o;
+            document.getElementById('st-sales-total').innerText = `$${revenue.toLocaleString()}`;
         }
 
         function getViewDays() {
@@ -697,109 +815,6 @@
                 days.push(`${d.getDate()}/${d.getMonth() + 1}`);
             } return days;
         }
-        function getIsoDate(dStr) {
-            const [d, m] = dStr.split('/').map(Number);
-            const today = new Date(); let y = today.getFullYear();
-            const test = new Date(y, m - 1, d);
-            if (Math.abs(test - today) > 15552000000) { if (test > today) y--; else y++; }
-            return `${y}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
-        }
-        function moveView(n) { viewOffset += n; localStorage.setItem('SF_VIEW_OFFSET', viewOffset); render(); }
-        function resetView() { viewOffset = -2; localStorage.setItem('SF_VIEW_OFFSET', viewOffset); render(); }
-        function setShift(s) { currentShift = s; render(); }
-        function updateClock() { document.getElementById('clock-display').innerText = new Date().toLocaleTimeString('en-US', { hour12: false }); }
-        function closeM() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
-
-        // RENDERING GRID
-        function render() {
-            const container = document.getElementById('sheets-container');
-            container.innerHTML = '';
-            const days = getViewDays();
-            const todayStr = `${new Date().getDate()}/${new Date().getMonth() + 1}`;
-
-            document.querySelectorAll('.shift-tab').forEach(t => t.classList.remove('active'));
-            const tabs = document.querySelectorAll('.shift-tab');
-            if (currentShift === '1st') tabs[0].classList.add('active');
-            if (currentShift === '2nd') tabs[1].classList.add('active');
-            if (currentShift === '3rd') tabs[2].classList.add('active');
-
-            const makePodTable = (podTitle, slotCount, color) => {
-                let html = `
-                <div class="pod-card">
-                    <div class="pod-header" style="background:${color}15; color:${color};"><strong>${podTitle}</strong></div>
-                    <div class="table-wrap">
-                        <table><thead><tr>
-                            <th class="sc-sticky sc-1">Station</th>
-                            ${days.map(d => `<th style="${d === todayStr ? 'background:#f97316;color:#fff;' : ''}">${d}</th>`).join('')}
-                        </tr></thead><tbody>`;
-
-                for (let i = 0; i < slotCount; i++) {
-                    html += `<tr><td class="sc-sticky sc-1" style="font-size:11px; color:#64748b;">Slot ${i + 1}</td>`;
-                    days.forEach(d => {
-                        const data = db.grid[d]?.[currentShift]?.[podTitle]?.[i] || {};
-                        const emp = db.emps.find(e => e.id == data.empId);
-                        const empName = emp ? emp.name : `<span style="color:#cbd5e1;">Empty</span>`;
-                        const model = data.model || "";
-                        const st = data.status || "";
-                        const sale = data.sale ? `<div style="color:#10b981; font-weight:900; font-size:12px;">$${data.sale}</div>` : "";
-
-                        html += `<td onclick="openGridM('${podTitle}', ${i}, '${d}')" style="cursor:pointer; min-height:80px; ${d === todayStr ? 'background:#fff7ed;' : ''}">
-                            <div style="font-size:11px; font-weight:900; color:#0f172a;">${empName}</div>
-                            ${model ? `<div style="font-size:9px; color:#64748b; margin-top:2px;">${model}</div>` : ""}
-                            ${st ? `<div class="st-${st}" style="margin-top:4px;">${st === 'WORKING' ? '✓' : st}</div>` : ""}
-                            ${sale}
-                        </td>`;
-                    });
-                    html += `</tr>`;
-                }
-                container.innerHTML += html + '</tbody></table></div></div>';
-            };
-
-            makePodTable('POD A', 10, '#3b82f6');
-            makePodTable('POD B', 10, '#22c55e');
-            makePodTable('POD F', 6, '#ef4444');
-            makePodTable('BACKUP', 4, '#f59e0b');
-        }
-
-        // STATS
-        function showStats() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('stats-start').value = statsRange.start || today;
-            document.getElementById('stats-end').value = statsRange.end || today;
-            updateStatsData(); document.getElementById('modal-stats').classList.remove('hidden');
-        }
-        function applyCustomStats() { statsRange.start = document.getElementById('stats-start').value; statsRange.end = document.getElementById('stats-end').value; updateStatsData(); }
-        function setStatsShift(s) { statsShift = s; updateStatsData(); }
-        function updateStatsData() {
-            const startD = new Date(document.getElementById('stats-start').value + 'T00:00:00');
-            const endD = new Date(document.getElementById('stats-end').value + 'T23:59:59');
-            let w = 0, a = 0, s = 0, o = 0, revenue = 0;
-
-            const days = [];
-            for (let d = new Date(startD); d <= endD; d.setDate(d.getDate() + 1)) {
-                days.push(`${d.getDate()}/${d.getMonth() + 1}`);
-            }
-
-            days.forEach(dKey => {
-                const dayData = db.grid[dKey] || {};
-                Object.entries(dayData).forEach(([shift, pods]) => {
-                    if (statsShift !== 'ALL' && shift !== statsShift) return;
-                    Object.values(pods).forEach(podSlots => {
-                        Object.values(podSlots).forEach(slot => {
-                            if (slot.status === 'WORKING') w++;
-                            else if (slot.status === 'ABSENT') a++;
-                            else if (slot.status === 'SICK') s++;
-                            else if (slot.status === 'OFF') o++;
-                            if (slot.sale) revenue += parseFloat(slot.sale);
-                        });
-                    });
-                });
-            });
-
-            document.getElementById('st-work').innerText = w; document.getElementById('st-absent').innerText = a; document.getElementById('st-sick').innerText = s; document.getElementById('st-off').innerText = o;
-            document.getElementById('st-sales-total').innerText = `$${revenue.toLocaleString()}`;
-        }
-
         function downloadBackup() {
             const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
             const a = document.createElement('a'); a.href = s; a.download = `Backup_${new Date().toLocaleDateString()}.json`; a.click();
@@ -807,6 +822,7 @@
         function startApp() { if (document.getElementById('pass-in').value === '0129') { localStorage.setItem('SF_LOGGED', 'true'); initData(); } else alert("PIN Error"); }
         function logout() { localStorage.removeItem('SF_LOGGED'); location.reload(); }
         function hardReset() { if (confirm("Wipe all data?")) { localStorage.clear(); location.reload(); } }
+        function updateClock() { document.getElementById('clock-display').innerText = new Date().toLocaleTimeString('en-US', { hour12: false }); }
         if (localStorage.getItem('SF_LOGGED')) initData();
     </script>
 </body>
