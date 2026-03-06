@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DreamArt V111 - HISTORY TRACKING</title>
+    <title>DreamArt V112 - REFINED LAYOUT</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -78,17 +78,6 @@
         textarea:focus {
             border-color: #3b82f6;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        .login-card input {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-
-        .login-card input:focus {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--gold);
         }
 
         /* BUTTONS */
@@ -165,7 +154,7 @@
             border-collapse: separate;
             border-spacing: 0;
             table-layout: fixed;
-            min-width: 1200px;
+            min-width: 1000px;
         }
 
         th {
@@ -189,8 +178,7 @@
         }
 
         /* COLUMN WIDTHS */
-        .col-team { width: 80px; }
-        .col-model { width: 100px; }
+        .col-sticky { width: 120px; }
 
         /* STICKY COLUMNS */
         .sc-sticky {
@@ -198,8 +186,8 @@
             z-index: 20;
             background: #fff !important;
         }
-        .sc-1 { left: 0; border-right: 1px solid var(--border); width: 80px; }
-        .sc-2 { left: 80px; border-right: 2px solid #cbd5e1; width: 100px; }
+        .sc-1 { left: 0; border-right: 1px solid var(--border); width: 100px; }
+        .sc-2 { left: 100px; border-right: 2px solid #cbd5e1; width: 140px; }
 
         th.sc-sticky { background: #0f172a !important; z-index: 30; }
 
@@ -208,26 +196,6 @@
         .st-OFF { color: #f97316; font-weight: 800; font-size: 13px; }
         .st-SICK { color: #8b5cf6; font-weight: 800; font-size: 13px; }
         .st-ABSENT { color: #ef4444; font-weight: 900; font-size: 13px; }
-        
-        .st-subtext {
-            display: block;
-            font-size: 10.5px;
-            font-weight: 700;
-            margin-top: 5px;
-            color: #64748b;
-            line-height: 1.2;
-        }
-        
-        .st-COV {
-            background: #eff6ff;
-            color: #2563eb;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            display: inline-block;
-            margin-top: 5px;
-            border: 1px solid #dbeafe;
-        }
 
         /* TABS */
         .shift-tabs {
@@ -237,7 +205,7 @@
             gap: 12px;
             border-bottom: 1px solid var(--border);
             position: sticky;
-            top: 72px; /* Nav height */
+            top: 72px;
             z-index: 900;
             align-items: center;
         }
@@ -280,7 +248,7 @@
             width: 100%;
             max-width: 440px;
             text-align: center;
-            box-shadow: 0 40px 100px -20px rgba(0,0,0,0.25);
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.25);
             border: 1px solid var(--border);
         }
 
@@ -343,11 +311,9 @@
         <div id="sheets-container" style="padding:0 10px;"></div>
     </div>
 
-    <!-- MODAL STATUS & ASSIGNMENT -->
     <div id="modal-status" class="modal hidden">
         <div class="modal-box">
             <h2 id="target-name" style="margin-top:0; font-size:20px;"></h2>
-            
             <div style="background:#fcfdfe; border:1px solid var(--border); padding:15px; border-radius:18px; margin-bottom:20px;">
                 <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:#64748b; display:block; text-align:left; margin-left:5px;">Daily Assignment Override:</label>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:5px;">
@@ -355,26 +321,22 @@
                     <input type="text" id="daily-model" placeholder="Daily Model" style="margin:0; padding:10px; font-size:12px;">
                 </div>
             </div>
-
             <div id="cov-zone" class="hidden" style="background:#f0f9ff; padding:20px; border-radius:18px; margin-bottom:20px; border:1px solid #bae6fd;">
                 <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:#0369a1; display:block; margin-bottom:10px;">Who are they covering?</label>
                 <select id="cov-select"></select>
                 <button class="btn-main" style="background:#0284c7; margin-top:10px;" onclick="confirmCov()">Confirm Coverage</button>
             </div>
-            
             <div id="sick-zone" class="hidden" style="background:#f5f3ff; padding:20px; border-radius:18px; margin-bottom:20px; border:1px solid #ddd6fe;">
                 <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:#6d28d9; display:block; margin-bottom:10px;">Expected Return Date:</label>
                 <input type="date" id="sick-date">
                 <button class="btn-main" style="background:#7c3aed; margin-top:10px;" onclick="confirmSick()">Save Sick Date</button>
             </div>
-
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 <button class="btn-main" style="background:#10b981;" onclick="handleWorking()">Working (✓)</button>
                 <button class="btn-main" style="background:#f97316;" onclick="saveSt('OFF')">Off</button>
                 <button class="btn-main" style="background:#ef4444;" onclick="saveSt('ABSENT')">Absent</button>
                 <button class="btn-main" style="background:#8b5cf6;" onclick="document.getElementById('sick-zone').classList.toggle('hidden')">Sick</button>
             </div>
-
             <div style="margin-top:25px; border-top:1px solid var(--border); padding-top:25px;">
                 <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; display:block; margin-bottom:10px;">Daily Sales ($)</label>
                 <div style="display:flex; gap:10px;">
@@ -462,9 +424,8 @@
     </div>
 
     <script>
-        let db = { emps: [], sched: {}, sales: {}, notes: {}, goals: {}, history: [] };
-        let act = null; 
-        let salesChartInst = null;
+        let db = { emps: [], sched: {}, sales: {}, notes: {}, history: [] };
+        let act = null;
         let currentShift = '1st';
         let statsShift = 'ALL';
         let statsRange = { start: null, end: null };
@@ -476,7 +437,7 @@
             if (!db.history) db.history = [];
             const user = prompt("Who is making this change? (Username Required)") || "User";
             const item = {
-                time: new Date().toLocaleString('en-US', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }),
+                time: new Date().toLocaleString('en-US', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }),
                 user: user,
                 desc: desc
             };
@@ -489,14 +450,14 @@
         function showHistory() {
             const list = document.getElementById('hist-list');
             list.innerHTML = db.history?.length ? '' : '<div style="padding:40px; color:#94a3b8;">No history logs</div>';
-            db.history?.forEach(h => {
+            db.history.forEach(h => {
                 list.innerHTML += `<div class="hist-item"><span class="hist-time">${h.time}</span><div class="hist-desc"><span class="hist-user">${h.user}:</span> ${h.desc}</div></div>`;
             });
             document.getElementById('modal-history').classList.remove('hidden');
         }
 
         function openM(id, k) {
-            const e = db.emps.find(x => x.id == id); if(!e) return;
+            const e = db.emps.find(x => x.id == id); if (!e) return;
             act = { id, key: k, name: e.name, isoDate: getIsoDate(k) };
             const daily = db.sched[id]?.[k];
             document.getElementById('target-name').innerText = `${e.name} (${k})`;
@@ -510,16 +471,14 @@
 
         function saveSt(s) {
             if (!act) return;
-            const e = db.emps.find(x => x.id == act.id);
             const team = document.getElementById('daily-team').value;
             const model = document.getElementById('daily-model').value;
-            let finalStatus = s;
-            if (typeof s === 'string') finalStatus = { status: s };
+            let finalStatus = (typeof s === 'string') ? { status: s } : s;
             finalStatus.team = team;
             finalStatus.model = model;
             if (!db.sched[act.id]) db.sched[act.id] = {};
             db.sched[act.id][act.key] = finalStatus;
-            logAction(`Assignment for ${e.name} on ${act.key}: Status=${finalStatus.status}, Team=${team}, Model=${model}`);
+            logAction(`Changed ${act.name} on ${act.key}: ${finalStatus.status} (Team: ${team})`);
             save();
         }
 
@@ -530,25 +489,24 @@
         function saveSale() {
             if (!act) return;
             const val = parseFloat(document.getElementById('sale-amount').value);
-            const e = db.emps.find(x => x.id == act.id);
             if (!db.sales) db.sales = {}; if (!db.sales[act.id]) db.sales[act.id] = {};
             if (isNaN(val) || val <= 0) delete db.sales[act.id][act.isoDate]; else db.sales[act.id][act.isoDate] = val;
-            logAction(`Sales $${val || 0} for ${e.name} (${act.isoDate})`);
+            logAction(`Saved sale for ${act.name}: $${val || 0}`);
             save(); alert("Saved!");
         }
 
         function doAdd() {
-            const n = document.getElementById('add-name').value; if(!n) return alert("Missing name");
+            const n = document.getElementById('add-name').value; if (!n) return alert("Missing name");
             const eid = document.getElementById('edit-id').value;
             const obj = { id: eid ? parseInt(eid) : Date.now(), name: n, team: document.getElementById('add-team').value, model: document.getElementById('add-model').value, pod: document.getElementById('add-pod').value, shift: document.getElementById('add-shift').value, role: document.getElementById('add-role').value, startDate: document.getElementById('add-start-date').value };
-            if(eid) { const i = db.emps.findIndex(e => e.id == eid); db.emps[i] = obj; logAction(`Edit: ${n}`); }
+            if (eid) { const i = db.emps.findIndex(e => e.id == eid); db.emps[i] = obj; logAction(`Edit: ${n}`); }
             else { db.emps.push(obj); logAction(`Add: ${n}`); }
             save();
         }
 
         function editFromStatus() { if (act && act.id) { closeM(); editMember(act.id); } }
         function editMember(id) {
-            const e = db.emps.find(x => x.id == id); if(!e) return;
+            const e = db.emps.find(x => x.id == id); if (!e) return;
             document.getElementById('modal-title').innerText = "Edit Member";
             document.getElementById('edit-id').value = e.id;
             document.getElementById('add-name').value = e.name;
@@ -571,7 +529,7 @@
 
         function doDelete() {
             const e = db.emps.find(x => x.id == parseInt(document.getElementById('edit-id').value));
-            if(confirm(`Wipe ${e.name}?`)) { db.emps = db.emps.filter(emp => emp.id !== e.id); logAction(`Delete: ${e.name}`); save(); }
+            if (confirm(`Wipe ${e.name}?`)) { db.emps = db.emps.filter(emp => emp.id !== e.id); logAction(`Delete: ${e.name}`); save(); }
         }
 
         function save() { localStorage.setItem('SF_V107_FINAL', JSON.stringify(db)); closeM(); render(); }
@@ -584,7 +542,6 @@
             setInterval(updateClock, 1000); render();
         }
 
-        function fmtDate(iso) { if(!iso) return ""; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
         function getViewDays() {
             const days = []; for (let i = 0; i < 7; i++) {
                 const d = new Date(); d.setDate(d.getDate() + viewOffset + i);
@@ -611,21 +568,21 @@
             const todayStr = `${new Date().getDate()}/${new Date().getMonth() + 1}`;
             document.querySelectorAll('.active').forEach(t => t.classList.remove('active'));
             const tabs = document.querySelectorAll('.shift-tab');
-            if(currentShift === '1st') tabs[0].classList.add('active'); if(currentShift === '2nd') tabs[1].classList.add('active'); if(currentShift === '3rd') tabs[2].classList.add('active');
+            if (currentShift === '1st') tabs[0].classList.add('active'); if (currentShift === '2nd') tabs[1].classList.add('active'); if (currentShift === '3rd') tabs[2].classList.add('active');
             const shiftEmps = db.emps.filter(e => e.shift === currentShift || (currentShift === '1st' && !e.shift));
 
-            const makeCard = (title, emps, label, color) => {
+            const makeCard = (title, emps, color) => {
                 const podId = `${currentShift}-${title}`;
                 let html = `
                 <div class="pod-card">
                     <div class="pod-header" style="background:${color}15; color:${color};"><strong>${title}</strong></div>
-                    <div style="padding:15px;"><textarea onblur="saveNote('${podId}', this.value)" style="height:40px;">${db.notes?.[podId] || ""}</textarea></div>
+                    <div style="padding:15px;"><textarea onblur="saveNote('${podId}', this.value)" style="height:40px;" placeholder="Notes...">${db.notes?.[podId] || ""}</textarea></div>
                     <div class="table-wrap">
                         <table><thead><tr>
                             <th class="sc-sticky sc-1">Team</th><th class="sc-sticky sc-2">Model</th>
                             ${days.map(d => `<th style="${d === todayStr ? 'background:#f97316;color:#fff;' : ''}">${d}</th>`).join('')}
                         </tr></thead><tbody>`;
-                
+
                 if (!emps.length) html += `<tr><td colspan="${2 + days.length}" style="padding:40px; color:#94a3b8;">Empty Pod</td></tr>`;
                 else emps.forEach(e => {
                     html += `<tr>`;
@@ -633,7 +590,7 @@
                         const raw = db.sched[e.id]?.[d] || 'WORKING';
                         const st = typeof raw === 'object' ? raw.status : raw;
                         const iso = getIsoDate(d);
-                        const sale = db.sales?.[e.id]?.[iso] ? `<div style="color:#10b981; margin-top:4px;">$${db.sales[e.id][iso]}</div>` : '';
+                        const sale = db.sales?.[e.id]?.[iso] ? `<div style="color:#10b981; margin-top:4px; font-weight:900;">$${db.sales[e.id][iso]}</div>` : '';
                         const dayTeam = (typeof raw === 'object' ? raw.team : null) || e.team || '-';
                         const dayModel = (typeof raw === 'object' ? raw.model : null) || e.model || '-';
                         return { dayTeam, dayModel, st, sale, d };
@@ -643,8 +600,8 @@
                     html += `<td class="sc-sticky sc-2" style="font-size:11px;">${todayData.dayModel}</td>`;
                     dayCells.forEach(cell => {
                         html += `<td onclick="openM(${e.id},'${cell.d}')" style="cursor:pointer; ${cell.d === todayStr ? 'background:#fff7ed;' : ''}">
-                            <div style="font-size:11px; font-weight:800; margin-bottom:5px; color:var(--slate-800);">${e.name}</div>
-                            <div class="st-${cell.st}">${cell.st==='WORKING'?'✓':cell.st}</div>
+                            <div style="font-size:11px; font-weight:900; margin-bottom:5px; color:#0f172a;">${e.name}</div>
+                            <div class="st-${cell.st}">${cell.st === 'WORKING' ? '✓' : cell.st}</div>
                             ${cell.dayTeam !== todayData.dayTeam ? `<div style="font-size:9px; color:#94a3b8;">(${cell.dayTeam})</div>` : ''}
                             ${cell.sale}
                         </td>`;
@@ -653,10 +610,10 @@
                 });
                 container.innerHTML += html + '</tbody></table></div></div>';
             };
-            makeCard('POD A', shiftEmps.filter(e => e.pod === 'A'), 'CHATTER', '#3b82f6');
-            makeCard('POD B', shiftEmps.filter(e => e.pod === 'B'), 'CHATTER', '#22c55e');
-            makeCard('POD F', shiftEmps.filter(e => e.pod === 'F'), 'CHATTER', '#ef4444');
-            makeCard('BACKUP', shiftEmps.filter(e => e.pod === 'BACKUP'), 'BACKUP', '#f59e0b');
+            makeCard('POD A', shiftEmps.filter(e => e.pod === 'A'), '#3b82f6');
+            makeCard('POD B', shiftEmps.filter(e => e.pod === 'B'), '#22c55e');
+            makeCard('POD F', shiftEmps.filter(e => e.pod === 'F'), '#ef4444');
+            makeCard('BACKUP', shiftEmps.filter(e => e.pod === 'BACKUP'), '#f59e0b');
         }
 
         function showStats() {
@@ -670,17 +627,17 @@
         function updateStatsData() {
             const startD = new Date(document.getElementById('stats-start').value + 'T00:00:00');
             const endD = new Date(document.getElementById('stats-end').value + 'T23:59:59');
-            let w=0, a=0, s=0, o=0, revenue=0;
+            let w = 0, a = 0, s = 0, o = 0, revenue = 0;
             db.emps.forEach(emp => {
-                if(statsShift !== 'ALL' && emp.shift !== statsShift) return;
-                for (let d = new Date(startD); d <= endD; d.setDate(d.getDate()+1)) {
-                    const key = `${d.getDate()}/${d.getMonth()+1}`;
+                if (statsShift !== 'ALL' && emp.shift !== statsShift) return;
+                for (let d = new Date(startD); d <= endD; d.setDate(d.getDate() + 1)) {
+                    const key = `${d.getDate()}/${d.getMonth() + 1}`;
                     const raw = db.sched[emp.id]?.[key] || 'WORKING';
-                    const st = typeof raw === 'object' ? raw.status : raw;
-                    if(st==='WORKING') w++; else if(st==='ABSENT') a++; else if(st==='SICK') s++; else if(st==='OFF') o++;
+                    const st = (typeof raw === 'object') ? raw.status : raw;
+                    if (st === 'WORKING') w++; else if (st === 'ABSENT') a++; else if (st === 'SICK') s++; else if (st === 'OFF') o++;
                 }
-                if(db.sales?.[emp.id]) Object.entries(db.sales[emp.id]).forEach(([iso, val]) => {
-                    const d = new Date(iso + 'T12:00:00'); if(d >= startD && d <= endD) revenue += val;
+                if (db.sales?.[emp.id]) Object.entries(db.sales[emp.id]).forEach(([iso, val]) => {
+                    const d = new Date(iso + 'T12:00:00'); if (d >= startD && d <= endD) revenue += val;
                 });
             });
             document.getElementById('st-work').innerText = w; document.getElementById('st-absent').innerText = a; document.getElementById('st-sick').innerText = s; document.getElementById('st-off').innerText = o;
@@ -690,14 +647,16 @@
             const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
             const a = document.createElement('a'); a.href = s; a.download = `Backup_${new Date().toLocaleDateString()}.json`; a.click();
         }
-        function startApp() { if(document.getElementById('pass-in').value==='0129') { localStorage.setItem('SF_LOGGED','true'); initData(); } else alert("PIN Error"); }
+        function startApp() { if (document.getElementById('pass-in').value === '0129') { localStorage.setItem('SF_LOGGED', 'true'); initData(); } else alert("PIN Error"); }
         function logout() { localStorage.removeItem('SF_LOGGED'); location.reload(); }
-        function hardReset() { if(confirm("Wipe all data?")) { localStorage.clear(); location.reload(); } }
-        if(localStorage.getItem('SF_LOGGED')) initData();
+        function hardReset() { if (confirm("Wipe all data?")) { localStorage.clear(); location.reload(); } }
+        if (localStorage.getItem('SF_LOGGED')) initData();
     </script>
 </body>
 
 </html>
+
+
 
 
 
